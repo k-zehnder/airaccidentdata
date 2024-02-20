@@ -1,0 +1,185 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API server for airaccidentdata.com",
+        "title": "AirAccidentData API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/api/v1",
+    "paths": {
+        "/accidents": {
+            "get": {
+                "description": "Get list of all aviation accidents",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accidents"
+                ],
+                "summary": "Get list of Accidents",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AircraftAccident"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.AircraftAccident": {
+            "type": "object",
+            "properties": {
+                "aircraftDamageDescription": {
+                    "type": "string"
+                },
+                "aircraftMakeName": {
+                    "type": "string"
+                },
+                "aircraftMissingFlag": {
+                    "type": "string"
+                },
+                "aircraftModelName": {
+                    "type": "string"
+                },
+                "aircraftOperator": {
+                    "type": "string"
+                },
+                "cabinCrewInjuryFatal": {
+                    "type": "integer"
+                },
+                "cabinCrewInjuryMinor": {
+                    "type": "integer"
+                },
+                "cabinCrewInjuryNone": {
+                    "type": "integer"
+                },
+                "cabinCrewInjurySerious": {
+                    "type": "integer"
+                },
+                "cabinCrewInjuryUnknown": {
+                    "type": "integer"
+                },
+                "entryDate": {
+                    "type": "string"
+                },
+                "eventLocalDate": {
+                    "type": "string"
+                },
+                "eventLocalTime": {
+                    "type": "string"
+                },
+                "eventTypeDescription": {
+                    "type": "string"
+                },
+                "farPart": {
+                    "type": "string"
+                },
+                "fatalFlag": {
+                    "type": "string"
+                },
+                "flightActivity": {
+                    "type": "string"
+                },
+                "flightCrewInjuryFatal": {
+                    "type": "integer"
+                },
+                "flightCrewInjuryMinor": {
+                    "type": "integer"
+                },
+                "flightCrewInjuryNone": {
+                    "type": "integer"
+                },
+                "flightCrewInjurySerious": {
+                    "type": "integer"
+                },
+                "flightCrewInjuryUnknown": {
+                    "type": "integer"
+                },
+                "flightNumber": {
+                    "type": "string"
+                },
+                "flightPhase": {
+                    "type": "string"
+                },
+                "fsdoDescription": {
+                    "type": "string"
+                },
+                "groundInjuryFatal": {
+                    "type": "integer"
+                },
+                "groundInjuryMinor": {
+                    "type": "integer"
+                },
+                "groundInjuryNone": {
+                    "type": "integer"
+                },
+                "groundInjurySerious": {
+                    "type": "integer"
+                },
+                "groundInjuryUnknown": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "locationCityName": {
+                    "type": "string"
+                },
+                "locationCountryName": {
+                    "type": "string"
+                },
+                "locationStateName": {
+                    "type": "string"
+                },
+                "maxInjuryLevel": {
+                    "type": "string"
+                },
+                "passengerInjuryFatal": {
+                    "type": "integer"
+                },
+                "passengerInjuryMinor": {
+                    "type": "integer"
+                },
+                "passengerInjuryNone": {
+                    "type": "integer"
+                },
+                "passengerInjurySerious": {
+                    "type": "integer"
+                },
+                "passengerInjuryUnknown": {
+                    "type": "integer"
+                },
+                "registrationNumber": {
+                    "type": "string"
+                },
+                "remarkText": {
+                    "type": "string"
+                },
+                "updated": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
