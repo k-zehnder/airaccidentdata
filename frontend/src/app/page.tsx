@@ -52,7 +52,7 @@ const Home = () => {
         <div>
           {accidents.map((accident) => (
             <div key={accident.id} className="border-b-2 py-4">
-              <Link legacyBehavior href={`/accidents/${accident.id}`}>
+              <Link legacyBehavior href={`/accidents/${accident.registrationNumber}`}>
                 <a>
                   <h2 className="text-2xl font-semibold">
                     {accident.registrationNumber}: {accident.aircraftMakeName} {accident.aircraftModelName}

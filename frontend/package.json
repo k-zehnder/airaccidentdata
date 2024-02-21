@@ -1,5 +1,5 @@
 {
-  "name": "zuplo-openai-paywall",
+  "name": "airaccidentdata",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,15 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth0/auth0-react": "^2.2.4",
-    "@auth0/nextjs-auth0": "^3.5.0",
     "@clerk/nextjs": "^4.29.7",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-slot": "^1.0.2",
-    "@zuplo/react-api-key-manager": "^2.5.0",
-    "@zuplo/runtime": "^5.1812.0",
     "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -28,8 +24,7 @@
     "react-dom": "^18",
     "stripe": "^14.11.0",
     "tailwind-merge": "^2.2.1",
-    "tailwindcss-animate": "^1.0.7",
-    "zustand": "^4.5.0"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",
