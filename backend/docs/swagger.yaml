@@ -1,5 +1,18 @@
 basePath: /api/v1
 definitions:
+  models.AccidentResponse:
+    properties:
+      accidents:
+        items:
+          $ref: '#/definitions/models.AircraftAccident'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
   models.AircraftAccident:
     properties:
       aircraftDamageDescription:
@@ -102,16 +115,27 @@ info:
 paths:
   /accidents:
     get:
-      description: Get list of all aviation accidents
+      description: Get list of all aviation accidents with pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of accidents per page
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.AircraftAccident'
-            type: array
+            $ref: '#/definitions/models.AccidentResponse'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:

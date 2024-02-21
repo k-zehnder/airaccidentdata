@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/accidents": {
             "get": {
-                "description": "Get list of all aviation accidents",
+                "description": "Get list of all aviation accidents with pagination",
                 "produces": [
                     "application/json"
                 ],
@@ -25,14 +25,31 @@ const docTemplate = `{
                     "Accidents"
                 ],
                 "summary": "Get list of Accidents",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of accidents per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.AircraftAccident"
-                            }
+                            "$ref": "#/definitions/models.AccidentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "500": {
@@ -46,6 +63,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.AccidentResponse": {
+            "type": "object",
+            "properties": {
+                "accidents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.AircraftAccident"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.AircraftAccident": {
             "type": "object",
             "properties": {

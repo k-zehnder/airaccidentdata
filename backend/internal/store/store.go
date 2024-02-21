@@ -4,14 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 
-	// Import the MySQL driver with a blank identifier to ensure its `init()` function is executed.
 	"github.com/computers33333/airaccidentdata/internal/models"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 // StoreInterface defines the methods that our store implementations must have.
 type StoreInterface interface {
-	GetAccidents([]*models.AircraftAccident, error)
+	GetAccidents(page, limit int) ([]*models.AircraftAccident, int, error)
 }
 
 // Store satisfies the StoreInterface.
@@ -36,21 +35,22 @@ func NewStore(dataSourceName string) (*Store, error) {
 	return &Store{db: db}, nil
 }
 
-// Method on the Store type that returns a slice of pointers and an error.
-// This method can modify state because it has a pointer receiver.
-func (s *Store) GetAccidents() ([]*models.AircraftAccident, error) {
+// GetAccidents fetches a specific page of aircraft accidents from the database.
+func (s *Store) GetAccidents(page int, limit int) ([]*models.AircraftAccident, int, error) {
 	var incidents []*models.AircraftAccident
 
-	// Query to fetch all incidents from the database
-	rows, err := s.db.Query("SELECT * FROM AircraftAccidents ORDER BY id DESC LIMIT 30;")
+	offset := (page - 1) * limit
+	query := `SELECT * FROM AircraftAccidents ORDER BY id DESC LIMIT ? OFFSET ?;`
+
+	// Fetch the accidents from the database
+	rows, err := s.db.Query(query, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, 0, fmt.Errorf("query execution error: %w", err)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var incident models.AircraftAccident
-
 		// Scan each column in the row into the corresponding field of the AircraftIncident struct
 		if err := rows.Scan(
 			&incident.ID, &incident.Updated, &incident.EntryDate, &incident.EventLocalDate,
@@ -68,7 +68,7 @@ func (s *Store) GetAccidents() ([]*models.AircraftAccident, error) {
 			&incident.GroundInjuryNone, &incident.GroundInjuryMinor, &incident.GroundInjurySerious,
 			&incident.GroundInjuryFatal, &incident.GroundInjuryUnknown,
 		); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		incidents = append(incidents, &incident)
@@ -76,9 +76,16 @@ func (s *Store) GetAccidents() ([]*models.AircraftAccident, error) {
 
 	// Handle any iteration errors.
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	// Return a slice of AircraftIncident pointers and an error.
-	return incidents, nil
+	// Fetch total count of incidents for pagination
+	var totalCount int
+	countQuery := "SELECT COUNT(*) FROM AircraftAccidents;"
+	err = s.db.QueryRow(countQuery).Scan(&totalCount)
+	if err != nil {
+		return nil, 0, fmt.Errorf("count query error: %w", err)
+	}
+
+	return incidents, totalCount, nil
 }

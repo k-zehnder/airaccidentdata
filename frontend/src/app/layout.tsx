@@ -26,9 +26,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         >
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="relative flex min-h-screen flex-col">
-              <main className="flex w-full flex-1 flex-col overflow-hidden">
+              <div className="flex w-full flex-1 flex-col overflow-hidden">
                 {children}
-              </main>
+              </div>
             </div>
           </ThemeProvider>
         </body>
