@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Link from 'next/link';
-import { Header } from '@/components/header';
-import Pagination from '@/components/pagination';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Link from "next/link";
+import { Header } from "@/components/header";
+import Pagination from "@/components/pagination";
 
 interface Accident {
   id: number;
@@ -12,6 +12,7 @@ interface Accident {
   remarkText: string;
   aircraftMakeName: string;
   aircraftModelName: string;
+  eventLocalDate: string;
   link: string;
 }
 
@@ -25,20 +26,34 @@ const Home = () => {
     const fetchAccidents = async () => {
       setFetching(true);
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_ENV === 'development'
-          ? `http://localhost:8080/api/v1/accidents?page=${currentPage}`
-          : `https://airaccidentdata.com/api/v1/accidents?page=${currentPage}`;
-        const response = await axios.get<{ accidents: Accident[], total: number }>(apiUrl);
+        const apiUrl =
+          process.env.NEXT_PUBLIC_ENV === "development"
+            ? `http://localhost:8080/api/v1/accidents?page=${currentPage}`
+            : `https://airaccidentdata.com/api/v1/accidents?page=${currentPage}`;
+        const response = await axios.get<{
+          accidents: Accident[];
+          total: number;
+        }>(apiUrl);
         setAccidents(response.data.accidents);
         setTotalPages(Math.ceil(response.data.total / 10)); // 10 accidents per page
       } catch (error) {
-        console.error('Error fetching accidents:', error);
+        console.error("Error fetching accidents:", error);
       }
       setFetching(false);
     };
 
     fetchAccidents();
   }, [currentPage]);
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", options);
+  };
 
   if (isFetching) return <div>Loading...</div>;
 
@@ -52,18 +67,26 @@ const Home = () => {
         <div>
           {accidents.map((accident) => (
             <div key={accident.id} className="border-b-2 py-4">
-              <Link legacyBehavior href={`/accidents/${accident.registrationNumber}`}>
+              <span className="text-gray-500 text-sm block lg:text-base mb-1">
+                {formatDate(accident.eventLocalDate)}
+              </span>
+              <Link legacyBehavior href={`/accidents/${accident.id}`}>
                 <a>
                   <h2 className="text-2xl font-semibold">
-                    {accident.registrationNumber}: {accident.aircraftMakeName} {accident.aircraftModelName}
+                    {accident.registrationNumber}: {accident.aircraftMakeName}{" "}
+                    {accident.aircraftModelName}
                   </h2>
-                  <p className="text-gray-600">{accident.remarkText}</p>
+                  <p className="text-gray-500">{accident.remarkText}</p>
                 </a>
               </Link>
             </div>
           ))}
         </div>
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </main>
     </>
   );
