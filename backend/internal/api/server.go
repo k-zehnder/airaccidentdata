@@ -11,7 +11,7 @@ func NewServer(store *store.Store) *gin.Engine {
 	log := logrus.New()
 	log.SetFormatter(&logrus.JSONFormatter{})
 
-	// Create a Gin router with the custom logger
+	// Create a Gin router with the custom logger and server
 	router := router.SetupRouter(store, log)
 
 	return router
