@@ -40,7 +40,7 @@ func (s *Store) GetAccidents(page int, limit int) ([]*models.AircraftAccident, i
 	var incidents []*models.AircraftAccident
 
 	offset := (page - 1) * limit
-	query := `SELECT * FROM AircraftAccidents ORDER BY id DESC LIMIT ? OFFSET ?;`
+	query := `SELECT * FROM AircraftAccidents ORDER BY entry_date DESC LIMIT ? OFFSET ?;`
 
 	// Fetch the accidents from the database
 	rows, err := s.db.Query(query, limit, offset)
