@@ -5,6 +5,7 @@ import axios from "axios";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import Pagination from "@/components/pagination";
+import { FaPlane } from 'react-icons/fa';
 
 interface Accident {
   id: number;
@@ -70,7 +71,7 @@ const Home = () => {
               <span className="text-gray-500 text-sm block lg:text-base mb-1">
                 {formatDate(accident.eventLocalDate)}
               </span>
-              <Link legacyBehavior href={`/accidents/${accident.id}`}>
+              <Link legacyBehavior href={`/accidents/${accident.registrationNumber}`}>
                 <a>
                   <h2 className="text-2xl font-semibold">
                     {accident.registrationNumber}: {accident.aircraftMakeName}{" "}

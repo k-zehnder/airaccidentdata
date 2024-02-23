@@ -33,7 +33,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ~/mysql_data:/var/lib/mysql
+      - accident_data:/var/lib/mysql
     networks:
       - app-network
     env_file:
@@ -62,5 +62,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
+  accident_data:
     driver: local
