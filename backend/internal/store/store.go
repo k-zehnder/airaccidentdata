@@ -36,7 +36,7 @@ func NewStore(dataSourceName string) (*Store, error) {
 }
 
 // GetAccidents fetches a specific page of aircraft accidents from the database.
-func (s *Store) GetAccidents(page int, limit int) ([]*models.AircraftAccident, int, error) {
+func (s *Store) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, error) {
 	var incidents []*models.AircraftAccident
 
 	offset := (page - 1) * limit

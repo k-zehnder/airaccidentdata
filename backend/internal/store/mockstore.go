@@ -28,7 +28,7 @@ func (ms *MockStore) SaveAccidents(accidents []*models.AircraftAccident) error {
 
 // GetAccidents simulates fetching accidents, returning a predefined error if set.
 // On success, it returns a slice of pointers to the internal accdents.
-func (ms *MockStore) GetAccidents(page int, limit int) ([]*models.AircraftAccident, int, error) {
+func (ms *MockStore) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, error) {
 	if ms.QueryError != nil {
 		return nil, 0, ms.QueryError
 	}

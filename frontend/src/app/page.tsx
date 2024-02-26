@@ -1,10 +1,12 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Link from "next/link";
-import { Header } from "@/components/header";
-import Pagination from "@/components/pagination";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Link from 'next/link';
+import { Header } from '@/components/header';
+import Pagination from '@/components/pagination';
+// import { Button } from "@/components/ui/button"
+import { Badge } from '@/components/ui/badge';
 
 interface Accident {
   id: number;
@@ -13,6 +15,7 @@ interface Accident {
   aircraftMakeName: string;
   aircraftModelName: string;
   entryDate: string;
+  fatalFlag: string;
   link: string;
 }
 
@@ -27,7 +30,7 @@ const Home = () => {
       setFetching(true);
       try {
         const apiUrl =
-          process.env.NEXT_PUBLIC_ENV === "development"
+          process.env.NEXT_PUBLIC_ENV === 'development'
             ? `http://localhost:8080/api/v1/accidents?page=${currentPage}`
             : `https://airaccidentdata.com/api/v1/accidents?page=${currentPage}`;
         const response = await axios.get<{
@@ -37,7 +40,7 @@ const Home = () => {
         setAccidents(response.data.accidents);
         setTotalPages(Math.ceil(response.data.total / 10)); // 10 accidents per page
       } catch (error) {
-        console.error("Error fetching accidents:", error);
+        console.error('Error fetching accidents:', error);
       }
       setFetching(false);
     };
@@ -47,12 +50,12 @@ const Home = () => {
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     };
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", options);
+    return date.toLocaleDateString('en-US', options);
   };
 
   if (isFetching) return <div>Loading...</div>;
@@ -70,12 +73,20 @@ const Home = () => {
               <span className="text-gray-500 text-sm block lg:text-base mb-1">
                 {formatDate(accident.entryDate)}
               </span>
-              <Link legacyBehavior href={`/accidents/${accident.registrationNumber}`}>
+              <Link
+                legacyBehavior
+                href={`/accidents/${accident.registrationNumber}`}
+              >
                 <a>
                   <h2 className="text-2xl font-semibold">
-                    {accident.registrationNumber}: {accident.aircraftMakeName}{" "}
+                    {accident.registrationNumber}: {accident.aircraftMakeName}{' '}
                     {accident.aircraftModelName}
                   </h2>
+                  {accident.fatalFlag === 'Yes' ? (
+                    <Badge key={accident.id} className="bg-red-500 mb-2">
+                      Fatalities
+                    </Badge>
+                  ) : null}
                   <p className="text-gray-500">{accident.remarkText}</p>
                 </a>
               </Link>

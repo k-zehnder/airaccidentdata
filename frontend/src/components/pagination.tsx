@@ -21,7 +21,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       {currentPage > 1 && (
         <button
           onClick={() => onPageChange(currentPage - 1)}
-          className="mx-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
+          className="mx-2 px-4 py-2 bg-foreground text-white rounded hover:bg-foreground focus:outline-none focus:ring-2 focus:bg-foreground focus:ring-opacity-50"
         >
           Previous
         </button>
@@ -31,7 +31,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
         <button
           key={page}
           onClick={() => onPageChange(page)}
-          className={`mx-1 px-3 py-2 text-sm font-medium ${currentPage === page ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'} rounded hover:bg-blue-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
+          className={`mx-1 px-3 py-2 text-sm font-medium ${currentPage === page ? 'bg-foreground text-white' : 'bg-white text-gray-700'} rounded hover:bg-foreground hover:text-white focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-opacity-50`}
         >
           {page}
         </button>
@@ -40,7 +40,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       {currentPage < totalPages && (
         <button
           onClick={() => onPageChange(currentPage + 1)}
-          className="mx-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
+          className="mx-2 px-4 py-2 bg-foreground text-white rounded hover:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
         >
           Next
         </button>
