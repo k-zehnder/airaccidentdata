@@ -33,7 +33,6 @@ const AccidentDetail = ({
     const fetchAccidentDetails = async () => {
       try {
         const response = await client.get<AccidentDetails>(`/accidents/${registrationNumber}`);
-        console.log(response.data);
         setAccidentDetails(response.data);
       } catch (error) {
         console.error('Error fetching accident details:', error);

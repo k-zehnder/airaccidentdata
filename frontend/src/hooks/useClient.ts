@@ -1,14 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
 
-// Define the structure of the accident details
-interface AccidentDetails {
-  date: string;
-  aircraftModel: string;
-  location: string;
-  summary: string;
-  recommendations: string[];
-}
-
 // Define the structure of the Axios client
 interface APIClient extends AxiosInstance {}
 
