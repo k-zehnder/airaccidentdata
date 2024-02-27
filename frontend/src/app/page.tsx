@@ -116,7 +116,7 @@ const Home = () => {
                     accident.groundInjuryFatal !== 0 ||
                     accident.groundInjuryUnknown !== 0) && (
                     <Badge key={accident.id} className="bg-yellow-500 mb-1">
-                      Injury
+                      Injuries
                     </Badge>
                   )}
                   <p className="text-gray-500">{accident.remarkText}</p>
