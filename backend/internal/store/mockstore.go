@@ -1,6 +1,10 @@
 package store
 
-import "github.com/computers33333/airaccidentdata/internal/models"
+import (
+	"fmt"
+
+	"github.com/computers33333/airaccidentdata/internal/models"
+)
 
 type MockStore struct {
 	Accidents  []*models.AircraftAccident
@@ -9,9 +13,9 @@ type MockStore struct {
 
 // NewMockStore initializes a MockStore with predefined accidents and potential errors.
 // It's designed for setting up tests with controlled data and error handling.
-func NewMockStore(incidents []*models.AircraftAccident, queryError error) *MockStore {
+func NewMockStore(accidents []*models.AircraftAccident, queryError error) *MockStore {
 	return &MockStore{
-		Accidents:  incidents,
+		Accidents:  accidents,
 		QueryError: queryError,
 	}
 }
@@ -27,7 +31,7 @@ func (ms *MockStore) SaveAccidents(accidents []*models.AircraftAccident) error {
 }
 
 // GetAccidents simulates fetching accidents, returning a predefined error if set.
-// On success, it returns a slice of pointers to the internal accdents.
+// On success, it retrns a slice of pointers to the internal accdents.
 func (ms *MockStore) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, error) {
 	if ms.QueryError != nil {
 		return nil, 0, ms.QueryError
@@ -42,4 +46,14 @@ func (ms *MockStore) GetAccidents(page, limit int) ([]*models.AircraftAccident, 
 		end = len(ms.Accidents)
 	}
 	return ms.Accidents[start:end], len(ms.Accidents), nil
+}
+
+// GetAccidentByRegistration simulates fetching a single accident by registration number.
+func (ms *MockStore) GetAccidentByRegistration(registrationNumber string) (*models.AircraftAccident, error) {
+	for _, accident := range ms.Accidents {
+		if accident.RegistrationNumber == registrationNumber {
+			return accident, nil
+		}
+	}
+	return nil, fmt.Errorf("no accident found with registration number: %s", registrationNumber)
 }

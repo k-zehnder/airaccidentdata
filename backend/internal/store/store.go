@@ -89,3 +89,44 @@ func (s *Store) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, 
 
 	return incidents, totalCount, nil
 }
+
+// GetAccidentByRegistration fetches a single accident from the database based on registration number.
+func (s *Store) GetAccidentByRegistration(registrationNumber string) (*models.AircraftAccident, error) {
+	query := `SELECT * FROM AircraftAccidents WHERE registration_number = ?;`
+
+	// Execute the query to fetch the accident with the given registration number.
+	row := s.db.QueryRow(query, registrationNumber)
+
+	// Initialize a new AircraftAccident struct to hold the result.
+	var accident models.AircraftAccident
+
+	// Scan the row into the Accident struct fields.
+	err := row.Scan(
+		&accident.ID, &accident.Updated, &accident.EntryDate, &accident.EventLocalDate,
+		&accident.EventLocalTime, &accident.LocationCityName, &accident.LocationStateName,
+		&accident.LocationCountryName, &accident.RemarkText, &accident.EventTypeDescription,
+		&accident.FSDODescription, &accident.RegistrationNumber, &accident.FlightNumber,
+		&accident.AircraftOperator, &accident.AircraftMakeName, &accident.AircraftModelName,
+		&accident.AircraftMissingFlag, &accident.AircraftDamageDescription, &accident.FlightActivity,
+		&accident.FlightPhase, &accident.FARPart, &accident.MaxInjuryLevel, &accident.FatalFlag,
+		&accident.FlightCrewInjuryNone, &accident.FlightCrewInjuryMinor, &accident.FlightCrewInjurySerious,
+		&accident.FlightCrewInjuryFatal, &accident.FlightCrewInjuryUnknown, &accident.CabinCrewInjuryNone,
+		&accident.CabinCrewInjuryMinor, &accident.CabinCrewInjurySerious, &accident.CabinCrewInjuryFatal,
+		&accident.CabinCrewInjuryUnknown, &accident.PassengerInjuryNone, &accident.PassengerInjuryMinor,
+		&accident.PassengerInjurySerious, &accident.PassengerInjuryFatal, &accident.PassengerInjuryUnknown,
+		&accident.GroundInjuryNone, &accident.GroundInjuryMinor, &accident.GroundInjurySerious,
+		&accident.GroundInjuryFatal, &accident.GroundInjuryUnknown,
+	)
+
+	// Handle the case where no rows were returned.
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("no accident found with registration number: %s", registrationNumber)
+	}
+
+	// Handle any other errors that may have occurred during scanning.
+	if err != nil {
+		return nil, fmt.Errorf("error scanning row: %w", err)
+	}
+
+	return &accident, nil
+}

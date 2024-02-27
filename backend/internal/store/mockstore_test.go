@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/computers33333/airaccidentdata/internal/models"
@@ -147,5 +148,48 @@ func TestMockStore_SaveAccidents_Error(t *testing.T) {
 	// Verify that the error returned by SaveAccidents matches the simulated error.
 	if err != simulatedError {
 		t.Errorf("Expected error '%v', got '%v'", simulatedError, err)
+	}
+}
+
+// TestMockStore_GetAccidentByReg tests the GetAccidentByReg method of the MockStore,
+// in a positive scenario where the accident is successfully fetched.
+func TestMockStore_GetAccidentByRegistration(t *testing.T) {
+	// Initialize a MockStore with a predefined accident.
+	expectedAccident := &models.AircraftAccident{RegistrationNumber: "1234"}
+	mockStore := NewMockStore([]*models.AircraftAccident{expectedAccident}, nil)
+
+	// Retrieve the accident by registration number from the MockStore.
+	accident, err := mockStore.GetAccidentByRegistration("1234")
+
+	// Verify that no error occurred.
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	// Verify that the fetched accident matches the expected one.
+	if accident.RegistrationNumber != expectedAccident.RegistrationNumber {
+		t.Fatalf("Expected registration number %s, got %s", expectedAccident.RegistrationNumber, accident.RegistrationNumber)
+	}
+}
+
+// TestMockStore_GetAccidentByRegistration_Error tests the error handling in the GetAccidentByReg method
+// of the MockStore. It ensures the method correctly returns an error when a simulated error is present.
+func TestMockStore_GetAccidentByRegistration_Error(t *testing.T) {
+	// Create a simulated error for testing error handling.
+	expectedError := fmt.Errorf("no accident found with registration number: %s", "1234")
+
+	// Initialize a MockStore with the simulated error.
+	mockStore := NewMockStore(nil, nil) // No accidents, so GetAccidentByReg should return an error.
+
+	// Attempt to retrieve the accident by registration number from the MockStore,
+	// expecting an error due to the absence of accidents.
+	_, err := mockStore.GetAccidentByRegistration("1234")
+
+	// Verify that an error was returned and matches the expected error.
+	if err == nil {
+		t.Fatal("Expected an error, got nil")
+	}
+	if err.Error() != expectedError.Error() {
+		t.Fatalf("Expected error '%v', got '%v'", expectedError, err)
 	}
 }
