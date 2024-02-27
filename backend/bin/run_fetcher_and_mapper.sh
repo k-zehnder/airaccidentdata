@@ -13,13 +13,16 @@ fi
 
 # Check for command line option to drop the existing database
 if [[ $1 == "--drop-db" ]]; then
-    echo "Dropping existing 'planecrashdata' database..."
-    mysql -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" -e "DROP DATABASE IF EXISTS planecrashdata;"
+    echo "Dropping existing 'airaccidentdata' database..."
+    mysql -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" -e "DROP DATABASE IF EXISTS airaccidentdata;"
 fi
 
 # Continue with the script to fetch and map data
 echo "Fetching data..."
 go run cmd/fetcher/main.go
+
+# echo "Sorting data..."
+# ??
 
 echo "Mapping data..."
 go run cmd/mapper/main.go
