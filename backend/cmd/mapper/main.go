@@ -35,7 +35,7 @@ func main() {
 	defer db.Close()
 
 	// Open CSV file
-	file, err := os.Open("downloaded_file.csv")
+	file, err := os.Open("sorted_downloaded_file.csv")
 	if err != nil {
 		log.Fatalf("Failed to open file: %v", err)
 	}
