@@ -1,11 +1,10 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import Pagination from '@/components/pagination';
-// import { Button } from "@/components/ui/button"
 import { Badge } from '@/components/ui/badge';
 
 interface Accident {
@@ -16,7 +15,26 @@ interface Accident {
   aircraftModelName: string;
   entryDate: string;
   fatalFlag: string;
-  link: string;
+  flightCrewInjuryNone: number;
+  flightCrewInjuryMinor: number;
+  flightCrewInjurySerious: number;
+  flightCrewInjuryFatal: number;
+  flightCrewInjuryUnknown: number;
+  cabinCrewInjuryNone: number;
+  cabinCrewInjuryMinor: number;
+  cabinCrewInjurySerious: number;
+  cabinCrewInjuryFatal: number;
+  cabinCrewInjuryUnknown: number;
+  passengerInjuryNone: number;
+  passengerInjuryMinor: number;
+  passengerInjurySerious: number;
+  passengerInjuryFatal: number;
+  passengerInjuryUnknown: number;
+  groundInjuryNone: number;
+  groundInjuryMinor: number;
+  groundInjurySerious: number;
+  groundInjuryFatal: number;
+  groundInjuryUnknown: number;
 }
 
 const Home = () => {
@@ -82,11 +100,25 @@ const Home = () => {
                     {accident.registrationNumber}: {accident.aircraftMakeName}{' '}
                     {accident.aircraftModelName}
                   </h2>
-                  {accident.fatalFlag === 'Yes' ? (
+                  {accident.fatalFlag === 'Yes' && (
                     <Badge key={accident.id} className="bg-red-500 mb-1">
                       Fatalities
                     </Badge>
-                  ) : null}
+                  )}
+                  {(accident.flightCrewInjurySerious !== 0 ||
+                    accident.flightCrewInjuryFatal !== 0 ||
+                    accident.flightCrewInjuryUnknown !== 0 ||
+                    accident.cabinCrewInjurySerious !== 0 ||
+                    accident.cabinCrewInjuryFatal !== 0 ||
+                    accident.passengerInjurySerious !== 0 ||
+                    accident.passengerInjuryFatal !== 0 ||
+                    accident.groundInjurySerious !== 0 ||
+                    accident.groundInjuryFatal !== 0 ||
+                    accident.groundInjuryUnknown !== 0) && (
+                    <Badge key={accident.id} className="bg-yellow-500 mb-1">
+                      Injuries
+                    </Badge>
+                  )}
                   <p className="text-gray-500">{accident.remarkText}</p>
                 </a>
               </Link>
