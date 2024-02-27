@@ -1,12 +1,11 @@
-'use client';
+To modularize the fetch logic into a custom hook called `useClient`, you can create a separate file for the hook and then utilize it within your component. Here's how you can do it:
 
-import React, { useState, useEffect } from 'react';
+First, create a new file called `useClient.ts` in your components directory:
+
+```typescript
+// components/useClient.ts
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Link from 'next/link';
-import { Header } from '@/components/header';
-import Pagination from '@/components/pagination';
-// import { Button } from "@/components/ui/button"
-import { Badge } from '@/components/ui/badge';
 
 interface Accident {
   id: number;
@@ -19,10 +18,9 @@ interface Accident {
   link: string;
 }
 
-const Home = () => {
+export const useClient = (currentPage: number) => {
   const [accidents, setAccidents] = useState<Accident[]>([]);
   const [totalPages, setTotalPages] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
   const [isFetching, setFetching] = useState(false);
 
   useEffect(() => {
@@ -48,15 +46,33 @@ const Home = () => {
     fetchAccidents();
   }, [currentPage]);
 
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    };
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', options);
+  return { accidents, totalPages, isFetching };
+};
+```
+
+Then, you can modify your `Home` component to use this hook:
+
+```typescript
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { Header } from '@/components/header';
+import Pagination from '@/components/pagination';
+import { Badge } from '@/components/ui/badge';
+import { useClient } from '@/components/useClient';
+
+const formatDate = (dateString: string) => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   };
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', options);
+};
+
+const Home = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const { accidents, totalPages, isFetching } = useClient(currentPage);
 
   if (isFetching) return <div>Loading...</div>;
 
@@ -83,7 +99,7 @@ const Home = () => {
                     {accident.aircraftModelName}
                   </h2>
                   {accident.fatalFlag === 'Yes' ? (
-                    <Badge key={accident.id} className="bg-red-500 mb-1">
+                    <Badge key={accident.id} className="bg-red-500 mb-2">
                       Fatalities
                     </Badge>
                   ) : null}
@@ -104,3 +120,6 @@ const Home = () => {
 };
 
 export default Home;
+```
+
+This separates the fetching logic into a reusable hook, `useClient`, which you can then use in any component that needs to fetch data from the API.

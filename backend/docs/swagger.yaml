@@ -143,4 +143,35 @@ paths:
       summary: Get list of Accidents
       tags:
       - Accidents
+  /accidents/{registration_number}:
+    get:
+      description: Get details of an aviation accident by its registration number
+      parameters:
+      - description: Registration number of the aircraft
+        in: path
+        name: registration_number
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Accident details
+          schema:
+            $ref: '#/definitions/models.AircraftAccident'
+        "400":
+          description: Invalid registration number
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Accident not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get accident by registration number
+      tags:
+      - Accidents
 swagger: "2.0"

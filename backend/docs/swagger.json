@@ -53,6 +53,53 @@
                     }
                 }
             }
+        },
+        "/accidents/{registration_number}": {
+            "get": {
+                "description": "Get details of an aviation accident by its registration number",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accidents"
+                ],
+                "summary": "Get accident by registration number",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Registration number of the aircraft",
+                        "name": "registration_number",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Accident details",
+                        "schema": {
+                            "$ref": "#/definitions/models.AircraftAccident"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid registration number",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Accident not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {

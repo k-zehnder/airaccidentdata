@@ -40,8 +40,9 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 	v1 := router.Group("/api/v1")
 	{
 		v1.GET("/accidents", controllers.GetAccidentsHandler(store, log))
+		v1.GET("/accidents/:registration_number", controllers.GetAccidentByRegistrationHandler(store, log))
 	}
 
-	// Return confiured router.
+	// Return configured router.
 	return router
 }

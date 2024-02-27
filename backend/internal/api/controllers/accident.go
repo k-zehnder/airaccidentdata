@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -55,5 +56,49 @@ func GetAccidentsHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc
 			"page":      page,
 			"limit":     limit,
 		})
+	}
+}
+
+// GetAccidentByRegistrationHandler creates a gin.HandlerFunc that handles requests to fetch an aviation accident by registration number.
+// @Summary Get accident by registration number
+// @Description Get details of an aviation accident by its registration number
+// @Tags Accidents
+// @Produce json
+// @Param registration_number path string true "Registration number of the aircraft"
+// @Success 200 {object} models.AircraftAccident "Accident details"
+// @Failure 400 {object} models.ErrorResponse "Invalid registration number"
+// @Failure 404 {object} models.ErrorResponse "Accident not found"
+// @Failure 500 {object} models.ErrorResponse "Internal Server Error"
+// @Router /accidents/{registration_number} [get]
+func GetAccidentByRegistrationHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extracting the registration number from the URL path parameters.
+		registrationNumber := c.Param("registration_number")
+
+		// Calling the GetAccidentByReg method of the store to retrieve the accident.
+		accident, err := store.GetAccidentByRegistration(registrationNumber)
+		if err != nil {
+			fmt.Println(err)
+			return
+			// // Handling specific error cases.
+			// switch err {
+			// case store.ErrInvalidRegistrationNumber:
+			// 	// Sending a bad request response for invalid registration number.
+			// 	c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid registration number"})
+			// case store.ErrAccidentNotFound:
+			// 	// Sending a not found response if the accident is not found.
+			// 	c.JSON(http.StatusNotFound, gin.H{"error": "Accident not found"})
+			// default:
+			// 	// Logging and sending an internal server error response for other errors.
+			// 	log.WithFields(logrus.Fields{
+			// 		"error": err.Error(),
+			// 	}).Error("Failed to get accident by registration number")
+			// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			// }
+			// return
+		}
+
+		// Responding with the accident details.
+		c.JSON(http.StatusOK, accident)
 	}
 }
