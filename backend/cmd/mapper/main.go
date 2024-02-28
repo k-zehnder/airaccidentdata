@@ -1,7 +1,3 @@
-// This program processes CSV data on aircraft incidents, importing it into a MySQL database.
-// It includes environment variable loading, database connection setup, CSV file parsing,
-// and data insertion with comprehensive error handling and logging.
-
 package main
 
 import (
@@ -13,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"time"
 
@@ -86,17 +83,28 @@ func processCSV(file *os.File, db *sql.DB) error {
 		return fmt.Errorf("failed to read headers: %w", err)
 	}
 
-	// Iteratively read each record
+	// Read all records into memory
+	var records [][]string
 	for {
 		record, err := reader.Read()
 		if err != nil {
 			if err == io.EOF {
 				break // End of file reached
 			}
-			// Log any errors encountered during reading, then stop processing.
 			return fmt.Errorf("error reading record: %w", err)
 		}
+		records = append(records, record)
+	}
 
+	// Sort records by ENTRY_DATE in descending order
+	sort.Slice(records, func(i, j int) bool {
+		entryDate1 := parseDate(records[i][1])
+		entryDate2 := parseDate(records[j][1])
+		return entryDate1.After(entryDate2)
+	})
+
+	// Iteratively insert sorted records into the database
+	for _, record := range records {
 		// Attempt to parse the current CSV record into an AircraftAccident structure.
 		incident, err := parseRecordToIncident(record)
 		if err != nil {

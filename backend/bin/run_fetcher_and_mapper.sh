@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# Navigate to the backend directory
-if [ -d "../" ]; then
-    echo "Navigating to backend directory..."
-    cd "../" || exit
+# Source .env file for MySQL credentials
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
 else
-    echo "Error: Backend directory not found."
+    echo "Error: .env file not found."
     exit 1
 fi
 
