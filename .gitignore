@@ -144,4 +144,6 @@ ssl
 nginx
 ca.pem
 reminders.txt
+sorted_downloaded_file.csv
 downloaded_file.csv
+venv
