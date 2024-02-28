@@ -1,70 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import Pagination from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
-
-interface Accident {
-  id: number;
-  registrationNumber: string;
-  remarkText: string;
-  aircraftMakeName: string;
-  aircraftModelName: string;
-  entryDate: string;
-  fatalFlag: string;
-  flightCrewInjuryNone: number;
-  flightCrewInjuryMinor: number;
-  flightCrewInjurySerious: number;
-  flightCrewInjuryFatal: number;
-  flightCrewInjuryUnknown: number;
-  cabinCrewInjuryNone: number;
-  cabinCrewInjuryMinor: number;
-  cabinCrewInjurySerious: number;
-  cabinCrewInjuryFatal: number;
-  cabinCrewInjuryUnknown: number;
-  passengerInjuryNone: number;
-  passengerInjuryMinor: number;
-  passengerInjurySerious: number;
-  passengerInjuryFatal: number;
-  passengerInjuryUnknown: number;
-  groundInjuryNone: number;
-  groundInjuryMinor: number;
-  groundInjurySerious: number;
-  groundInjuryFatal: number;
-  groundInjuryUnknown: number;
-}
+import { useAccidentData } from '../hooks/useAccidentData';
 
 const Home = () => {
-  const [accidents, setAccidents] = useState<Accident[]>([]);
-  const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isFetching, setFetching] = useState(false);
-
-  useEffect(() => {
-    const fetchAccidents = async () => {
-      setFetching(true);
-      try {
-        const apiUrl =
-          process.env.NEXT_PUBLIC_ENV === 'development'
-            ? `http://localhost:8080/api/v1/accidents?page=${currentPage}`
-            : `https://airaccidentdata.com/api/v1/accidents?page=${currentPage}`;
-        const response = await axios.get<{
-          accidents: Accident[];
-          total: number;
-        }>(apiUrl);
-        setAccidents(response.data.accidents);
-        setTotalPages(Math.ceil(response.data.total / 10)); // 10 accidents per page
-      } catch (error) {
-        console.error('Error fetching accidents:', error);
-      }
-      setFetching(false);
-    };
-
-    fetchAccidents();
-  }, [currentPage]);
+  const { accidents, totalPages, isFetching } = useAccidentData(currentPage);
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
