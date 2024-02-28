@@ -30,6 +30,9 @@ const Home = () => {
         <h1 className="text-4xl font-bold tracking-tight mb-6">
           Explore Aviation Accidents and Insights
         </h1>
+        <p className="max-w-[700px] text-lg text-muted-foreground">
+          Your gateway to understanding air travel incidents and promoting a safer flying future.
+        </p>
         <div>
           {accidents.map((accident) => (
             <div key={accident.id} className="border-b-2 py-4">
