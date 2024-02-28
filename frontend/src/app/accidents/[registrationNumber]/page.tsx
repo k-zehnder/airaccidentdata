@@ -1,46 +1,17 @@
 "use client";
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
 import { buttonVariants } from '@/components/ui/button';
-import { useClient } from '@/hooks/useClient';
-
-// Define the structure of the accident details
-interface AccidentDetails {
-  entryDate: string;
-  aircraftMakeName: string;
-  location: string;
-  summary: string;
-  recommendations: string[];
-  locationCityName: string;
-  locationStateName: string;
-  locationCountryName: string;
-  remarkText: string;
-  eventTypeDescription: string;
-}
+import { useFetchAccidentDetails } from '@/hooks/useAccidentData';
 
 const AccidentDetail = ({
   params,
 }: {
   params: { registrationNumber: string };
 }) => {
-  const [accidentDetails, setAccidentDetails] = useState<AccidentDetails | null>(null);
   const { registrationNumber } = params;
-  const client = useClient();
-
-  useEffect(() => {
-    const fetchAccidentDetails = async () => {
-      try {
-        const response = await client.get<AccidentDetails>(`/accidents/${registrationNumber}`);
-        setAccidentDetails(response.data);
-      } catch (error) {
-        console.error('Error fetching accident details:', error);
-      }
-    };
-
-    fetchAccidentDetails();
-  }, []);
+  const accidentDetails = useFetchAccidentDetails(registrationNumber);
 
   if (!accidentDetails) {
     return (
