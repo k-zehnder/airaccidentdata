@@ -1,5 +1,5 @@
 "use client";
-
+// Home component
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/header';
@@ -51,17 +51,19 @@ const Home = () => {
                     </Badge>
                   )}
                   {(accident.flightCrewInjurySerious !== 0 ||
-                    accident.flightCrewInjuryFatal !== 0 ||
-                    accident.flightCrewInjuryUnknown !== 0 ||
                     accident.cabinCrewInjurySerious !== 0 ||
-                    accident.cabinCrewInjuryFatal !== 0 ||
                     accident.passengerInjurySerious !== 0 ||
-                    accident.passengerInjuryFatal !== 0 ||
-                    accident.groundInjurySerious !== 0 ||
-                    accident.groundInjuryFatal !== 0 ||
-                    accident.groundInjuryUnknown !== 0) && (
+                    accident.groundInjurySerious !== 0) && (
                     <Badge key={accident.id} className="bg-yellow-500 mb-1">
-                      Injuries
+                      Serious Injuries
+                    </Badge>
+                  )}
+                  {(accident.flightCrewInjuryMinor !== 0 ||
+                    accident.cabinCrewInjuryMinor !== 0 ||
+                    accident.passengerInjuryMinor !== 0 ||
+                    accident.groundInjuryMinor !== 0) && (
+                    <Badge key={accident.id} className="bg-green-500 mb-1">
+                      Minor Injuries
                     </Badge>
                   )}
                   <p className="text-gray-500">{accident.remarkText}</p>
@@ -74,6 +76,7 @@ const Home = () => {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
+          darkMode={true} 
         />
       </main>
     </>

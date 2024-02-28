@@ -47,7 +47,6 @@ export const useFetchAccidentDetails = (registrationNumber: string) => {
             ? `http://localhost:8080/api/v1/accidents/${registrationNumber}`
             : `https://airaccidentdata.com/api/v1/accidents/${registrationNumber}`;
           const response = await axios.get<AccidentDetails>(apiUrl);
-          console.log(response.data);
           setAccidentDetails(response.data);
         }
       } catch (error) {
