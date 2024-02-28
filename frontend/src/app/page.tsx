@@ -18,7 +18,7 @@ const Home = () => {
     <>
       <Header />
       <main className="container mx-auto px-4 py-6">
-        <div className="max-w-4xl mx-auto mb-8 text-center">
+        <div className="max-w-4xl mx-auto mb-6 text-center">
           <a
             href="https://airaccidentdata.com/swagger/index.html"
             target="_blank"
