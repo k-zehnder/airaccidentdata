@@ -1,13 +1,11 @@
 #!/bin/bash
 
-# Navigate to the backend directory where the .env file is located
-cd "$(dirname "$0")"/../backend || exit
-
-# Source .env file for MySQL credentials
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+# Navigate to the backend directory
+if [ -d "../" ]; then
+    echo "Navigating to backend directory..."
+    cd "../" || exit
 else
-    echo "Error: .env file not found."
+    echo "Error: Backend directory not found."
     exit 1
 fi
 
@@ -20,9 +18,6 @@ fi
 # Continue with the script to fetch and map data
 echo "Fetching data..."
 go run cmd/fetcher/main.go
-
-# echo "Sorting data..."
-# ??
 
 echo "Mapping data..."
 go run cmd/mapper/main.go
