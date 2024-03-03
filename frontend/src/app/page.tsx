@@ -59,39 +59,39 @@ const Home = () => {
           {accidents.map((accident) => (
             <div key={accident.id} className="border-b-2 py-4">
               <span className="text-gray-500 text-sm block lg:text-base mb-1">
-                {formatDate(accident.entryDate)}
+                {formatDate(accident.entry_date)}
               </span>
               <Link
                 legacyBehavior
-                href={`/accidents/${accident.registrationNumber}`}
+                href={`/accidents/${accident.id}`}
               >
                 <a>
                   <h3 className="text-xl font-semibold mb-1">
-                    {accident.registrationNumber}: {accident.aircraftMakeName}{' '}
-                    {accident.aircraftModelName}
+                    {/* {accident.id}: {accident.aircraft_make_name}{' '} */}
+                    {/* {accident.aircraft_model_name} */}
                   </h3>
-                  {accident.fatalFlag === 'Yes' && (
+                  {accident.fatal_flag === 'Yes' && (
                     <Badge key={accident.id} className="bg-red-500 mb-1">
                       Fatalities
                     </Badge>
                   )}
-                  {(accident.flightCrewInjurySerious !== 0 ||
-                    accident.cabinCrewInjurySerious !== 0 ||
-                    accident.passengerInjurySerious !== 0 ||
-                    accident.groundInjurySerious !== 0) && (
+                  {(accident.flight_crew_injury_serious !== 0 ||
+                    accident.cabin_crew_injury_serious !== 0 ||
+                    accident.passenger_injury_serious !== 0 ||
+                    accident.ground_injury_serious !== 0) && (
                     <Badge key={accident.id} className="bg-yellow-500 mb-1">
                       Serious Injuries
                     </Badge>
                   )}
-                  {(accident.flightCrewInjuryMinor !== 0 ||
-                    accident.cabinCrewInjuryMinor !== 0 ||
-                    accident.passengerInjuryMinor !== 0 ||
-                    accident.groundInjuryMinor !== 0) && (
+                  {(accident.flight_crew_injury_minor !== 0 ||
+                    accident.cabin_crew_injury_minor !== 0 ||
+                    accident.passenger_injury_minor !== 0 ||
+                    accident.ground_injury_minor !== 0) && (
                     <Badge key={accident.id} className="bg-green-500 mb-1">
                       Minor Injuries
                     </Badge>
                   )}
-                  <p className="text-gray-500">{accident.remarkText}</p>
+                  <p className="text-gray-500">{accident.remark_text}</p>
                 </a>
               </Link>
             </div>

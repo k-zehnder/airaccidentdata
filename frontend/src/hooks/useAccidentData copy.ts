@@ -19,8 +19,20 @@ export const useAccidentData = (currentPage: number) => {
           accidents: Accident[];
           total: number;
         }>(apiUrl);
-        setAccidents(response.data.accidents);
-        console.log(response.data)
+
+        // Fetch aircraft details for each accident
+        const accidentsWithAircraftDetails = await Promise.all(
+          response.data.accidents.map(async (accident) => {
+            const aircraftApiUrl = `https://airaccidentdata.com/api/v1/aircrafts/${accident.aircraft_id}`;
+            const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
+            return {
+              ...accident,
+              aircraftDetails: aircraftResponse.data,
+            };
+          })
+        );
+
+        setAccidents(accidentsWithAircraftDetails);
         setTotalPages(Math.ceil(response.data.total / 10)); // 10 accidents per page
       } catch (error) {
         console.error('Error fetching accidents:', error);
