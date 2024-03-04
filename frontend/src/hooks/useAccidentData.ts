@@ -34,6 +34,7 @@ export const useAccidentData = (currentPage: number) => {
             };
           })
         );
+
         setAccidents(accidentsWithAircraftDetails);
         setTotalPages(Math.ceil(response.data.total) / 10); // 10 accidents per page
       } catch (error) {
