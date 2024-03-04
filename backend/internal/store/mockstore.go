@@ -7,21 +7,27 @@ import (
 )
 
 type MockStore struct {
+	Aircrafts  []*models.Aircraft
 	Accidents  []*models.AircraftAccident
-	QueryError error // Used to simulate datbase query errors
+	QueryError error // Used to simulate database query errors
 }
 
-// NewMockStore initializes a MockStore with predefined accidents and potential errors.
-// It's designed for setting up tests with controlled data and error handling.
-func NewMockStore(accidents []*models.AircraftAccident, queryError error) *MockStore {
+func NewMockStore(aircrafts []*models.Aircraft, accidents []*models.AircraftAccident, queryError error) *MockStore {
 	return &MockStore{
+		Aircrafts:  aircrafts,
 		Accidents:  accidents,
 		QueryError: queryError,
 	}
 }
 
-// SaveArticles simulates storing accidents, returning a predefined error if set.
-// On success, it updates the internal slice of accidents.
+func (ms *MockStore) SaveAircrafts(aircrafts []*models.Aircraft) error {
+	if ms.QueryError != nil {
+		return ms.QueryError
+	}
+	ms.Aircrafts = aircrafts
+	return nil
+}
+
 func (ms *MockStore) SaveAccidents(accidents []*models.AircraftAccident) error {
 	if ms.QueryError != nil {
 		return ms.QueryError
@@ -30,30 +36,42 @@ func (ms *MockStore) SaveAccidents(accidents []*models.AircraftAccident) error {
 	return nil
 }
 
-// GetAccidents simulates fetching accidents, returning a predefined error if set.
-// On success, it retrns a slice of pointers to the internal accdents.
-func (ms *MockStore) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, error) {
+func (ms *MockStore) GetAircrafts() ([]*models.Aircraft, error) {
 	if ms.QueryError != nil {
-		return nil, 0, ms.QueryError
+		return nil, ms.QueryError
 	}
-
-	start := (page - 1) * limit
-	end := start + limit
-	if start >= len(ms.Accidents) {
-		return nil, len(ms.Accidents), nil
-	}
-	if end > len(ms.Accidents) {
-		end = len(ms.Accidents)
-	}
-	return ms.Accidents[start:end], len(ms.Accidents), nil
+	return ms.Aircrafts, nil
 }
 
-// GetAccidentByRegistration simulates fetching a single accident by registration number.
-func (ms *MockStore) GetAccidentByRegistration(registrationNumber string) (*models.AircraftAccident, error) {
-	for _, accident := range ms.Accidents {
-		if accident.RegistrationNumber == registrationNumber {
-			return accident, nil
+func (ms *MockStore) GetAccidents() ([]*models.AircraftAccident, error) {
+	if ms.QueryError != nil {
+		return nil, ms.QueryError
+	}
+	return ms.Accidents, nil
+}
+
+func (ms *MockStore) GetAircraftWithAccidents(registrationNumber string) (*models.Aircraft, error) {
+	var aircraftWithAccidents *models.Aircraft
+
+	for _, aircraft := range ms.Aircrafts {
+		if aircraft.RegistrationNumber == registrationNumber {
+			aircraftWithAccidents = aircraft
+			break
 		}
 	}
-	return nil, fmt.Errorf("no accident found with registration number: %s", registrationNumber)
+
+	if aircraftWithAccidents == nil {
+		return nil, fmt.Errorf("aircraft with registration number %s not found", registrationNumber)
+	}
+
+	var aircraftAccidents []*models.AircraftAccident
+	for _, accident := range ms.Accidents {
+		if accident.AircraftID == aircraftWithAccidents.ID {
+			aircraftAccidents = append(aircraftAccidents, accident)
+		}
+	}
+
+	aircraftWithAccidents.Accidents = aircraftAccidents
+
+	return aircraftWithAccidents, nil
 }
