@@ -25,8 +25,8 @@ export const useAccidentData = (currentPage: number) => {
           response.data.accidents.map(async accident => {
             const aircraftApiUrl =
               process.env.NEXT_PUBLIC_ENV === 'development'
-                ? `http://localhost:8080/api/v1/aircrafts/details/${accident.aircraft_id}`
-                : `https://airaccidentdata.com/api/v1/aircrafts/details/${accident.aircraft_id}`;
+                ? `http://localhost:8080/api/v1/aircrafts/${accident.aircraft_id}`
+                : `https://airaccidentdata.com/api/v1/aircrafts/${accident.aircraft_id}`;
             const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
             return {
               ...accident,
@@ -58,16 +58,16 @@ export const useFetchAccidentDetails = (accidentId: string) => {
       try {
         const apiUrl =
           process.env.NEXT_PUBLIC_ENV === 'development'
-            ? `http://localhost:8080/api/v1/accidents/id/${accidentId}`
-            : `https://airaccidentdata.com/api/v1/accidents/id/${accidentId}`;
+            ? `http://localhost:8080/api/v1/accidents/${accidentId}`
+            : `https://airaccidentdata.com/api/v1/accidents/${accidentId}`;
         const response = await axios.get<Accident>(apiUrl);
         const accidentData = response.data;
 
         // Fetch aircraft details using aircraft ID
         const aircraftApiUrl =
           process.env.NEXT_PUBLIC_ENV === 'development'
-            ? `http://localhost:8080/api/v1/aircrafts/details/${accidentData.aircraft_id}`
-            : `https://airaccidentdata.com/api/v1/aircrafts/details/${accidentData.aircraft_id}`;
+            ? `http://localhost:8080/api/v1/aircrafts/${accidentData.aircraft_id}`
+            : `https://airaccidentdata.com/api/v1/aircrafts/${accidentData.aircraft_id}`;
         const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
         const aircraftData = aircraftResponse.data;
 

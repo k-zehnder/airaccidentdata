@@ -107,12 +107,12 @@ func (s *Store) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, 
 	return incidents, totalCount, nil
 }
 
-// GetAccidentByRegistrationHandler fetches an aircraft and its accidents by registration number
-func (s *Store) GetAccidentByRegistrationHandler(registrationNumber string) (*models.Aircraft, error) {
+// GetAccidentByIdHandler fetches an aircraft and its accidents by registration number
+func (s *Store) GetAccidentByIdHandler(id int) (*models.Aircraft, error) {
 	// Fetch Aircraft
-	aircraftQuery := `SELECT id, registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator FROM Aircrafts WHERE registration_number = ?`
+	aircraftQuery := `SELECT id, registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator FROM Aircrafts WHERE id = ?`
 	var aircraft models.Aircraft
-	err := s.db.QueryRow(aircraftQuery, registrationNumber).Scan(&aircraft.ID, &aircraft.RegistrationNumber, &aircraft.AircraftMakeName, &aircraft.AircraftModelName, &aircraft.AircraftOperator)
+	err := s.db.QueryRow(aircraftQuery, id).Scan(&aircraft.ID, &aircraft.RegistrationNumber, &aircraft.AircraftMakeName, &aircraft.AircraftModelName, &aircraft.AircraftOperator)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching aircraft: %w", err)
 	}
