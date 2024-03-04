@@ -1,6 +1,7 @@
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "../lib/utils";
+import Head from 'next/head'; 
 
 // Define the font styling using CSS-in-JS or a separate CSS class
 const fontStyling = {
@@ -9,8 +10,8 @@ const fontStyling = {
 
 export const metadata = {
   title: "airaccidentdata.com",
-  description: "Latest plane crash accidents and incident news.",
-  imageUrl: "http://s.airaccidentdata.com/og-image.png",
+  description: "Latest plane crash accidents and incident news!",
+  faviconUrl: "http://s.airaccidentdata.com/og-image.png",
 };
 
 interface RootLayoutProps {
