@@ -99,7 +99,7 @@ func GetAccidentByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 // @Description Retrieve a list of all aircraft.
 // @Tags Aircrafts
 // @Produce json
-// @Success 200 {array} models.AircraftListResponse
+// @Success 200 {array} models.AircraftResponse
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
 // @Router /aircrafts [get]
 func GetAllAircraftsHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
@@ -122,11 +122,11 @@ func GetAllAircraftsHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 
 // GetAccidentsByIdnHandler creates a gin.HandlerFunc that handles requests to fetch aviation accidents by ID.
 // @Summary Get a list of accidents by aircraft ID
-// @Description Get details of an aviation accident by its ID
+// @Description Get aviation accidents for an aircraft ID.
 // @Tags Aircrafts
 // @Produce json
 // @Param id path string true "ID of the aircraft"
-// @Success 200 {object} models.AccidentDetailResponse "Accident details"
+// @Success 200 {array} models.AircraftAccidentResponse "Accidents details"
 // @Failure 400 {object} models.ErrorResponse "Invalid ID number"
 // @Failure 404 {object} models.ErrorResponse "Accident not found"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
@@ -161,7 +161,7 @@ func GetAccidentsByIdnHandler(store *store.Store, log *logrus.Logger) gin.Handle
 // @Tags Aircrafts
 // @Produce json
 // @Param id path int true "Aircraft ID"
-// @Success 200 {object} models.Aircraft
+// @Success 200 {object} models.AircraftResponse
 // @Failure 400 {object} models.ErrorResponse "Invalid aircraft ID"
 // @Failure 404 {object} models.ErrorResponse "Aircraft not found"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"

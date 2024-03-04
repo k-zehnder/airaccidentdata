@@ -124,7 +124,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.AircraftListResponse"
+                                "$ref": "#/definitions/models.AircraftResponse"
                             }
                         }
                     },
@@ -160,7 +160,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Aircraft"
+                            "$ref": "#/definitions/models.AircraftResponse"
                         }
                     },
                     "400": {
@@ -186,7 +186,7 @@ const docTemplate = `{
         },
         "/aircrafts/{id}/accidents": {
             "get": {
-                "description": "Get details of an aviation accident by its ID",
+                "description": "Get aviation accidents for an aircraft ID.",
                 "produces": [
                     "application/json"
                 ],
@@ -205,9 +205,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Accident details",
+                        "description": "Accidents details",
                         "schema": {
-                            "$ref": "#/definitions/models.AccidentDetailResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AircraftAccidentResponse"
+                            }
                         }
                     },
                     "400": {
@@ -233,32 +236,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.AccidentDetailResponse": {
-            "type": "object",
-            "properties": {
-                "accidents": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.AircraftAccident"
-                    }
-                },
-                "aircraft_make_name": {
-                    "type": "string"
-                },
-                "aircraft_model_name": {
-                    "type": "string"
-                },
-                "aircraft_operator": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "registration_number": {
-                    "type": "string"
-                }
-            }
-        },
         "models.AccidentResponse": {
             "type": "object",
             "properties": {
@@ -276,32 +253,6 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
-                }
-            }
-        },
-        "models.Aircraft": {
-            "type": "object",
-            "properties": {
-                "accidents": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.AircraftAccident"
-                    }
-                },
-                "aircraft_make_name": {
-                    "type": "string"
-                },
-                "aircraft_model_name": {
-                    "type": "string"
-                },
-                "aircraft_operator": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "registration_number": {
-                    "type": "string"
                 }
             }
         },
@@ -552,17 +503,6 @@ const docTemplate = `{
                 },
                 "updated": {
                     "type": "string"
-                }
-            }
-        },
-        "models.AircraftListResponse": {
-            "type": "object",
-            "properties": {
-                "aircraft": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.AircraftResponse"
-                    }
                 }
             }
         },
