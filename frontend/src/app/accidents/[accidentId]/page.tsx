@@ -29,15 +29,6 @@ const AccidentDetail = ({
     );
   }
 
-  if (!accidentDetails) {
-    return (
-      <>
-        <Header />
-        <div>No accident details found for {accidentId}</div>
-      </>
-    );
-  }
-
   // Hardcoded safety recommendations
   const safetyRecommendations: string[] = [
     "Ensure proper maintenance checks are performed regularly.",
@@ -57,16 +48,16 @@ const AccidentDetail = ({
           <div className="md:col-span-1 bg-white dark:bg-background/50 shadow-md rounded border p-6 mb-6">
             <h2 className="text-2xl font-semibold mb-4">Incident Overview</h2>
             <p>
-              <strong>Date:</strong> {accidentDetails.entry_date}
+              <strong>Date: </strong>{accidentDetails?.entry_date}
             </p>
             <p>
-              {/* <strong>Aircraft Make:</strong> {accidentDetails.aircraft_make_name} */}
+              <strong>Aircraft Make:</strong> {accidentDetails?.aircraftDetails?.aircraft_make_name} {accidentDetails?.aircraftDetails?.aircraft_model_name}
             </p>
             <p>
-              <strong>Event Type:</strong> {accidentDetails.event_type_description}
+              <strong>Event Type:</strong> {accidentDetails?.event_type_description}
             </p>
             <p>
-              <strong>Remark:</strong> {accidentDetails.remark_text}
+              <strong>Remark:</strong> {accidentDetails?.remark_text}
             </p>
             {/* <p>{accidentDetails.summary}</p> */}
           </div>
@@ -77,7 +68,7 @@ const AccidentDetail = ({
               Location Information
             </h2>
             <p>
-              {accidentDetails.location_city_name}, {accidentDetails.location_state_name}, {accidentDetails.location_country_name}
+              {accidentDetails?.location_city_name}, {accidentDetails?.location_state_name}, {accidentDetails?.location_country_name}
             </p>
             {/* Insert map or location details here */}
           </div>

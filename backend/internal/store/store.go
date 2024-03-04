@@ -48,7 +48,14 @@ func (s *Store) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, 
 			location_city_name, location_state_name, location_country_name, 
 			remark_text, event_type_description, fsdo_description,
 			flight_number, aircraft_missing_flag, aircraft_damage_description,
-			flight_activity, flight_phase, far_part, max_injury_level, fatal_flag, aircraft_id
+			flight_activity, flight_phase, far_part, max_injury_level, fatal_flag,
+			flight_crew_injury_none, flight_crew_injury_minor, flight_crew_injury_serious, 
+			flight_crew_injury_fatal, flight_crew_injury_unknown, cabin_crew_injury_none, 
+			cabin_crew_injury_minor, cabin_crew_injury_serious, cabin_crew_injury_fatal, 
+			cabin_crew_injury_unknown, passenger_injury_none, passenger_injury_minor, 
+			passenger_injury_serious, passenger_injury_fatal, passenger_injury_unknown, 
+			ground_injury_none, ground_injury_minor, ground_injury_serious, ground_injury_fatal, 
+			ground_injury_unknown, aircraft_id
 		FROM Accidents
 		ORDER BY id LIMIT ? OFFSET ?;
 	`
@@ -62,14 +69,21 @@ func (s *Store) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, 
 
 	for rows.Next() {
 		var incident models.AircraftAccident
-		// Scan each column in the row into the corresponding field of the AircraftIncident struct
+		// Scan each column in the row into the corresponding field of the AircraftAccident struct
 		if err := rows.Scan(
 			&incident.ID, &incident.Updated, &incident.EntryDate, &incident.EventLocalDate,
 			&incident.EventLocalTime, &incident.LocationCityName, &incident.LocationStateName,
 			&incident.LocationCountryName, &incident.RemarkText, &incident.EventTypeDescription,
 			&incident.FSDODescription, &incident.FlightNumber, &incident.AircraftMissingFlag,
 			&incident.AircraftDamageDescription, &incident.FlightActivity, &incident.FlightPhase,
-			&incident.FARPart, &incident.MaxInjuryLevel, &incident.FatalFlag, &incident.AircraftID,
+			&incident.FARPart, &incident.MaxInjuryLevel, &incident.FatalFlag,
+			&incident.FlightCrewInjuryNone, &incident.FlightCrewInjuryMinor, &incident.FlightCrewInjurySerious,
+			&incident.FlightCrewInjuryFatal, &incident.FlightCrewInjuryUnknown, &incident.CabinCrewInjuryNone,
+			&incident.CabinCrewInjuryMinor, &incident.CabinCrewInjurySerious, &incident.CabinCrewInjuryFatal,
+			&incident.CabinCrewInjuryUnknown, &incident.PassengerInjuryNone, &incident.PassengerInjuryMinor,
+			&incident.PassengerInjurySerious, &incident.PassengerInjuryFatal, &incident.PassengerInjuryUnknown,
+			&incident.GroundInjuryNone, &incident.GroundInjuryMinor, &incident.GroundInjurySerious,
+			&incident.GroundInjuryFatal, &incident.GroundInjuryUnknown, &incident.AircraftID,
 		); err != nil {
 			return nil, 0, err
 		}
