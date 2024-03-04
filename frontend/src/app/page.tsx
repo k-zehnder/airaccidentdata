@@ -11,7 +11,6 @@ import { formatDate } from '../lib/utils';
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { accidents, totalPages, isFetching } = useAccidentData(currentPage);
-  console.log(accidents)
 
   if (isFetching) return <div>Loading...</div>;
 

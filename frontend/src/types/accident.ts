@@ -1,5 +1,5 @@
 export interface Aircraft {
-    accidents: Accident[];
+    // accidents: Accident[];
     aircraft_make_name: string;
     aircraft_model_name: string;
     aircraft_operator: string;

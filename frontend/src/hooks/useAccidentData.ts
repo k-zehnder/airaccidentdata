@@ -20,21 +20,22 @@ export const useAccidentData = (currentPage: number) => {
           total: number;
         }>(apiUrl);
 
-      // Fetch aircraft details for each accident
-      const accidentsWithAircraftDetails = await Promise.all(
-        response.data.accidents.map(async accident => {
-          // const aircraftApiUrl = `https://airaccidentdata.com/api/v1/aircrafts/${accident.aircraft_id}`;
-          const aircraftApiUrl = `http://localhost:8080/api/v1/aircrafts/byId/${accident.aircraft_id}`;
-          const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
-          return {
-            ...accident,
-            aircraftDetails: aircraftResponse.data,
-          }
-        })
-      )
-      setAccidents(accidentsWithAircraftDetails);
-      setTotalPages(Math.ceil(response.data.total) / 10); // 10 accidents per page
-
+        // Fetch aircraft details for each accident
+        const accidentsWithAircraftDetails = await Promise.all(
+          response.data.accidents.map(async accident => {
+            const aircraftApiUrl =
+              process.env.NEXT_PUBLIC_ENV === 'development'
+                ? `http://localhost:8080/api/v1/aircrafts/byId/${accident.aircraft_id}`
+                : `https://airaccidentdata.com/api/v1/aircrafts/byId/${accident.aircraft_id}`;
+            const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
+            return {
+              ...accident,
+              aircraftDetails: aircraftResponse.data,
+            };
+          })
+        );
+        setAccidents(accidentsWithAircraftDetails);
+        setTotalPages(Math.ceil(response.data.total) / 10); // 10 accidents per page
       } catch (error) {
         console.error('Error fetching accidents:', error);
       }
@@ -55,19 +56,25 @@ export const useFetchAccidentDetails = (accidentId: string) => {
     const fetchAccidentDetails = async () => {
       setLoading(true);
       try {
-        const apiUrl = `http://localhost:8080/api/v1/accidents/byId/${accidentId}`;
+        const apiUrl =
+          process.env.NEXT_PUBLIC_ENV === 'development'
+            ? `http://localhost:8080/api/v1/accidents/byId/${accidentId}`
+            : `https://airaccidentdata.com/api/v1/accidents/byId/${accidentId}`;
         const response = await axios.get<Accident>(apiUrl);
         const accidentData = response.data;
 
         // Fetch aircraft details using aircraft ID
-        const aircraftApiUrl = `http://localhost:8080/api/v1/aircrafts/byId/${accidentData.aircraft_id}`;
+        const aircraftApiUrl =
+          process.env.NEXT_PUBLIC_ENV === 'development'
+            ? `http://localhost:8080/api/v1/aircrafts/byId/${accidentData.aircraft_id}`
+            : `https://airaccidentdata.com/api/v1/aircrafts/byId/${accidentData.aircraft_id}`;
         const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
         const aircraftData = aircraftResponse.data;
 
         // Combine accident and aircraft details
         const combinedData = {
           ...accidentData,
-          aircraftDetails: aircraftData
+          aircraftDetails: aircraftData,
         };
 
         setAccidentDetails(combinedData);
