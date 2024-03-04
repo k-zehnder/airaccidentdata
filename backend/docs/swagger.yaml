@@ -171,6 +171,37 @@ paths:
       summary: Get a list of accidents
       tags:
       - Accidents
+  /accidents/byId/{id}:
+    get:
+      description: Retrieve details of an accident by its ID
+      parameters:
+      - description: Accident ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AircraftAccident'
+        "400":
+          description: Invalid accident ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Accident not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get an accident by ID
+      tags:
+      - Accidents
   /aircrafts:
     get:
       description: Retrieve a list of all aircraft.

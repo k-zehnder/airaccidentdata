@@ -214,3 +214,45 @@ func (s *Store) GetAircraftById(id int) (*models.Aircraft, error) {
 	// Return the scanned aircraft.
 	return &aircraft, nil
 }
+
+// GetAccidentById fetches an accident by its ID from the database.
+func (s *Store) GetAccidentById(id int) (*models.AircraftAccident, error) {
+	// Query to fetch the accident by ID.
+	query := `
+		SELECT 
+			id, updated, entry_date, event_local_date, event_local_time,
+			location_city_name, location_state_name, location_country_name, 
+			remark_text, event_type_description, fsdo_description,
+			flight_number, aircraft_missing_flag, aircraft_damage_description,
+			flight_activity, flight_phase, far_part, max_injury_level, fatal_flag, aircraft_id
+		FROM Accidents
+		WHERE id = ?;
+	`
+
+	// Perform the database query.
+	row := s.db.QueryRow(query, id)
+
+	// Create a variable to hold the scanned accident.
+	var accident models.AircraftAccident
+
+	// Scan the values from the row into the accident struct.
+	err := row.Scan(
+		&accident.ID, &accident.Updated, &accident.EntryDate, &accident.EventLocalDate,
+		&accident.EventLocalTime, &accident.LocationCityName, &accident.LocationStateName,
+		&accident.LocationCountryName, &accident.RemarkText, &accident.EventTypeDescription,
+		&accident.FSDODescription, &accident.FlightNumber, &accident.AircraftMissingFlag,
+		&accident.AircraftDamageDescription, &accident.FlightActivity, &accident.FlightPhase,
+		&accident.FARPart, &accident.MaxInjuryLevel, &accident.FatalFlag, &accident.AircraftID,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// Return nil for the accident if not found.
+			return nil, nil
+		}
+		// Return the error if any other error occurred.
+		return nil, fmt.Errorf("error scanning accident row: %w", err)
+	}
+
+	// Return the scanned accident.
+	return &accident, nil
+}

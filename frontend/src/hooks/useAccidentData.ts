@@ -46,3 +46,40 @@ export const useAccidentData = (currentPage: number) => {
 
   return { accidents, totalPages, isFetching };
 };
+
+export const useFetchAccidentDetails = (accidentId: string) => {
+  const [accidentDetails, setAccidentDetails] = useState<Accident | null>(null);
+  const [isLoading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchAccidentDetails = async () => {
+      setLoading(true);
+      try {
+        const apiUrl = `http://localhost:8080/api/v1/accidents/byId/${accidentId}`;
+        const response = await axios.get<Accident>(apiUrl);
+        const accidentData = response.data;
+
+        // Fetch aircraft details using aircraft ID
+        const aircraftApiUrl = `http://localhost:8080/api/v1/aircrafts/byId/${accidentData.aircraft_id}`;
+        const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
+        const aircraftData = aircraftResponse.data;
+
+        // Combine accident and aircraft details
+        const combinedData = {
+          ...accidentData,
+          aircraftDetails: aircraftData
+        };
+
+        setAccidentDetails(combinedData);
+      } catch (error) {
+        console.error('Error fetching accident details:', error);
+        setAccidentDetails(null);
+      }
+      setLoading(false);
+    };
+
+    fetchAccidentDetails();
+  }, [accidentId]);
+
+  return { accidentDetails, isLoading };
+};

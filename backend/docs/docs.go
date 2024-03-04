@@ -61,6 +61,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/accidents/byId/{id}": {
+            "get": {
+                "description": "Retrieve details of an accident by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accidents"
+                ],
+                "summary": "Get an accident by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Accident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.AircraftAccident"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid accident ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Accident not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/aircrafts": {
             "get": {
                 "description": "Retrieve a list of all aircraft.",
