@@ -15,16 +15,6 @@ type AccidentResponse struct {
 	Limit     int                `json:"limit"`
 }
 
-// AccidentResponse defines the structure for the response containing specific aircraft accidents.
-type AccidentDetailResponse struct {
-	ID                 int                `json:"id"`
-	RegistrationNumber string             `json:"registration_number"`
-	AircraftMakeName   string             `json:"aircraft_make_name"`
-	AircraftModelName  string             `json:"aircraft_model_name"`
-	AircraftOperator   string             `json:"aircraft_operator"`
-	Accidents          []AircraftAccident `json:"accidents"`
-}
-
 // AircraftResponse defines the structure for the response containing aircraft details.
 type AircraftResponse struct {
 	ID                 int    `json:"id"`
@@ -34,9 +24,14 @@ type AircraftResponse struct {
 	AircraftOperator   string `json:"aircraft_operator"`
 }
 
-// AircraftListResponse defines the structure for the response containing a list of aircraft.
-type AircraftListResponse struct {
-	Aircraft []AircraftResponse `json:"aircraft"`
+// AccidentResponse defines the structure for the response containing specific aircraft accidents.
+type AccidentDetailResponse struct {
+	ID                 int                `json:"id"`
+	RegistrationNumber string             `json:"registration_number"`
+	AircraftMakeName   string             `json:"aircraft_make_name"`
+	AircraftModelName  string             `json:"aircraft_model_name"`
+	AircraftOperator   string             `json:"aircraft_operator"`
+	Accidents          []AircraftAccident `json:"accidents"`
 }
 
 // AircraftAccident represents details of an aviation accident.
