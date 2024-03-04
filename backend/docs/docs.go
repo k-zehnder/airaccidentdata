@@ -61,7 +61,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/accidents/byId/{id}": {
+        "/accidents/id/{aircraft_id}": {
             "get": {
                 "description": "Retrieve details of an accident by its ID",
                 "produces": [
@@ -137,7 +137,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/aircrafts/byId/{id}": {
+        "/aircrafts/details/{aircraft_id}": {
             "get": {
                 "description": "Retrieve details of an aircraft by its ID",
                 "produces": [
