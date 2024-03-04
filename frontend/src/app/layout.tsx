@@ -10,6 +10,7 @@ const fontStyling = {
 export const metadata = {
   title: "airaccidentdata.com",
   description: "Latest plane crash accidents and incident news.",
+  imageUrl: "http://s.airaccidentdata.com/og-image.png",
 };
 
 interface RootLayoutProps {
