@@ -171,7 +171,7 @@ paths:
       summary: Get a list of accidents
       tags:
       - Accidents
-  /accidents/byId/{id}:
+  /accidents/id/{aircraft_id}:
     get:
       description: Retrieve details of an accident by its ID
       parameters:
@@ -252,7 +252,7 @@ paths:
       summary: Get a list of accidents by aircraft registration number
       tags:
       - Aircrafts
-  /aircrafts/byId/{id}:
+  /aircrafts/details/{aircraft_id}:
     get:
       description: Retrieve details of an aircraft by its ID
       parameters:
