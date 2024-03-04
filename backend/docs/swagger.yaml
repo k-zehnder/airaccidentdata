@@ -171,7 +171,7 @@ paths:
       summary: Get a list of accidents
       tags:
       - Accidents
-  /accidents/id/{aircraft_id}:
+  /accidents/id/{id}:
     get:
       description: Retrieve details of an accident by its ID
       parameters:
@@ -252,7 +252,7 @@ paths:
       summary: Get a list of accidents by aircraft registration number
       tags:
       - Aircrafts
-  /aircrafts/details/{aircraft_id}:
+  /aircrafts/details/{id}:
     get:
       description: Retrieve details of an aircraft by its ID
       parameters:
@@ -280,7 +280,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get an aircraft by ID
+      summary: Get details about an aircraft by ID
       tags:
       - Aircrafts
 swagger: "2.0"

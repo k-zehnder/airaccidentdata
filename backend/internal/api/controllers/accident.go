@@ -114,7 +114,7 @@ func GetAccidentsByRegistrationHandler(store *store.Store, log *logrus.Logger) g
 }
 
 // GetAircraftByIdHandler creates a gin.HandlerFunc that handles requests to fetch an aircraft by its ID.
-// @Summary Get an aircraft by ID
+// @Summary Get details about an aircraft by ID
 // @Description Retrieve details of an aircraft by its ID
 // @Tags Aircrafts
 // @Produce json
@@ -123,11 +123,11 @@ func GetAccidentsByRegistrationHandler(store *store.Store, log *logrus.Logger) g
 // @Failure 400 {object} models.ErrorResponse "Invalid aircraft ID"
 // @Failure 404 {object} models.ErrorResponse "Aircraft not found"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
-// @Router /aircrafts/details/{aircraft_id} [get]
+// @Router /aircrafts/details/{id} [get]
 func GetAircraftByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract the ID parameter from the URL path.
-		idStr := c.Param("aircraft_id")
+		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid aircraft ID"})
@@ -157,11 +157,11 @@ func GetAircraftByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 // @Failure 400 {object} models.ErrorResponse "Invalid accident ID"
 // @Failure 404 {object} models.ErrorResponse "Accident not found"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
-// @Router /accidents/id/{aircraft_id} [get]
+// @Router /accidents/id/{id} [get]
 func GetAccidentByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract the ID parameter from the URL path.
-		idStr := c.Param("accident_id")
+		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid accident ID"})
