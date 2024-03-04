@@ -1,42 +1,43 @@
+export interface Aircraft {
+    accidents: Accident[];
+    aircraft_make_name: string;
+    aircraft_model_name: string;
+    aircraft_operator: string;
+    id: number;
+    registration_number: string;
+}
+
 export interface Accident {
     id: number;
-    registrationNumber: string;
-    remarkText: string;
-    aircraftMakeName: string;
-    aircraftModelName: string;
-    entryDate: string;
-    fatalFlag: string;
-    flightCrewInjuryNone: number;
-    flightCrewInjuryMinor: number;
-    flightCrewInjurySerious: number;
-    flightCrewInjuryFatal: number;
-    flightCrewInjuryUnknown: number;
-    cabinCrewInjuryNone: number;
-    cabinCrewInjuryMinor: number;
-    cabinCrewInjurySerious: number;
-    cabinCrewInjuryFatal: number;
-    cabinCrewInjuryUnknown: number;
-    passengerInjuryNone: number;
-    passengerInjuryMinor: number;
-    passengerInjurySerious: number;
-    passengerInjuryFatal: number;
-    passengerInjuryUnknown: number;
-    groundInjuryNone: number;
-    groundInjuryMinor: number;
-    groundInjurySerious: number;
-    groundInjuryFatal: number;
-    groundInjuryUnknown: number;
-}
-  
-export interface AccidentDetails {
-    entryDate: string;
-    aircraftMakeName: string;
-    location: string;
-    summary: string;
-    recommendations: string[];
-    locationCityName: string;
-    locationStateName: string;
-    locationCountryName: string;
-    remarkText: string;
-    eventTypeDescription: string;
+    entry_date: string;
+    event_local_date: string;
+    event_local_time: string;
+    location_city_name: string;
+    location_state_name: string;
+    location_country_name: string;
+    remark_text: string;
+    event_type_description: string;
+    fatal_flag: string;
+    flight_crew_injury_none: number;
+    flight_crew_injury_minor: number;
+    flight_crew_injury_serious: number;
+    flight_crew_injury_fatal: number;
+    flight_crew_injury_unknown: number;
+    cabin_crew_injury_none: number;
+    cabin_crew_injury_minor: number;
+    cabin_crew_injury_serious: number;
+    cabin_crew_injury_fatal: number;
+    cabin_crew_injury_unknown: number;
+    passenger_injury_none: number;
+    passenger_injury_minor: number;
+    passenger_injury_serious: number;
+    passenger_injury_fatal: number;
+    passenger_injury_unknown: number;
+    ground_injury_none: number;
+    ground_injury_minor: number;
+    ground_injury_serious: number;
+    ground_injury_fatal: number;
+    ground_injury_unknown: number;
+    aircraft_id: number;
+    aircraftDetails?: Aircraft
 }

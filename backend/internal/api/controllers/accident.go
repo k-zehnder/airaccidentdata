@@ -12,7 +12,7 @@ import (
 
 // GetAccidentsHandler creates a gin.HandlerFunc that handles requests to fetch a list of aviation accidents.
 // It utilizes pagination to efficiently return a subset of accidents based on the provided query parameters.
-// @Summary Get list of Accidents
+// @Summary Get a list of accidents
 // @Description Get list of all aviation accidents with pagination
 // @Tags Accidents
 // @Produce json
@@ -22,7 +22,7 @@ import (
 // @Failure 400 {object} models.ErrorResponse "Invalid parameters"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
 // @Router /accidents [get]
-func GetAccidentsHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
+func GetAllAccidentsHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extracting 'page' and 'limit' from the query parameters.
 		// Default values are used if they are not provided or invalid.
@@ -59,46 +59,124 @@ func GetAccidentsHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc
 	}
 }
 
-// GetAccidentByRegistrationHandler creates a gin.HandlerFunc that handles requests to fetch an aviation accident by registration number.
-// @Summary Get accident by registration number
+// GetAllAircraftsHandler creates a gin.HandlerFunc that handles requests to fetch all aircraft.
+// @Summary Get a list of aircrafts
+// @Description Retrieve a list of all aircraft.
+// @Tags Aircrafts
+// @Produce json
+// @Success 200 {array} models.Aircraft
+// @Failure 500 {object} models.ErrorResponse "Internal Server Error"
+// @Router /aircrafts [get]
+func GetAllAircraftsHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Calling the GetAllAircrafts method of the store to retrieve all aircraft.
+		aircrafts, err := store.GetAllAircrafts()
+		if err != nil {
+			// Logging the error and sending an internal server error response.
+			log.WithFields(logrus.Fields{
+				"error": err.Error(),
+			}).Error("Failed to get aircrafts")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Responding with the aircrafts.
+		c.JSON(http.StatusOK, aircrafts)
+	}
+}
+
+// GetAccidentByRegistrationHandler creates a gin.HandlerFunc that handles requests to fetch aviation accidents by registration number.
+// @Summary Get a list of accidents by aircraft registration number
 // @Description Get details of an aviation accident by its registration number
-// @Tags Accidents
+// @Tags Aircrafts
 // @Produce json
 // @Param registration_number path string true "Registration number of the aircraft"
-// @Success 200 {object} models.AircraftAccident "Accident details"
+// @Success 200 {object} models.AccidentDetailResponse "Accident details"
 // @Failure 400 {object} models.ErrorResponse "Invalid registration number"
 // @Failure 404 {object} models.ErrorResponse "Accident not found"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
-// @Router /accidents/{registration_number} [get]
-func GetAccidentByRegistrationHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
+// @Router /aircrafts/{registration_number}/accidents [get]
+func GetAccidentsByRegistrationHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extracting the registration number from the URL path parameters.
 		registrationNumber := c.Param("registration_number")
 
 		// Calling the GetAccidentByReg method of the store to retrieve the accident.
-		accident, err := store.GetAccidentByRegistration(registrationNumber)
+		accident, err := store.GetAccidentByRegistrationHandler(registrationNumber)
 		if err != nil {
 			fmt.Println(err)
 			return
-			// // Handling specific error cases.
-			// switch err {
-			// case store.ErrInvalidRegistrationNumber:
-			// 	// Sending a bad request response for invalid registration number.
-			// 	c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid registration number"})
-			// case store.ErrAccidentNotFound:
-			// 	// Sending a not found response if the accident is not found.
-			// 	c.JSON(http.StatusNotFound, gin.H{"error": "Accident not found"})
-			// default:
-			// 	// Logging and sending an internal server error response for other errors.
-			// 	log.WithFields(logrus.Fields{
-			// 		"error": err.Error(),
-			// 	}).Error("Failed to get accident by registration number")
-			// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			// }
-			// return
 		}
 
 		// Responding with the accident details.
+		c.JSON(http.StatusOK, accident)
+	}
+}
+
+// GetAircraftByIdHandler creates a gin.HandlerFunc that handles requests to fetch an aircraft by its ID.
+// @Summary Get an aircraft by ID
+// @Description Retrieve details of an aircraft by its ID
+// @Tags Aircrafts
+// @Produce json
+// @Param id path int true "Aircraft ID"
+// @Success 200 {object} models.Aircraft
+// @Failure 400 {object} models.ErrorResponse "Invalid aircraft ID"
+// @Failure 404 {object} models.ErrorResponse "Aircraft not found"
+// @Failure 500 {object} models.ErrorResponse "Internal Server Error"
+// @Router /aircrafts/byId/{id} [get]
+func GetAircraftByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract the ID parameter from the URL path.
+		idStr := c.Param("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid aircraft ID"})
+			return
+		}
+
+		// Call the store method to fetch the aircraft by its ID.
+		aircraft, err := store.GetAircraftById(id)
+		if err != nil {
+			log.WithError(err).Error("Failed to fetch aircraft by ID")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch aircraft"})
+			return
+		}
+
+		// Return the aircraft in the response.
+		c.JSON(http.StatusOK, aircraft)
+	}
+}
+
+// GetAccidentByIdHandler creates a gin.HandlerFunc that handles requests to fetch an accident by its ID.
+// @Summary Get an accident by ID
+// @Description Retrieve details of an accident by its ID
+// @Tags Accidents
+// @Produce json
+// @Param id path int true "Accident ID"
+// @Success 200 {object} models.AircraftAccident
+// @Failure 400 {object} models.ErrorResponse "Invalid accident ID"
+// @Failure 404 {object} models.ErrorResponse "Accident not found"
+// @Failure 500 {object} models.ErrorResponse "Internal Server Error"
+// @Router /accidents/byId/{id} [get]
+func GetAccidentByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract the ID parameter from the URL path.
+		idStr := c.Param("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid accident ID"})
+			return
+		}
+
+		// Call the store method to fetch the accident by its ID.
+		accident, err := store.GetAccidentById(id)
+		if err != nil {
+			log.WithError(err).Error("Failed to fetch accident by ID")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch accident"})
+			return
+		}
+
+		// Return the accident in the response.
 		c.JSON(http.StatusOK, accident)
 	}
 }

@@ -20,7 +20,7 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 
 	// Configure CORS.
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000", "http://localhost:8080", "https://airaccidentdata.com", "https://www.airaccidentdata.com/"}
+	config.AllowOrigins = []string{"http://localhost:3000", "http://localhost:8080", "https://airaccidentdata.com", "https://www.airaccidentdata.com"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	router.Use(cors.New(config))
@@ -33,14 +33,18 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 
 	// Serve a debug route at :8080.
 	router.GET("", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, "welcome home")
+		ctx.JSON(http.StatusOK, "meow")
 	})
 
 	// Set up the v1 routes group
 	v1 := router.Group("/api/v1")
 	{
-		v1.GET("/accidents", controllers.GetAccidentsHandler(store, log))
-		v1.GET("/accidents/:registration_number", controllers.GetAccidentByRegistrationHandler(store, log))
+		v1.GET("/aircrafts", controllers.GetAllAircraftsHandler(store, log))
+		v1.GET("/aircrafts/:registration_number/accidents", controllers.GetAccidentsByRegistrationHandler(store, log))
+		v1.GET("/aircrafts/byId/:id", controllers.GetAircraftByIdHandler(store, log))
+		v1.GET("/accidents", controllers.GetAllAccidentsHandler(store, log))
+		// Add route to get accident by ID
+		v1.GET("/accidents/byId/:id", controllers.GetAccidentByIdHandler(store, log))
 	}
 
 	// Return configured router.

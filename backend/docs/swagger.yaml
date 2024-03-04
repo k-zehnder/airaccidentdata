@@ -1,5 +1,22 @@
 basePath: /api/v1
 definitions:
+  models.AccidentDetailResponse:
+    properties:
+      accidents:
+        items:
+          $ref: '#/definitions/models.AircraftAccident'
+        type: array
+      aircraft_make_name:
+        type: string
+      aircraft_model_name:
+        type: string
+      aircraft_operator:
+        type: string
+      id:
+        type: integer
+      registration_number:
+        type: string
+    type: object
   models.AccidentResponse:
     properties:
       accidents:
@@ -13,91 +30,102 @@ definitions:
       total:
         type: integer
     type: object
+  models.Aircraft:
+    properties:
+      accidents:
+        items:
+          $ref: '#/definitions/models.AircraftAccident'
+        type: array
+      aircraft_make_name:
+        type: string
+      aircraft_model_name:
+        type: string
+      aircraft_operator:
+        type: string
+      id:
+        type: integer
+      registration_number:
+        type: string
+    type: object
   models.AircraftAccident:
     properties:
-      aircraftDamageDescription:
+      aircraft_damage_description:
         type: string
-      aircraftMakeName:
-        type: string
-      aircraftMissingFlag:
-        type: string
-      aircraftModelName:
-        type: string
-      aircraftOperator:
-        type: string
-      cabinCrewInjuryFatal:
+      aircraft_id:
         type: integer
-      cabinCrewInjuryMinor:
-        type: integer
-      cabinCrewInjuryNone:
-        type: integer
-      cabinCrewInjurySerious:
-        type: integer
-      cabinCrewInjuryUnknown:
-        type: integer
-      entryDate:
+      aircraft_missing_flag:
         type: string
-      eventLocalDate:
-        type: string
-      eventLocalTime:
-        type: string
-      eventTypeDescription:
-        type: string
-      farPart:
-        type: string
-      fatalFlag:
-        type: string
-      flightActivity:
-        type: string
-      flightCrewInjuryFatal:
+      cabin_crew_injury_fatal:
         type: integer
-      flightCrewInjuryMinor:
+      cabin_crew_injury_minor:
         type: integer
-      flightCrewInjuryNone:
+      cabin_crew_injury_none:
         type: integer
-      flightCrewInjurySerious:
+      cabin_crew_injury_serious:
         type: integer
-      flightCrewInjuryUnknown:
+      cabin_crew_injury_unknown:
         type: integer
-      flightNumber:
+      entry_date:
         type: string
-      flightPhase:
+      event_local_date:
         type: string
-      fsdoDescription:
+      event_local_time:
         type: string
-      groundInjuryFatal:
+      event_type_description:
+        type: string
+      far_part:
+        type: string
+      fatal_flag:
+        type: string
+      flight_activity:
+        type: string
+      flight_crew_injury_fatal:
         type: integer
-      groundInjuryMinor:
+      flight_crew_injury_minor:
         type: integer
-      groundInjuryNone:
+      flight_crew_injury_none:
         type: integer
-      groundInjurySerious:
+      flight_crew_injury_serious:
         type: integer
-      groundInjuryUnknown:
+      flight_crew_injury_unknown:
+        type: integer
+      flight_number:
+        type: string
+      flight_phase:
+        type: string
+      fsdo_description:
+        type: string
+      ground_injury_fatal:
+        type: integer
+      ground_injury_minor:
+        type: integer
+      ground_injury_none:
+        type: integer
+      ground_injury_serious:
+        type: integer
+      ground_injury_unknown:
         type: integer
       id:
         type: integer
-      locationCityName:
+      location_city_name:
         type: string
-      locationCountryName:
+      location_country_name:
         type: string
-      locationStateName:
+      location_state_name:
         type: string
-      maxInjuryLevel:
+      max_injury_level:
         type: string
-      passengerInjuryFatal:
+      passenger_injury_fatal:
         type: integer
-      passengerInjuryMinor:
+      passenger_injury_minor:
         type: integer
-      passengerInjuryNone:
+      passenger_injury_none:
         type: integer
-      passengerInjurySerious:
+      passenger_injury_serious:
         type: integer
-      passengerInjuryUnknown:
+      passenger_injury_unknown:
         type: integer
-      registrationNumber:
-        type: string
-      remarkText:
+      remark_text:
         type: string
       updated:
         type: string
@@ -140,10 +168,60 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get list of Accidents
+      summary: Get a list of accidents
       tags:
       - Accidents
-  /accidents/{registration_number}:
+  /accidents/byId/{id}:
+    get:
+      description: Retrieve details of an accident by its ID
+      parameters:
+      - description: Accident ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AircraftAccident'
+        "400":
+          description: Invalid accident ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Accident not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get an accident by ID
+      tags:
+      - Accidents
+  /aircrafts:
+    get:
+      description: Retrieve a list of all aircraft.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Aircraft'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get a list of aircrafts
+      tags:
+      - Aircrafts
+  /aircrafts/{registration_number}/accidents:
     get:
       description: Get details of an aviation accident by its registration number
       parameters:
@@ -158,7 +236,7 @@ paths:
         "200":
           description: Accident details
           schema:
-            $ref: '#/definitions/models.AircraftAccident'
+            $ref: '#/definitions/models.AccidentDetailResponse'
         "400":
           description: Invalid registration number
           schema:
@@ -171,7 +249,38 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get accident by registration number
+      summary: Get a list of accidents by aircraft registration number
       tags:
-      - Accidents
+      - Aircrafts
+  /aircrafts/byId/{id}:
+    get:
+      description: Retrieve details of an aircraft by its ID
+      parameters:
+      - description: Aircraft ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aircraft'
+        "400":
+          description: Invalid aircraft ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Aircraft not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get an aircraft by ID
+      tags:
+      - Aircrafts
 swagger: "2.0"
