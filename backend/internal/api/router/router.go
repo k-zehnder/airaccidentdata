@@ -39,11 +39,20 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 	// Set up the v1 routes group
 	v1 := router.Group("/api/v1")
 	{
+		// List all aircrafts or filter by registration number using a query parameter
 		v1.GET("/aircrafts", controllers.GetAllAircraftsHandler(store, log))
-		v1.GET("/aircrafts/:registration_number/accidents", controllers.GetAccidentsByRegistrationHandler(store, log))
-		v1.GET("/aircrafts/details/:id", controllers.GetAircraftByIdHandler(store, log))
+
+		// Get a specific aircraft by ID
+		v1.GET("/aircrafts/:id", controllers.GetAircraftByIdHandler(store, log))
+
+		// Get accidents for a specific aircraft by id
+		v1.GET("/aircrafts/:id/accidents", controllers.GetAccidentByIdHandler(store, log))
+
+		// List all accidents or filter them using query parameters
 		v1.GET("/accidents", controllers.GetAllAccidentsHandler(store, log))
-		v1.GET("/accidents/id/:id", controllers.GetAccidentByIdHandler(store, log))
+
+		// Get a specific accident by ID
+		v1.GET("/accidents/:id", controllers.GetAccidentByIdHandler(store, log))
 	}
 
 	// Return configured router.
