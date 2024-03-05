@@ -10,8 +10,8 @@ import (
 
 // StoreInterface defines the methods that our store implementations must have.
 type StoreInterface interface {
-	GetAccidents(page, limit int) ([]*models.Accident, int, error)
-	GetAccidentsByRegistration(registrationNumber string) ([]*models.Accident, error)
+	GetAccidents(page, limit int) ([]*models.AircraftAccident, int, error)
+	GetAccidentsByRegistration(registrationNumber string) ([]*models.AircraftAccident, error)
 	GetAircraftById(id int) ([]*models.Aircraft, int, error)
 }
 
@@ -38,8 +38,8 @@ func NewStore(dataSourceName string) (*Store, error) {
 }
 
 // GetAccidents fetches a specific page of aircraft accidents from the database.
-func (s *Store) GetAccidents(page, limit int) ([]*models.Accident, int, error) {
-	var incidents []*models.Accident
+func (s *Store) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, error) {
+	var incidents []*models.AircraftAccident
 
 	offset := (page - 1) * limit
 	query := `
@@ -68,7 +68,7 @@ func (s *Store) GetAccidents(page, limit int) ([]*models.Accident, int, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var incident models.Accident
+		var incident models.AircraftAccident
 		// Scan each column in the row into the corresponding field of the AircraftAccident struct
 		if err := rows.Scan(
 			&incident.ID, &incident.Updated, &incident.EntryDate, &incident.EventLocalDate,
@@ -126,7 +126,7 @@ func (s *Store) GetAccidentByIdHandler(id int) (*models.Aircraft, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var accident models.Accident
+		var accident models.AircraftAccident
 		if err := rows.Scan(
 			&accident.ID, &accident.Updated, &accident.EntryDate, &accident.EventLocalDate,
 			&accident.EventLocalTime, &accident.LocationCityName, &accident.LocationStateName,
@@ -230,7 +230,7 @@ func (s *Store) GetAircraftById(id int) (*models.Aircraft, error) {
 }
 
 // GetAccidentById fetches an accident by its ID from the database.
-func (s *Store) GetAccidentById(id int) (*models.Accident, error) {
+func (s *Store) GetAccidentById(id int) (*models.AircraftAccident, error) {
 	// Query to fetch the accident by ID.
 	query := `
 		SELECT 
@@ -247,7 +247,7 @@ func (s *Store) GetAccidentById(id int) (*models.Accident, error) {
 	row := s.db.QueryRow(query, id)
 
 	// Create a variable to hold the scanned accident.
-	var accident models.Accident
+	var accident models.AircraftAccident
 
 	// Scan the values from the row into the accident struct.
 	err := row.Scan(

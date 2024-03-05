@@ -9,10 +9,10 @@ type ErrorResponse struct {
 
 // AccidentResponse defines the structure for the paginated accident response.
 type AccidentResponse struct {
-	Accidents []AircraftAccidentResponse `json:"accidents"`
-	Total     int                        `json:"total"`
-	Page      int                        `json:"page"`
-	Limit     int                        `json:"limit"`
+	Accidents []AircraftAccident `json:"accidents"`
+	Total     int                `json:"total"`
+	Page      int                `json:"page"`
+	Limit     int                `json:"limit"`
 }
 
 // AircraftResponse defines the structure for the response containing aircraft details.
@@ -26,12 +26,12 @@ type AircraftResponse struct {
 
 // AccidentResponse defines the structure for the response containing specific aircraft accidents.
 type AccidentDetailResponse struct {
-	ID                 int                        `json:"id"`
-	RegistrationNumber string                     `json:"registration_number"`
-	AircraftMakeName   string                     `json:"aircraft_make_name"`
-	AircraftModelName  string                     `json:"aircraft_model_name"`
-	AircraftOperator   string                     `json:"aircraft_operator"`
-	Accidents          []AircraftAccidentResponse `json:"accidents"`
+	ID                 int                `json:"id"`
+	RegistrationNumber string             `json:"registration_number"`
+	AircraftMakeName   string             `json:"aircraft_make_name"`
+	AircraftModelName  string             `json:"aircraft_model_name"`
+	AircraftOperator   string             `json:"aircraft_operator"`
+	Accidents          []AircraftAccident `json:"accidents"`
 }
 
 // AircraftAccident represents details of an aviation accident.

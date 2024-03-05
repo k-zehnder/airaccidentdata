@@ -105,7 +105,7 @@ func processCSV(file *os.File, db *sql.DB) error {
 
 	// Iteratively insert sorted records into the database
 	for _, record := range records {
-		// Attempt to parse the current CSV record into an Aircraft and Accident structures.
+		// Attempt to parse the current CSV record into an Aircraft and AircraftAccident structures.
 		aircraft, incident, err := parseRecordToIncident(record)
 		if err != nil {
 			// Log any errors encountered during parsing and skip to the next record.
@@ -204,7 +204,7 @@ func parseTime(timeStr string) string {
 }
 
 // parseRecordToIncident converts a CSV record to an AircraftAccident struct.
-func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident, error) {
+func parseRecordToIncident(record []string) (*models.Aircraft, *models.AircraftAccident, error) {
 	if len(record) < 42 {
 		return nil, nil, fmt.Errorf("record does not have enough columns")
 	}
@@ -218,7 +218,7 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident,
 	}
 
 	// Parse the fields for AircraftAccident struct
-	incident := &models.Accident{
+	incident := &models.AircraftAccident{
 		Updated:                   record[0],            // UPDATED
 		EntryDate:                 parseDate(record[1]), // ENTRY_DATE
 		EventLocalDate:            parseDate(record[2]), // EVENT_LCL_DATE
@@ -278,7 +278,7 @@ func insertAircraft(ctx context.Context, db *sql.DB, registrationNumber, aircraf
 	return int(aircraftID), nil
 }
 
-func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *models.Accident) error {
+func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *models.AircraftAccident) error {
 	stmt := `INSERT INTO Accidents (
 		updated, 
 		entry_date, 

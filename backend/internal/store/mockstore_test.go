@@ -8,7 +8,7 @@ import (
 )
 
 func TestMockStore_GetAccidents(t *testing.T) {
-	expectedAccidents := []*models.Accident{
+	expectedAccidents := []*models.AircraftAccident{
 		{ID: 1},
 	}
 	mockStore := NewMockStore(nil, expectedAccidents, nil)
@@ -28,7 +28,7 @@ func TestMockStore_GetAccidents(t *testing.T) {
 
 func TestMockStore_SaveAccidents(t *testing.T) {
 	mockStore := NewMockStore(nil, nil, nil)
-	accidents := []*models.Accident{
+	accidents := []*models.AircraftAccident{
 		{ID: 2},
 	}
 	err := mockStore.SaveAccidents(accidents)
@@ -120,7 +120,7 @@ func TestMockStore_SaveAircrafts_Error(t *testing.T) {
 func TestMockStore_SaveAccidents_Error(t *testing.T) {
 	simulatedError := errors.New("simulated save error")
 	mockStore := NewMockStore(nil, nil, simulatedError)
-	err := mockStore.SaveAccidents([]*models.Accident{{ID: 3}})
+	err := mockStore.SaveAccidents([]*models.AircraftAccident{{ID: 3}})
 	if err != simulatedError {
 		t.Errorf("Expected error '%v', got '%v'", simulatedError, err)
 	}
@@ -132,7 +132,7 @@ func TestMockStore_GetAircraftWithAccidents(t *testing.T) {
 		RegistrationNumber: "ABC123",
 		ID:                 1,
 	}
-	expectedAccidents := []*models.Accident{
+	expectedAccidents := []*models.AircraftAccident{
 		{ID: 1, AircraftID: 1},
 		{ID: 2, AircraftID: 1},
 	}

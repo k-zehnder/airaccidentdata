@@ -120,7 +120,7 @@ func GetAllAircraftsHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 	}
 }
 
-// GetAccidentsByIdHandler creates a gin.HandlerFunc that handles requests to fetch aviation accidents by ID.
+// GetAccidentsByIdnHandler creates a gin.HandlerFunc that handles requests to fetch aviation accidents by ID.
 // @Summary Get a list of accidents by aircraft ID
 // @Description Get aviation accidents for an aircraft ID.
 // @Tags Aircrafts
@@ -131,7 +131,7 @@ func GetAllAircraftsHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 // @Failure 404 {object} models.ErrorResponse "Accident not found"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
 // @Router /aircrafts/{id}/accidents [get]
-func GetAccidentsByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
+func GetAccidentsByIdnHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extracting the ID from the URL path parameters.
 		idStr := c.Param("id")
@@ -155,7 +155,7 @@ func GetAccidentsByIdHandler(store *store.Store, log *logrus.Logger) gin.Handler
 	}
 }
 
-// GetAircraftByIdHandler creates a gin.HandlerFunc that handles requests to fetch details about an aircraft by its ID.
+// GetAircraftByIdHandler creates a gin.HandlerFunc that handles requests to fetch an aircraft by its ID.
 // @Summary Get details about an aircraft by ID
 // @Description Retrieve details of an aircraft by its ID
 // @Tags Aircrafts
