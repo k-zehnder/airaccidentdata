@@ -11,6 +11,14 @@ CREATE TABLE IF NOT EXISTS Aircrafts (
     aircraft_operator VARCHAR(255)
 );
 
+-- Create Aircraft Images Table
+CREATE TABLE IF NOT EXISTS AircraftImages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    aircraft_id INT,
+    image_url VARCHAR(255),
+    FOREIGN KEY (aircraft_id) REFERENCES Aircrafts(id)
+);
+
 -- Create Accidents Table
 CREATE TABLE IF NOT EXISTS Accidents (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -54,6 +62,14 @@ CREATE TABLE IF NOT EXISTS Accidents (
     ground_injury_unknown INT,
     aircraft_id INT,
     FOREIGN KEY (aircraft_id) REFERENCES Aircrafts(id)
+);
+
+-- Create Accident Images Table
+CREATE TABLE IF NOT EXISTS AccidentImages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    accident_id INT,
+    image_url VARCHAR(255),
+    FOREIGN KEY (accident_id) REFERENCES Accidents(id)
 );
 
 -- Insert a new aircraft
@@ -146,6 +162,14 @@ INSERT INTO Accidents (
     0, 
     1  
 );
+
+-- Insert a new image for the aircraft
+INSERT INTO AircraftImages (aircraft_id, image_url)
+VALUES (1, 'https://example.com/aircraft_image.jpg');
+
+-- Insert a new image for the accident
+INSERT INTO AccidentImages (accident_id, image_url)
+VALUES (1, 'https://example.com/accident_image.jpg');
 
 -- Query for accidents of a specific aircraft registration number
 SELECT * 

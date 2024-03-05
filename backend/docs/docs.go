@@ -233,6 +233,107 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/aircrafts/{id}/images": {
+            "get": {
+                "description": "Retrieve all images associated with a specific aircraft.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aircrafts"
+                ],
+                "summary": "Get all images for an aircraft",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Aircraft ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Images for the aircraft",
+                        "schema": {
+                            "$ref": "#/definitions/models.ImagesForAircraftResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid aircraft ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Aircraft not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/aircrafts/{id}/images/{imageID}": {
+            "get": {
+                "description": "Retrieve details of a specific image associated with a specific aircraft.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aircrafts"
+                ],
+                "summary": "Get a specific image for an aircraft",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Aircraft ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Image ID",
+                        "name": "imageID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image URL",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid aircraft or image ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Aircraft or image not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -531,6 +632,20 @@ const docTemplate = `{
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "models.ImagesForAircraftResponse": {
+            "type": "object",
+            "properties": {
+                "aircraft_id": {
+                    "type": "integer"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         }
