@@ -270,3 +270,62 @@ func (s *Store) GetAccidentById(id int) (*models.AircraftAccident, error) {
 	// Return the scanned accident.
 	return &accident, nil
 }
+
+// GetAircraftImagesById fetches all images associated with an aircraft by its ID.
+func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]string, error) {
+	// Query to fetch all images associated with the aircraft.
+	query := `SELECT image_url FROM AircraftImages WHERE aircraft_id = ?`
+
+	// Perform the database query
+	rows, err := s.db.Query(query, aircraftID)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching aircraft images: %w", err)
+	}
+	defer rows.Close()
+
+	// Create a slice to store retrieved image URLs.
+	var imageUrls []string
+
+	// Iterate over the rows and scan the image URLs into the slice.
+	for rows.Next() {
+		var imageUrl string
+		err := rows.Scan(&imageUrl)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning image URL: %w", err)
+		}
+		imageUrls = append(imageUrls, imageUrl)
+	}
+
+	// Check for any iteration errors.
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iteration error: %w", err)
+	}
+
+	return imageUrls, nil
+}
+
+// GetImageForAircraft fetches a specific image associated with an aircraft by its ID.
+func (s *Store) GetImageForAircraft(aircraftID, imageID int) (string, error) {
+	// Query to fetch a specific image associated with the aircraft.
+	query := `SELECT image_url FROM AircraftImages WHERE aircraft_id = ? AND id = ?`
+
+	// Perform the database query.
+	row := s.db.QueryRow(query, aircraftID, imageID)
+
+	// Create a variable to hold the scanned image URL.
+	var imageUrl string
+
+	// Scan the value from the row into the imageUrl variable.
+	err := row.Scan(&imageUrl)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// Return empty string for the imageUrl if image not found.
+			return "", nil
+		}
+		// Return the error if any other error occurred.
+		return "", fmt.Errorf("error scanning image URL: %w", err)
+	}
+
+	// Return the scanned image URL.
+	return imageUrl, nil
+}

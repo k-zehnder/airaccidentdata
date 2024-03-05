@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/computers33333/airaccidentdata/internal/models"
 	"github.com/computers33333/airaccidentdata/internal/store"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	// Importing models package
 )
 
 // GetAllAccidentsHandler creates a gin.HandlerFunc that handles requests to fetch a list of aviation accidents.
@@ -186,5 +186,86 @@ func GetAircraftByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 
 		// Return the aircraft in the response.
 		c.JSON(http.StatusOK, aircraft)
+	}
+}
+
+// GetAllImagesForAircraftHandler creates a gin.HandlerFunc that handles requests to fetch all images for a specific aircraft.
+// @Summary Get all images for an aircraft
+// @Description Retrieve all images associated with a specific aircraft.
+// @Tags Aircrafts
+// @Produce json
+// @Param id path int true "Aircraft ID"
+// @Success 200 {object} models.ImagesForAircraftResponse "Images for the aircraft"
+// @Failure 400 {object} models.ErrorResponse "Invalid aircraft ID"
+// @Failure 404 {object} models.ErrorResponse "Aircraft not found"
+// @Failure 500 {object} models.ErrorResponse "Internal Server Error"
+// @Router /aircrafts/{id}/images [get]
+func GetAllImagesForAircraftHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract the aircraft ID from the URL path parameters.
+		idStr := c.Param("id")
+		aircraftID, err := strconv.Atoi(idStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid aircraft ID"})
+			return
+		}
+
+		// Call the store method to fetch all images for the aircraft.
+		images, err := store.GetAllImagesForAircraft(aircraftID)
+		if err != nil {
+			log.WithError(err).Error("Failed to fetch images for aircraft")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch images for aircraft"})
+			return
+		}
+
+		// Construct the response data.
+		response := models.ImagesForAircraftResponse{
+			AircraftID: aircraftID,
+			Images:     images,
+		}
+
+		// Return the image URLs in the response.
+		c.JSON(http.StatusOK, response)
+	}
+}
+
+// GetImageForAircraftHandler creates a gin.HandlerFunc that handles requests to fetch a specific image for an aircraft by its ID.
+// @Summary Get a specific image for an aircraft
+// @Description Retrieve details of a specific image associated with a specific aircraft.
+// @Tags Aircrafts
+// @Produce json
+// @Param id path int true "Aircraft ID"
+// @Param imageID path int true "Image ID"
+// @Success 200 {string} string "Image URL"
+// @Failure 400 {object} models.ErrorResponse "Invalid aircraft or image ID"
+// @Failure 404 {object} models.ErrorResponse "Aircraft or image not found"
+// @Failure 500 {object} models.ErrorResponse "Internal Server Error"
+// @Router /aircrafts/{id}/images/{imageID} [get]
+func GetImageForAircraftHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Extract the aircraft ID and image ID from the URL path parameters.
+		aircraftIDStr := c.Param("id")
+		imageIDStr := c.Param("imageID")
+		aircraftID, err := strconv.Atoi(aircraftIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid aircraft ID"})
+			return
+		}
+		imageID, err := strconv.Atoi(imageIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid image ID"})
+			return
+		}
+
+		// Call the store method to fetch the specific image for the aircraft.
+		imageURL, err := store.GetImageForAircraft(aircraftID, imageID)
+		if err != nil {
+			log.WithError(err).Error("Failed to fetch image for aircraft")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch image for aircraft"})
+			return
+		}
+
+		// Return the image URL in the response.
+		c.JSON(http.StatusOK, imageURL)
 	}
 }

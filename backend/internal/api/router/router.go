@@ -53,6 +53,16 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 
 		// Get a specific accident by ID
 		v1.GET("/accidents/:id", controllers.GetAccidentByIdHandler(store, log))
+
+		// New route group for handling aircraft images
+		images := v1.Group("/aircrafts/:id/images")
+		{
+			// Get all images for a specific aircraft
+			images.GET("/", controllers.GetAllImagesForAircraftHandler(store, log))
+
+			// Get a specific image by its ID
+			images.GET("/:imageID", controllers.GetImageForAircraftHandler(store, log))
+		}
 	}
 
 	// Return configured router.
