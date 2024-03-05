@@ -242,7 +242,7 @@ const docTemplate = `{
                 "accidents": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.AircraftAccident"
+                        "$ref": "#/definitions/models.AircraftAccidentResponse"
                     }
                 },
                 "limit": {
@@ -253,131 +253,6 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
-                }
-            }
-        },
-        "models.AircraftAccident": {
-            "type": "object",
-            "properties": {
-                "aircraft_damage_description": {
-                    "type": "string"
-                },
-                "aircraft_id": {
-                    "type": "integer"
-                },
-                "aircraft_missing_flag": {
-                    "type": "string"
-                },
-                "cabin_crew_injury_fatal": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_minor": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_none": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_serious": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_unknown": {
-                    "type": "integer"
-                },
-                "entry_date": {
-                    "type": "string"
-                },
-                "event_local_date": {
-                    "type": "string"
-                },
-                "event_local_time": {
-                    "type": "string"
-                },
-                "event_type_description": {
-                    "type": "string"
-                },
-                "far_part": {
-                    "type": "string"
-                },
-                "fatal_flag": {
-                    "type": "string"
-                },
-                "flight_activity": {
-                    "type": "string"
-                },
-                "flight_crew_injury_fatal": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_minor": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_none": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_serious": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_unknown": {
-                    "type": "integer"
-                },
-                "flight_number": {
-                    "type": "string"
-                },
-                "flight_phase": {
-                    "type": "string"
-                },
-                "fsdo_description": {
-                    "type": "string"
-                },
-                "ground_injury_fatal": {
-                    "type": "integer"
-                },
-                "ground_injury_minor": {
-                    "type": "integer"
-                },
-                "ground_injury_none": {
-                    "type": "integer"
-                },
-                "ground_injury_serious": {
-                    "type": "integer"
-                },
-                "ground_injury_unknown": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "location_city_name": {
-                    "type": "string"
-                },
-                "location_country_name": {
-                    "type": "string"
-                },
-                "location_state_name": {
-                    "type": "string"
-                },
-                "max_injury_level": {
-                    "type": "string"
-                },
-                "passenger_injury_fatal": {
-                    "type": "integer"
-                },
-                "passenger_injury_minor": {
-                    "type": "integer"
-                },
-                "passenger_injury_none": {
-                    "type": "integer"
-                },
-                "passenger_injury_serious": {
-                    "type": "integer"
-                },
-                "passenger_injury_unknown": {
-                    "type": "integer"
-                },
-                "remark_text": {
-                    "type": "string"
-                },
-                "updated": {
-                    "type": "string"
                 }
             }
         },

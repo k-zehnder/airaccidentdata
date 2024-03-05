@@ -8,11 +8,11 @@ import (
 
 type MockStore struct {
 	Aircrafts  []*models.Aircraft
-	Accidents  []*models.AircraftAccident
+	Accidents  []*models.Accident
 	QueryError error // Used to simulate database query errors
 }
 
-func NewMockStore(aircrafts []*models.Aircraft, accidents []*models.AircraftAccident, queryError error) *MockStore {
+func NewMockStore(aircrafts []*models.Aircraft, accidents []*models.Accident, queryError error) *MockStore {
 	return &MockStore{
 		Aircrafts:  aircrafts,
 		Accidents:  accidents,
@@ -28,7 +28,7 @@ func (ms *MockStore) SaveAircrafts(aircrafts []*models.Aircraft) error {
 	return nil
 }
 
-func (ms *MockStore) SaveAccidents(accidents []*models.AircraftAccident) error {
+func (ms *MockStore) SaveAccidents(accidents []*models.Accident) error {
 	if ms.QueryError != nil {
 		return ms.QueryError
 	}
@@ -43,7 +43,7 @@ func (ms *MockStore) GetAircrafts() ([]*models.Aircraft, error) {
 	return ms.Aircrafts, nil
 }
 
-func (ms *MockStore) GetAccidents() ([]*models.AircraftAccident, error) {
+func (ms *MockStore) GetAccidents() ([]*models.Accident, error) {
 	if ms.QueryError != nil {
 		return nil, ms.QueryError
 	}
@@ -64,7 +64,7 @@ func (ms *MockStore) GetAircraftWithAccidents(registrationNumber string) (*model
 		return nil, fmt.Errorf("aircraft with registration number %s not found", registrationNumber)
 	}
 
-	var aircraftAccidents []*models.AircraftAccident
+	var aircraftAccidents []*models.Accident
 	for _, accident := range ms.Accidents {
 		if accident.AircraftID == aircraftWithAccidents.ID {
 			aircraftAccidents = append(aircraftAccidents, accident)
