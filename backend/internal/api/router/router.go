@@ -46,7 +46,7 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 		v1.GET("/aircrafts/:id", controllers.GetAircraftByIdHandler(store, log))
 
 		// Get accidents for a specific aircraft by id
-		v1.GET("/aircrafts/:id/accidents", controllers.GetAccidentByIdHandler(store, log))
+		v1.GET("/aircrafts/:id/accidents", controllers.GetAccidentsByIdHandler(store, log))
 
 		// List all accidents or filter them using query parameters
 		v1.GET("/accidents", controllers.GetAllAccidentsHandler(store, log))
