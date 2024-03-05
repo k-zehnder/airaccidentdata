@@ -29,6 +29,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="relative flex min-h-screen flex-col">
               <div className="flex w-full flex-1 flex-col overflow-hidden">
+                <link rel="icon" href="https://s.airaccidentdata.com/favicon.ico" type="image/xicon" sizes="16x16" />
                 {children}
               </div>
             </div>
