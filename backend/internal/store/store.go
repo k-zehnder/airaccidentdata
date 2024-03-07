@@ -158,15 +158,22 @@ func (s *Store) GetAccidentByIdHandler(id int) (*models.Aircraft, error) {
 	return &aircraft, nil
 }
 
-// GetAllAircrafts fetches all aircraft from the database.
-func (s *Store) GetAllAircrafts() ([]*models.Aircraft, error) {
-	// Query to fetch all aircraft.
-	query := `SELECT id, registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator FROM Aircrafts`
+// GetAllAircrafts fetches a specific page of aircrafts from the database with pagination.
+func (s *Store) GetAllAircrafts(page, limit int) ([]*models.Aircraft, int, error) {
+	// Calculate the offset based on the page number and limit.
+	offset := (page - 1) * limit
+
+	// Query to fetch a specific page of aircrafts.
+	query := `
+		SELECT id, registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator
+		FROM Aircrafts
+		LIMIT ? OFFSET ? 
+	`
 
 	// Perform the database query.
-	rows, err := s.db.Query(query)
+	rows, err := s.db.Query(query, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching aircrafts: %w", err)
+		return nil, 0, fmt.Errorf("error fetching aircrafts: %w", err)
 	}
 	defer rows.Close()
 
@@ -184,17 +191,22 @@ func (s *Store) GetAllAircrafts() ([]*models.Aircraft, error) {
 			&aircraft.AircraftOperator,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("error scanning aircraft row: %w", err)
+			return nil, 0, fmt.Errorf("error scanning aircraft row: %w", err)
 		}
 		aircrafts = append(aircrafts, &aircraft)
 	}
 
-	// Check for any iteration errors.
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iteration error: %w", err)
+	// Query to fetch the total count of aircrafts.
+	countQuery := `SELECT COUNT(*) FROM Aircrafts`
+	var totalCount int
+	err = s.db.QueryRow(countQuery).Scan(&totalCount)
+	if err != nil {
+		return nil, 0, fmt.Errorf("error fetching total number of accidents: %w", err)
 	}
 
-	return aircrafts, nil
+	// Return the retrieved aircrafts and total count.
+	return aircrafts, totalCount, nil
+
 }
 
 // GetAircraftById fetches an aircraft by its ID from the database.

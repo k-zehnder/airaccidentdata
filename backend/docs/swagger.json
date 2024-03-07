@@ -36,7 +36,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.AccidentResponse"
+                            "$ref": "#/definitions/models.AccidentPaginatedResponse"
                         }
                     },
                     "400": {
@@ -103,22 +103,39 @@
         },
         "/aircrafts": {
             "get": {
-                "description": "Retrieve a list of all aircraft.",
+                "description": "Retrieve a list of all aircraft with pagination.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Aircrafts"
                 ],
-                "summary": "Get a list of aircrafts",
+                "summary": "Get a list of aircraft with pagination",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of aircraft per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Aircrafts data with pagination details",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.AircraftResponse"
-                            }
+                            "$ref": "#/definitions/models.AircraftPaginatedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "500": {
@@ -330,7 +347,7 @@
         }
     },
     "definitions": {
-        "models.AccidentResponse": {
+        "models.AccidentPaginatedResponse": {
             "type": "object",
             "properties": {
                 "accidents": {
@@ -597,6 +614,26 @@
                 },
                 "updated": {
                     "type": "string"
+                }
+            }
+        },
+        "models.AircraftPaginatedResponse": {
+            "type": "object",
+            "properties": {
+                "aircrafts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.AircraftResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },
