@@ -210,6 +210,15 @@ definitions:
       message:
         type: string
     type: object
+  models.ImagesForAircraftResponse:
+    properties:
+      aircraft_id:
+        type: integer
+      images:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
 info:
   contact: {}
   description: API server for airaccidentdata.com
@@ -384,11 +393,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: Image URLs
+          description: Image IDs and URLs
           schema:
-            items:
-              type: string
-            type: array
+            $ref: '#/definitions/models.ImagesForAircraftResponse'
         "400":
           description: Invalid aircraft ID
           schema:

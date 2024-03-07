@@ -53,3 +53,10 @@ type AircraftAccident struct {
 	GroundInjuryUnknown       int       `json:"ground_injury_unknown"`
 	AircraftID                int       `json:"aircraft_id"`
 }
+
+type AircraftImage struct {
+	ID          int    `json:"id"`
+	AircraftID  int    `json:"aircraft_id"`
+	ImageURL    string `json:"image_url"`
+	Description string `json:"description"`
+}

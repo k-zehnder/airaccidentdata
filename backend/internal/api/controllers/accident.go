@@ -213,7 +213,7 @@ func GetAircraftByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 // @Tags Aircrafts
 // @Produce json
 // @Param id path int true "Aircraft ID"
-// @Success 200 {array} string "Image URLs"
+// @Success 200 {object} models.ImagesForAircraftResponse "Image IDs and URLs"
 // @Failure 400 {object} models.ErrorResponse "Invalid aircraft ID"
 // @Failure 404 {object} models.ErrorResponse "Aircraft not found"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
@@ -224,7 +224,7 @@ func GetAllImagesForAircraftHandler(store *store.Store, log *logrus.Logger) gin.
 		idStr := c.Param("id")
 		aircraftID, err := strconv.Atoi(idStr)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid aircraft ID"})
+			c.JSON(http.StatusBadRequest, models.ErrorResponse{Message: "Invalid aircraft ID"})
 			return
 		}
 
@@ -232,17 +232,17 @@ func GetAllImagesForAircraftHandler(store *store.Store, log *logrus.Logger) gin.
 		images, err := store.GetAllImagesForAircraft(aircraftID)
 		if err != nil {
 			log.WithError(err).Error("Failed to fetch images for aircraft")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch images for aircraft"})
+			c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: "Failed to fetch images for aircraft"})
 			return
 		}
 
 		// Construct the response data.
-		response := models.ImagesForAircraftResponse{
-			AircraftID: aircraftID,
-			Images:     images,
+		response := make(map[string]string)
+		for _, image := range images {
+			response[strconv.Itoa(image.ID)] = image.ImageURL
 		}
 
-		// Return the image URLs in the response.
+		// Return the image IDs and URLs in the response.
 		c.JSON(http.StatusOK, response)
 	}
 }

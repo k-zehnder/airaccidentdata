@@ -272,12 +272,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Image URLs",
+                        "description": "Image IDs and URLs",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.ImagesForAircraftResponse"
                         }
                     },
                     "400": {
@@ -672,6 +669,20 @@ const docTemplate = `{
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "models.ImagesForAircraftResponse": {
+            "type": "object",
+            "properties": {
+                "aircraft_id": {
+                    "type": "integer"
+                },
+                "images": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 }
             }
         }
