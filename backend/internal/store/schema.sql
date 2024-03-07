@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS Aircrafts (
 CREATE TABLE IF NOT EXISTS AircraftImages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     aircraft_id INT,
-    image_url VARCHAR(255),
+    image_url TEXT,
     FOREIGN KEY (aircraft_id) REFERENCES Aircrafts(id)
 );
 

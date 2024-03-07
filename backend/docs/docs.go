@@ -24,7 +24,7 @@ const docTemplate = `{
                 "tags": [
                     "Accidents"
                 ],
-                "summary": "Get a list of accidents",
+                "summary": "Get a list of accidents withh pagination",
                 "parameters": [
                     {
                         "type": "integer",
@@ -272,9 +272,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Images for the aircraft",
+                        "description": "Image URLs",
                         "schema": {
-                            "$ref": "#/definitions/models.ImagesForAircraftResponse"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     },
                     "400": {
@@ -669,20 +672,6 @@ const docTemplate = `{
             "properties": {
                 "message": {
                     "type": "string"
-                }
-            }
-        },
-        "models.ImagesForAircraftResponse": {
-            "type": "object",
-            "properties": {
-                "aircraft_id": {
-                    "type": "integer"
-                },
-                "images": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         }

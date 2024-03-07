@@ -1,1 +1,0 @@
-# export MYSQL_DSN="user:password@tcp(localhost:3306)/airaccidentdata?parseTime=true"
