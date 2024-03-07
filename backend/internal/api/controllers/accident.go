@@ -13,7 +13,7 @@ import (
 
 // GetAllAccidentsHandler creates a gin.HandlerFunc that handles requests to fetch a list of aviation accidents.
 // It utilizes pagination to efficiently return a subset of accidents based on the provided query parameters.
-// @Summary Get a list of accidents withh pagination
+// @Summary Get a list of accidents with pagination
 // @Description Get list of all aviation accidents with pagination
 // @Tags Accidents
 // @Produce json
@@ -242,8 +242,10 @@ func GetAllImagesForAircraftHandler(store *store.Store, log *logrus.Logger) gin.
 			response[strconv.Itoa(image.ID)] = image.ImageURL
 		}
 
-		// Return the image IDs and URLs in the response.
-		c.JSON(http.StatusOK, response)
+		c.JSON(http.StatusOK, gin.H{
+			"aircraft_id": aircraftID,
+			"images":      response,
+		})
 	}
 }
 

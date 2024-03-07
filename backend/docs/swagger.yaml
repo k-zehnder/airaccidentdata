@@ -252,7 +252,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get a list of accidents withh pagination
+      summary: Get a list of accidents with pagination
       tags:
       - Accidents
   /accidents/{id}:
