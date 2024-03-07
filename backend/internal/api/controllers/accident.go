@@ -19,7 +19,7 @@ import (
 // @Produce json
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of accidents per page"
-// @Success 200 {object} models.AccidentResponse
+// @Success 200 {object} models.AccidentPaginatedResponse
 // @Failure 400 {object} models.ErrorResponse "Invalid parameters"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
 // @Router /accidents [get]
@@ -94,29 +94,47 @@ func GetAccidentByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 	}
 }
 
-// GetAllAircraftsHandler creates a gin.HandlerFunc that handles requests to fetch all aircraft.
-// @Summary Get a list of aircrafts
-// @Description Retrieve a list of all aircraft.
+// GetAllAircraftsHandler creates a gin.HandlerFunc that handles requests to fetch all aircraft with pagination.
+// @Summary Get a list of aircraft with pagination
+// @Description Retrieve a list of all aircraft with pagination.
 // @Tags Aircrafts
 // @Produce json
-// @Success 200 {array} models.AircraftResponse
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of aircraft per page"
+// @Success 200 {object} models.AircraftPaginatedResponse "Aircrafts data with pagination details"
+// @Failure 400 {object} models.ErrorResponse "Invalid parameters"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
 // @Router /aircrafts [get]
 func GetAllAircraftsHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Calling the GetAllAircrafts method of the store to retrieve all aircraft.
-		aircrafts, err := store.GetAllAircrafts()
-		if err != nil {
-			// Logging the error and sending an internal server error response.
-			log.WithFields(logrus.Fields{
-				"error": err.Error(),
-			}).Error("Failed to get aircrafts")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		// Extract page and limit from query parameters with default values
+		page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+		if err != nil || page < 1 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page number"})
 			return
 		}
 
-		// Responding with the aircrafts.
-		c.JSON(http.StatusOK, aircrafts)
+		limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+		if err != nil || limit < 1 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit number"})
+			return
+		}
+
+		// Call the store method to fetch paginated aircraft data
+		aircrafts, totalCount, err := store.GetAllAircrafts(page, limit)
+		if err != nil {
+			log.WithError(err).Error("Failed to fetch aircrafts")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch aircrafts"})
+			return
+		}
+
+		// Respond with paginated aircraft data
+		c.JSON(http.StatusOK, gin.H{
+			"aircrafts": aircrafts,
+			"total":     totalCount,
+			"page":      page,
+			"limit":     limit,
+		})
 	}
 }
 

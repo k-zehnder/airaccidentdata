@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  models.AccidentResponse:
+  models.AccidentPaginatedResponse:
     properties:
       accidents:
         items:
@@ -179,6 +179,19 @@ definitions:
       updated:
         type: string
     type: object
+  models.AircraftPaginatedResponse:
+    properties:
+      aircrafts:
+        items:
+          $ref: '#/definitions/models.AircraftResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
   models.AircraftResponse:
     properties:
       aircraft_make_name:
@@ -230,7 +243,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AccidentResponse'
+            $ref: '#/definitions/models.AccidentPaginatedResponse'
         "400":
           description: Invalid parameters
           schema:
@@ -275,21 +288,32 @@ paths:
       - Accidents
   /aircrafts:
     get:
-      description: Retrieve a list of all aircraft.
+      description: Retrieve a list of all aircraft with pagination.
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of aircraft per page
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Aircrafts data with pagination details
           schema:
-            items:
-              $ref: '#/definitions/models.AircraftResponse'
-            type: array
+            $ref: '#/definitions/models.AircraftPaginatedResponse'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get a list of aircrafts
+      summary: Get a list of aircraft with pagination
       tags:
       - Aircrafts
   /aircrafts/{id}:

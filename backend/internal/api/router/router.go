@@ -39,29 +39,21 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 	// Set up the v1 routes group
 	v1 := router.Group("/api/v1")
 	{
-		// List all aircrafts or filter by registration number using a query parameter
-		v1.GET("/aircrafts", controllers.GetAllAircraftsHandler(store, log))
-
-		// Get a specific aircraft by ID
-		v1.GET("/aircrafts/:id", controllers.GetAircraftByIdHandler(store, log))
-
-		// Get accidents for a specific aircraft by id
-		v1.GET("/aircrafts/:id/accidents", controllers.GetAccidentByIdHandler(store, log))
-
-		// List all accidents or filter them using query parameters
-		v1.GET("/accidents", controllers.GetAllAccidentsHandler(store, log))
-
-		// Get a specific accident by ID
-		v1.GET("/accidents/:id", controllers.GetAccidentByIdHandler(store, log))
-
-		// New route group for handling aircraft images
-		images := v1.Group("/aircrafts/:id/images")
+		// Set up aircrafts route
+		aircrafts := v1.Group("/aircrafts")
 		{
-			// Get all images for a specific aircraft
-			images.GET("/", controllers.GetAllImagesForAircraftHandler(store, log))
+			aircrafts.GET("", controllers.GetAllAircraftsHandler(store, log))
+			aircrafts.GET("/:id", controllers.GetAircraftByIdHandler(store, log))
+			aircrafts.GET("/:id/accidents", controllers.GetAccidentByIdHandler(store, log))
+			aircrafts.GET("/:id/images", controllers.GetAllImagesForAircraftHandler(store, log))
+			aircrafts.GET("/:id/images/:imageID", controllers.GetImageForAircraftHandler(store, log))
+		}
 
-			// Get a specific image by its ID
-			images.GET("/:imageID", controllers.GetImageForAircraftHandler(store, log))
+		// Set up accidents route
+		accidents := v1.Group("/accidents")
+		{
+			accidents.GET("", controllers.GetAllAccidentsHandler(store, log))
+			accidents.GET("/:id", controllers.GetAccidentByIdHandler(store, log))
 		}
 	}
 

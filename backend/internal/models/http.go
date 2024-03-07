@@ -8,8 +8,16 @@ type ErrorResponse struct {
 }
 
 // AccidentResponse defines the structure for the paginated accident response.
-type AccidentResponse struct {
+type AccidentPaginatedResponse struct {
 	Accidents []AircraftAccident `json:"accidents"`
+	Total     int                `json:"total"`
+	Page      int                `json:"page"`
+	Limit     int                `json:"limit"`
+}
+
+// AircraftPaginatedResponse defines the structure for the paginated aircraft response.
+type AircraftPaginatedResponse struct {
+	Aircrafts []AircraftResponse `json:"aircrafts"`
 	Total     int                `json:"total"`
 	Page      int                `json:"page"`
 	Limit     int                `json:"limit"`
