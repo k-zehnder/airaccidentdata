@@ -283,10 +283,10 @@ func (s *Store) GetAccidentById(id int) (*models.AircraftAccident, error) {
 	return &accident, nil
 }
 
-// GetAircraftImagesById fetches all images associated with an aircraft by its ID.
-func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]string, error) {
+// GetAllImagesForAircraft fetches all images associated with an aircraft by its ID.
+func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]*models.AircraftImage, error) {
 	// Query to fetch all images associated with the aircraft.
-	query := `SELECT image_url FROM AircraftImages WHERE aircraft_id = ?`
+	query := `SELECT id, image_url FROM AircraftImages WHERE aircraft_id = ?`
 
 	// Perform the database query
 	rows, err := s.db.Query(query, aircraftID)
@@ -295,17 +295,17 @@ func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]string, error) {
 	}
 	defer rows.Close()
 
-	// Create a slice to store retrieved image URLs.
-	var imageUrls []string
+	// Create a slice to store retrieved images.
+	var images []*models.AircraftImage
 
-	// Iterate over the rows and scan the image URLs into the slice.
+	// Iterate over the rows and scan the image details into the slice.
 	for rows.Next() {
-		var imageUrl string
-		err := rows.Scan(&imageUrl)
+		var image models.AircraftImage
+		err := rows.Scan(&image.ID, &image.ImageURL)
 		if err != nil {
-			return nil, fmt.Errorf("error scanning image URL: %w", err)
+			return nil, fmt.Errorf("error scanning image details: %w", err)
 		}
-		imageUrls = append(imageUrls, imageUrl)
+		images = append(images, &image)
 	}
 
 	// Check for any iteration errors.
@@ -313,7 +313,7 @@ func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]string, error) {
 		return nil, fmt.Errorf("iteration error: %w", err)
 	}
 
-	return imageUrls, nil
+	return images, nil
 }
 
 // GetImageForAircraft fetches a specific image associated with an aircraft by its ID.
