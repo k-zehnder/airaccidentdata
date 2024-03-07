@@ -24,7 +24,7 @@ const docTemplate = `{
                 "tags": [
                     "Accidents"
                 ],
-                "summary": "Get a list of accidents withh pagination",
+                "summary": "Get a list of accidents with pagination",
                 "parameters": [
                     {
                         "type": "integer",
