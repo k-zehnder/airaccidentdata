@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS Accidents (
     remark_text TEXT,
     event_type_description VARCHAR(255),
     fsdo_description VARCHAR(255),
-    flight_number VARCHAR(255),
+    flight_number VARCHAR(255) UNIQUE,
     aircraft_missing_flag VARCHAR(50),
     aircraft_damage_description VARCHAR(255),
     flight_activity VARCHAR(255),
@@ -80,7 +80,7 @@ ON DUPLICATE KEY UPDATE
     aircraft_model_name = VALUES(aircraft_model_name),
     aircraft_operator = VALUES(aircraft_operator);
 
--- Insert a new accident
+-- Insert a new accident with "on duplicate key update"
 INSERT INTO Accidents (
     updated, 
     entry_date, 
@@ -161,15 +161,56 @@ INSERT INTO Accidents (
     0, 
     0, 
     1  
-);
+) ON DUPLICATE KEY UPDATE
+    updated = VALUES(updated),
+    entry_date = VALUES(entry_date),
+    event_local_date = VALUES(event_local_date),
+    event_local_time = VALUES(event_local_time),
+    location_city_name = VALUES(location_city_name),
+    location_state_name = VALUES(location_state_name),
+    location_country_name = VALUES(location_country_name),
+    remark_text = VALUES(remark_text),
+    event_type_description = VALUES(event_type_description),
+    fsdo_description = VALUES(fsdo_description),
+    flight_number = VALUES(flight_number),
+    aircraft_missing_flag = VALUES(aircraft_missing_flag),
+    aircraft_damage_description = VALUES(aircraft_damage_description),
+    flight_activity = VALUES(flight_activity),
+    flight_phase = VALUES(flight_phase),
+    far_part = VALUES(far_part),
+    max_injury_level = VALUES(max_injury_level),
+    fatal_flag = VALUES(fatal_flag),
+    flight_crew_injury_none = VALUES(flight_crew_injury_none),
+    flight_crew_injury_minor = VALUES(flight_crew_injury_minor),
+    flight_crew_injury_serious = VALUES(flight_crew_injury_serious),
+    flight_crew_injury_fatal = VALUES(flight_crew_injury_fatal),
+    flight_crew_injury_unknown = VALUES(flight_crew_injury_unknown),
+    cabin_crew_injury_none = VALUES(cabin_crew_injury_none),
+    cabin_crew_injury_minor = VALUES(cabin_crew_injury_minor),
+    cabin_crew_injury_serious = VALUES(cabin_crew_injury_serious),
+    cabin_crew_injury_fatal = VALUES(cabin_crew_injury_fatal),
+    cabin_crew_injury_unknown = VALUES(cabin_crew_injury_unknown),
+    passenger_injury_none = VALUES(passenger_injury_none),
+    passenger_injury_minor = VALUES(passenger_injury_minor),
+    passenger_injury_serious = VALUES(passenger_injury_serious),
+    passenger_injury_fatal = VALUES(passenger_injury_fatal),
+    passenger_injury_unknown = VALUES(passenger_injury_unknown),
+    ground_injury_none = VALUES(ground_injury_none),
+    ground_injury_minor = VALUES(ground_injury_minor),
+    ground_injury_serious = VALUES(ground_injury_serious),
+    ground_injury_fatal = VALUES(ground_injury_fatal),
+    ground_injury_unknown = VALUES(ground_injury_unknown),
+    aircraft_id = VALUES(aircraft_id);
 
--- Insert a new image for the aircraft
+-- Insert a new image for the aircraft with "on duplicate key update"
 INSERT INTO AircraftImages (aircraft_id, image_url)
-VALUES (1, 'https://example.com/aircraft_image.jpg');
+VALUES (1, 'https://example.com/aircraft_image.jpg')
+ON DUPLICATE KEY UPDATE image_url = VALUES(image_url);
 
--- Insert a new image for the accident
+-- Insert a new image for the accident with "on duplicate key update"
 INSERT INTO AccidentImages (accident_id, image_url)
-VALUES (1, 'https://example.com/accident_image.jpg');
+VALUES (1, 'https://example.com/accident_image.jpg')
+ON DUPLICATE KEY UPDATE image_url = VALUES(image_url);
 
 -- Query for accidents of a specific aircraft registration number
 SELECT * 
