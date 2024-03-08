@@ -2,11 +2,14 @@ package store
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/computers33333/airaccidentdata/internal/models"
 )
 
+// TestMockStore_GetAccidents tests the GetAccidents method of the MockStore.
+// It verifies that the method returns the expected accidents and handles errors correctly.
 func TestMockStore_GetAccidents(t *testing.T) {
 	expectedAccidents := []*models.AircraftAccident{
 		{ID: 1},
@@ -26,6 +29,8 @@ func TestMockStore_GetAccidents(t *testing.T) {
 	}
 }
 
+// TestMockStore_SaveAccidents tests the SaveAccidents method of the MockStore.
+// It verifies that the method saves accidents correctly and handles errors properly.
 func TestMockStore_SaveAccidents(t *testing.T) {
 	mockStore := NewMockStore(nil, nil, nil)
 	accidents := []*models.AircraftAccident{
@@ -45,6 +50,8 @@ func TestMockStore_SaveAccidents(t *testing.T) {
 	}
 }
 
+// TestMockStore_GetAircrafts tests the GetAircrafts method of the MockStore.
+// It checks that the method returns the expected aircrafts and handles errors correctly.
 func TestMockStore_GetAircrafts(t *testing.T) {
 	expectedAircrafts := []*models.Aircraft{
 		{RegistrationNumber: "ABC123"},
@@ -64,6 +71,8 @@ func TestMockStore_GetAircrafts(t *testing.T) {
 	}
 }
 
+// TestMockStore_SaveAircrafts tests the SaveAircrafts method of the MockStore.
+// It ensures that the method saves aircrafts correctly and handles errors properly.
 func TestMockStore_SaveAircrafts(t *testing.T) {
 	mockStore := NewMockStore(nil, nil, nil)
 	aircrafts := []*models.Aircraft{
@@ -83,6 +92,7 @@ func TestMockStore_SaveAircrafts(t *testing.T) {
 	}
 }
 
+// TestMockStore_GetAircrafts_Error tests error handling in the GetAircrafts method of the MockStore.
 func TestMockStore_GetAircrafts_Error(t *testing.T) {
 	expectedError := errors.New("query error")
 	mockStore := NewMockStore(nil, nil, expectedError)
@@ -95,7 +105,7 @@ func TestMockStore_GetAircrafts_Error(t *testing.T) {
 	}
 }
 
-// GetAircraftWithAccidents
+// TestMockStore_GetAccidents_Error tests error handling in the GetAccidents method of the MockStore.
 func TestMockStore_GetAccidents_Error(t *testing.T) {
 	expectedError := errors.New("query error")
 	mockStore := NewMockStore(nil, nil, expectedError)
@@ -108,6 +118,7 @@ func TestMockStore_GetAccidents_Error(t *testing.T) {
 	}
 }
 
+// TestMockStore_SaveAircrafts_Error tests error handling in the SaveAircrafts method of the MockStore.
 func TestMockStore_SaveAircrafts_Error(t *testing.T) {
 	simulatedError := errors.New("simulated save error")
 	mockStore := NewMockStore(nil, nil, simulatedError)
@@ -117,6 +128,7 @@ func TestMockStore_SaveAircrafts_Error(t *testing.T) {
 	}
 }
 
+// TestMockStore_SaveAccidents_Error tests error handling in the SaveAccidents method of the MockStore.
 func TestMockStore_SaveAccidents_Error(t *testing.T) {
 	simulatedError := errors.New("simulated save error")
 	mockStore := NewMockStore(nil, nil, simulatedError)
@@ -126,7 +138,8 @@ func TestMockStore_SaveAccidents_Error(t *testing.T) {
 	}
 }
 
-// GetAircraftWithAccidents
+// TestMockStore_GetAircraftWithAccidents tests the GetAircraftWithAccidents method of the MockStore.
+// It verifies that the method returns the expected aircraft with associated accidents.
 func TestMockStore_GetAircraftWithAccidents(t *testing.T) {
 	expectedAircraft := &models.Aircraft{
 		RegistrationNumber: "ABC123",
@@ -159,5 +172,26 @@ func TestMockStore_GetAircraftWithAccidents(t *testing.T) {
 		if accident.AircraftID != expectedAircraft.ID {
 			t.Errorf("Expected accident AircraftID %d, got %d", expectedAircraft.ID, accident.AircraftID)
 		}
+	}
+}
+
+// TestMockStore_GetAircraftWithAccidents_NotFound tests the scenario when the aircraft is not found.
+// It ensures that the method returns an error when the aircraft with the specified registration number is not found.
+func TestMockStore_GetAircraftWithAccidents_NotFound(t *testing.T) {
+	mockStore := NewMockStore(nil, nil, nil)
+
+	// Specify a registration number that doesn't exist in the mock store
+	registrationNumber := "NonExistent"
+
+	aircraftWithAccidents, err := mockStore.GetAircraftWithAccidents(registrationNumber)
+	if aircraftWithAccidents != nil {
+		t.Fatalf("Expected nil aircraft, got %v", aircraftWithAccidents)
+	}
+	if err == nil {
+		t.Fatal("Expected an error, got nil")
+	}
+	expectedErrorMessage := fmt.Sprintf("aircraft with registration number %s not found", registrationNumber)
+	if err.Error() != expectedErrorMessage {
+		t.Errorf("Expected error '%s', got '%v'", expectedErrorMessage, err)
 	}
 }
