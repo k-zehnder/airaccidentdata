@@ -372,8 +372,7 @@ func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *m
         ground_injury_fatal = VALUES(ground_injury_fatal),
         ground_injury_unknown = VALUES(ground_injury_unknown),
         aircraft_id = VALUES(aircraft_id)
-`
-
+	`
 	_, err := db.ExecContext(ctx, stmt,
 		incident.Updated,
 		incident.EntryDate.Format("2006-01-02"),
