@@ -262,7 +262,7 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.AircraftA
 	return aircraft, incident, nil
 }
 
-// insertAircraft inserts a new aircraft into the database and returns its ID.
+// insertAircraft inserts a new aircraft into the database or updates it if it already exists.
 func insertAircraft(ctx context.Context, db *sql.DB, registrationNumber, aircraftMake, aircraftModel, aircraftOperator string) (int, error) {
 	stmt := `
 		INSERT INTO Aircrafts (registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator) 
@@ -273,12 +273,13 @@ func insertAircraft(ctx context.Context, db *sql.DB, registrationNumber, aircraf
 			aircraft_operator = VALUES(aircraft_operator)
 	`
 
+	// Execute the SQL statement
 	_, err := db.ExecContext(ctx, stmt, registrationNumber, aircraftMake, aircraftModel, aircraftOperator)
 	if err != nil {
 		return 0, fmt.Errorf("error inserting or updating aircraft: %w", err)
 	}
 
-	// Retrieve the ID of the inserted or updated aircraft.
+	// Retrieve the ID of the inserted or updated aircraft
 	var aircraftID int
 	err = db.QueryRowContext(ctx, "SELECT id FROM Aircrafts WHERE registration_number = ?", registrationNumber).Scan(&aircraftID)
 	if err != nil {
@@ -290,6 +291,22 @@ func insertAircraft(ctx context.Context, db *sql.DB, registrationNumber, aircraf
 
 // insertAccident inserts or updates an accident associated with an aircraft in the database.
 func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *models.AircraftAccident) error {
+	// Check if the accident already exists
+	var existingID int
+	checkStmt := `
+			SELECT id FROM Accidents
+			WHERE aircraft_id = ? AND event_local_date = ? AND event_local_time = ?
+		`
+	err := db.QueryRowContext(ctx, checkStmt, aircraftID, incident.EventLocalDate.Format("2006-01-02"), incident.EventLocalTime).Scan(&existingID)
+	if err != nil && err != sql.ErrNoRows {
+		return fmt.Errorf("error checking for existing accident: %w", err)
+	}
+
+	if existingID != 0 {
+		// Accident already exists, handle it accordingly
+		return nil // Or return an error if required
+	}
+
 	stmt := `
     INSERT INTO Accidents (
         updated, 
@@ -373,7 +390,7 @@ func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *m
         ground_injury_unknown = VALUES(ground_injury_unknown),
         aircraft_id = VALUES(aircraft_id)
 	`
-	_, err := db.ExecContext(ctx, stmt,
+	_, execErr := db.ExecContext(ctx, stmt,
 		incident.Updated,
 		incident.EntryDate.Format("2006-01-02"),
 		incident.EventLocalDate.Format("2006-01-02"),
@@ -414,8 +431,8 @@ func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *m
 		incident.GroundInjuryUnknown,
 		aircraftID,
 	)
-	if err != nil {
-		return fmt.Errorf("error inserting or updating accident: %w", err)
+	if execErr != nil {
+		return fmt.Errorf("error inserting or updating accident: %w", execErr)
 	}
 	return nil
 }
