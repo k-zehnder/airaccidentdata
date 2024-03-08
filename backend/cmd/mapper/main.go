@@ -264,62 +264,115 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.AircraftA
 
 // insertAircraft inserts a new aircraft into the database and returns its ID.
 func insertAircraft(ctx context.Context, db *sql.DB, registrationNumber, aircraftMake, aircraftModel, aircraftOperator string) (int, error) {
-	_, err := db.ExecContext(ctx, "INSERT INTO Aircrafts (registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator) VALUES (?, ?, ?, ?)", registrationNumber, aircraftMake, aircraftModel, aircraftOperator)
+	stmt := `
+		INSERT INTO Aircrafts (registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator) 
+		VALUES (?, ?, ?, ?) 
+		ON DUPLICATE KEY UPDATE 
+			aircraft_make_name = VALUES(aircraft_make_name), 
+			aircraft_model_name = VALUES(aircraft_model_name), 
+			aircraft_operator = VALUES(aircraft_operator)
+	`
+
+	_, err := db.ExecContext(ctx, stmt, registrationNumber, aircraftMake, aircraftModel, aircraftOperator)
 	if err != nil {
-		return 0, fmt.Errorf("error inserting aircraft: %w", err)
+		return 0, fmt.Errorf("error inserting or updating aircraft: %w", err)
 	}
 
-	// Retrieve the last inserted ID.
+	// Retrieve the ID of the inserted or updated aircraft.
 	var aircraftID int
-	err = db.QueryRowContext(ctx, "SELECT id from Aircrafts where registration_number = ?", registrationNumber).Scan(&aircraftID)
+	err = db.QueryRowContext(ctx, "SELECT id FROM Aircrafts WHERE registration_number = ?", registrationNumber).Scan(&aircraftID)
 	if err != nil {
-		return 0, fmt.Errorf("error retrieving last inserted ID: %w", err)
+		return 0, fmt.Errorf("error retrieving aircraft ID: %w", err)
 	}
-	return int(aircraftID), nil
+
+	return aircraftID, nil
 }
 
+// insertAccident inserts or updates an accident associated with an aircraft in the database.
 func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *models.AircraftAccident) error {
-	stmt := `INSERT INTO Accidents (
-		updated, 
-		entry_date, 
-		event_local_date, 
-		event_local_time,
-		location_city_name,
-		location_state_name,
-		location_country_name,
-		remark_text,
-		event_type_description,
-		fsdo_description,
-		flight_number,
-		aircraft_missing_flag,
-		aircraft_damage_description,
-		flight_activity,
-		flight_phase,
-		far_part,
-		max_injury_level,
-		fatal_flag,
-		flight_crew_injury_none,
-		flight_crew_injury_minor,
-		flight_crew_injury_serious,
-		flight_crew_injury_fatal,
-		flight_crew_injury_unknown,
-		cabin_crew_injury_none,
-		cabin_crew_injury_minor,
-		cabin_crew_injury_serious,
-		cabin_crew_injury_fatal,
-		cabin_crew_injury_unknown,
-		passenger_injury_none,
-		passenger_injury_minor,
-		passenger_injury_serious,
-		passenger_injury_fatal,
-		passenger_injury_unknown,
-		ground_injury_none,
-		ground_injury_minor,
-		ground_injury_serious,
-		ground_injury_fatal,
-		ground_injury_unknown,
-		aircraft_id
-	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	stmt := `
+    INSERT INTO Accidents (
+        updated, 
+        entry_date, 
+        event_local_date, 
+        event_local_time,
+        location_city_name,
+        location_state_name,
+        location_country_name,
+        remark_text,
+        event_type_description,
+        fsdo_description,
+        flight_number,
+        aircraft_missing_flag,
+        aircraft_damage_description,
+        flight_activity,
+        flight_phase,
+        far_part,
+        max_injury_level,
+        fatal_flag,
+        flight_crew_injury_none,
+        flight_crew_injury_minor,
+        flight_crew_injury_serious,
+        flight_crew_injury_fatal,
+        flight_crew_injury_unknown,
+        cabin_crew_injury_none,
+        cabin_crew_injury_minor,
+        cabin_crew_injury_serious,
+        cabin_crew_injury_fatal,
+        cabin_crew_injury_unknown,
+        passenger_injury_none,
+        passenger_injury_minor,
+        passenger_injury_serious,
+        passenger_injury_fatal,
+        passenger_injury_unknown,
+        ground_injury_none,
+        ground_injury_minor,
+        ground_injury_serious,
+        ground_injury_fatal,
+        ground_injury_unknown,
+        aircraft_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE
+        updated = VALUES(updated),
+        entry_date = VALUES(entry_date),
+        event_local_date = VALUES(event_local_date),
+        event_local_time = VALUES(event_local_time),
+        location_city_name = VALUES(location_city_name),
+        location_state_name = VALUES(location_state_name),
+        location_country_name = VALUES(location_country_name),
+        remark_text = VALUES(remark_text),
+        event_type_description = VALUES(event_type_description),
+        fsdo_description = VALUES(fsdo_description),
+        flight_number = VALUES(flight_number),
+        aircraft_missing_flag = VALUES(aircraft_missing_flag),
+        aircraft_damage_description = VALUES(aircraft_damage_description),
+        flight_activity = VALUES(flight_activity),
+        flight_phase = VALUES(flight_phase),
+        far_part = VALUES(far_part),
+        max_injury_level = VALUES(max_injury_level),
+        fatal_flag = VALUES(fatal_flag),
+        flight_crew_injury_none = VALUES(flight_crew_injury_none),
+        flight_crew_injury_minor = VALUES(flight_crew_injury_minor),
+        flight_crew_injury_serious = VALUES(flight_crew_injury_serious),
+        flight_crew_injury_fatal = VALUES(flight_crew_injury_fatal),
+        flight_crew_injury_unknown = VALUES(flight_crew_injury_unknown),
+        cabin_crew_injury_none = VALUES(cabin_crew_injury_none),
+        cabin_crew_injury_minor = VALUES(cabin_crew_injury_minor),
+        cabin_crew_injury_serious = VALUES(cabin_crew_injury_serious),
+        cabin_crew_injury_fatal = VALUES(cabin_crew_injury_fatal),
+        cabin_crew_injury_unknown = VALUES(cabin_crew_injury_unknown),
+        passenger_injury_none = VALUES(passenger_injury_none),
+        passenger_injury_minor = VALUES(passenger_injury_minor),
+        passenger_injury_serious = VALUES(passenger_injury_serious),
+        passenger_injury_fatal = VALUES(passenger_injury_fatal),
+        passenger_injury_unknown = VALUES(passenger_injury_unknown),
+        ground_injury_none = VALUES(ground_injury_none),
+        ground_injury_minor = VALUES(ground_injury_minor),
+        ground_injury_serious = VALUES(ground_injury_serious),
+        ground_injury_fatal = VALUES(ground_injury_fatal),
+        ground_injury_unknown = VALUES(ground_injury_unknown),
+        aircraft_id = VALUES(aircraft_id)
+`
 
 	_, err := db.ExecContext(ctx, stmt,
 		incident.Updated,
@@ -363,7 +416,7 @@ func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *m
 		aircraftID,
 	)
 	if err != nil {
-		return fmt.Errorf("error inserting accident: %w", err)
+		return fmt.Errorf("error inserting or updating accident: %w", err)
 	}
 	return nil
 }
