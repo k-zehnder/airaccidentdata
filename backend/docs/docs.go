@@ -17,14 +17,14 @@ const docTemplate = `{
     "paths": {
         "/accidents": {
             "get": {
-                "description": "Get list of all aviation accidents with pagination",
+                "description": "Get a list of all aviation accidents",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Accidents"
                 ],
-                "summary": "Get a list of accidents with pagination",
+                "summary": "Get a list of accidents",
                 "parameters": [
                     {
                         "type": "integer",
@@ -110,14 +110,14 @@ const docTemplate = `{
         },
         "/aircrafts": {
             "get": {
-                "description": "Retrieve a list of all aircraft with pagination.",
+                "description": "Retrieve a list of all aircrafts.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Aircrafts"
                 ],
-                "summary": "Get a list of aircraft with pagination",
+                "summary": "Get a list of aircrafts",
                 "parameters": [
                     {
                         "type": "integer",

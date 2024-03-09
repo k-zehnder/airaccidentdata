@@ -13,8 +13,8 @@ import (
 
 // GetAllAccidentsHandler creates a gin.HandlerFunc that handles requests to fetch a list of aviation accidents.
 // It utilizes pagination to efficiently return a subset of accidents based on the provided query parameters.
-// @Summary Get a list of accidents with pagination
-// @Description Get list of all aviation accidents with pagination
+// @Summary Get a list of accidents
+// @Description Get a list of all aviation accidents 
 // @Tags Accidents
 // @Produce json
 // @Param page query int false "Page number"
@@ -95,8 +95,8 @@ func GetAccidentByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 }
 
 // GetAllAircraftsHandler creates a gin.HandlerFunc that handles requests to fetch all aircraft with pagination.
-// @Summary Get a list of aircraft with pagination
-// @Description Retrieve a list of all aircraft with pagination.
+// @Summary Get a list of aircrafts
+// @Description Retrieve a list of all aircrafts.
 // @Tags Aircrafts
 // @Produce json
 // @Param page query int false "Page number"

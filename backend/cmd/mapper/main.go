@@ -291,20 +291,30 @@ func insertAircraft(ctx context.Context, db *sql.DB, registrationNumber, aircraf
 
 // insertAccident inserts or updates an accident associated with an aircraft in the database.
 func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *models.AircraftAccident) error {
-	// Check if the accident already exists
-	var existingID int
+	// Check if the accident already exists based on unique constraints
+	var existingAccidentID int
 	checkStmt := `
-			SELECT id FROM Accidents
-			WHERE aircraft_id = ? AND event_local_date = ? AND event_local_time = ?
-		`
-	err := db.QueryRowContext(ctx, checkStmt, aircraftID, incident.EventLocalDate.Format("2006-01-02"), incident.EventLocalTime).Scan(&existingID)
+        SELECT id FROM Accidents
+        WHERE aircraft_id = ? AND event_local_date = ? AND event_local_time = ?
+    `
+	err := db.QueryRowContext(ctx, checkStmt, aircraftID, incident.EventLocalDate, incident.EventLocalTime).Scan(&existingAccidentID)
 	if err != nil && err != sql.ErrNoRows {
 		return fmt.Errorf("error checking for existing accident: %w", err)
 	}
 
-	if existingID != 0 {
-		// Accident already exists, handle it accordingly
-		return nil // Or return an error if required
+	if existingAccidentID != 0 {
+		// Accident already exists, update the existing entry
+		updateStmt := `
+            UPDATE Accidents
+            SET updated = ?, entry_date = ?, event_local_date = ?, event_local_time = ?, location_city_name = ?, location_state_name = ?, location_country_name = ?, remark_text = ?, event_type_description = ?, fsdo_description = ?, flight_number = ?, aircraft_missing_flag = ?, aircraft_damage_description = ?, flight_activity = ?, flight_phase = ?, far_part = ?, max_injury_level = ?, fatal_flag = ?, flight_crew_injury_none = ?, flight_crew_injury_minor = ?, flight_crew_injury_serious = ?, flight_crew_injury_fatal = ?, flight_crew_injury_unknown = ?, cabin_crew_injury_none = ?, cabin_crew_injury_minor = ?, cabin_crew_injury_serious = ?, cabin_crew_injury_fatal = ?, cabin_crew_injury_unknown = ?, passenger_injury_none = ?, passenger_injury_minor = ?, passenger_injury_serious = ?, passenger_injury_fatal = ?, passenger_injury_unknown = ?, ground_injury_none = ?, ground_injury_minor = ?, ground_injury_serious = ?, ground_injury_fatal = ?, ground_injury_unknown = ?
+            WHERE id = ?
+        `
+		_, err := db.ExecContext(ctx, updateStmt, incident.Updated, incident.EntryDate, incident.EventLocalDate, incident.EventLocalTime, incident.LocationCityName, incident.LocationStateName, incident.LocationCountryName, incident.RemarkText, incident.EventTypeDescription, incident.FSDODescription, incident.FlightNumber, incident.AircraftMissingFlag, incident.AircraftDamageDescription, incident.FlightActivity, incident.FlightPhase, incident.FARPart, incident.MaxInjuryLevel, incident.FatalFlag, incident.FlightCrewInjuryNone, incident.FlightCrewInjuryMinor, incident.FlightCrewInjurySerious, incident.FlightCrewInjuryFatal, incident.FlightCrewInjuryUnknown, incident.CabinCrewInjuryNone, incident.CabinCrewInjuryMinor, incident.CabinCrewInjurySerious, incident.CabinCrewInjuryFatal, incident.CabinCrewInjuryUnknown, incident.PassengerInjuryNone, incident.PassengerInjuryMinor, incident.PassengerInjurySerious, incident.PassengerInjuryFatal, incident.PassengerInjuryUnknown, incident.GroundInjuryNone, incident.GroundInjuryMinor, incident.GroundInjurySerious, incident.GroundInjuryFatal, incident.GroundInjuryUnknown, existingAccidentID)
+		if err != nil {
+			return fmt.Errorf("error updating existing accident: %w", err)
+		}
+
+		return nil
 	}
 
 	stmt := `
