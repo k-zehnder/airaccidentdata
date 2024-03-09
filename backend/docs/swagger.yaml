@@ -227,7 +227,7 @@ info:
 paths:
   /accidents:
     get:
-      description: Get list of all aviation accidents with pagination
+      description: Get a list of all aviation accidents
       parameters:
       - description: Page number
         in: query
@@ -252,7 +252,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get a list of accidents with pagination
+      summary: Get a list of accidents
       tags:
       - Accidents
   /accidents/{id}:
@@ -288,7 +288,7 @@ paths:
       - Accidents
   /aircrafts:
     get:
-      description: Retrieve a list of all aircraft with pagination.
+      description: Retrieve a list of all aircrafts.
       parameters:
       - description: Page number
         in: query
@@ -313,7 +313,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get a list of aircraft with pagination
+      summary: Get a list of aircrafts
       tags:
       - Aircrafts
   /aircrafts/{id}:
