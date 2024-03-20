@@ -22,18 +22,36 @@ export const useAccidentData = (currentPage: number) => {
 
         // Fetch aircraft details for each accident
         const accidentsWithAircraftDetails = await Promise.all(
-          response.data.accidents.map(async accident => {
+          response.data.accidents.map(async (accident: any) => {
             const aircraftApiUrl =
               process.env.NEXT_PUBLIC_ENV === 'development'
                 ? `http://localhost:8080/api/v1/aircrafts/${accident.aircraft_id}`
                 : `https://airaccidentdata.com/api/v1/aircrafts/${accident.aircraft_id}`;
             const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
-            return {
-              ...accident,
-              aircraftDetails: aircraftResponse.data,
-            };
-          })
-        );
+
+            // Constructing the URL for fetching the specific image of the aircraft
+              // Fetching the image URLs for the aircraft
+              const imageUrl = `${process.env.NEXT_PUBLIC_ENV === 'development'
+              ? `http://localhost:8080/api/v1/aircrafts/${accident.aircraft_id}/images`
+              : `https://airaccidentdata.com/api/v1/aircrafts/${accident.aircraft_id}/images`}`;
+              const imageResponse = await axios.get<{ images: Record<string, string> }>(imageUrl);
+          
+              const images = imageResponse.data.images;
+              const imageUrls = Object.values(images);
+              // console.log('imageUrls', imageUrls);
+              const thirdImageUrl = imageUrls.find(url => url.startsWith('https://'));
+              const aircraftImageUrl = thirdImageUrl ? thirdImageUrl : 'https://upload.wikimedia.org/wikipedia/commons/e/e2/BK-117_Polizei-NRW_D-HNWL.jpg';
+
+            // Log aircraft details for debugging
+            console.log(`Aircraft details for ID ${accident.aircraft_id}:`, thirdImageUrl);
+
+          return {
+            ...accident,
+            aircraftDetails: aircraftResponse.data,
+            imageUrl: aircraftImageUrl,
+          };
+        })
+      );
 
         setAccidents(accidentsWithAircraftDetails);
         setTotalPages(Math.ceil(response.data.total) / 10); // 10 accidents per page

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -26,9 +26,15 @@ const Home = () => {
             className="inline-flex items-center rounded-lg bg-muted px-3 py-1 text-sm font-medium justify-center"
           >
             🔗
-            <div className="ml-2 w-1 h-4 bg-border" data-orientation="vertical" role="none"></div>
+            <div
+              className="ml-2 w-1 h-4 bg-border"
+              data-orientation="vertical"
+              role="none"
+            ></div>
             <span className="sm:hidden">Check out the API Documentation</span>
-            <span className="hidden sm:inline">Check out the API Documentation</span>
+            <span className="hidden sm:inline">
+              Check out the API Documentation
+            </span>
             <svg
               width="15"
               height="15"
@@ -51,12 +57,16 @@ const Home = () => {
             Explore Aviation Accidents and Insights
           </h1>
           <p className="text-lg text-muted-foreground mb-8 text-center">
-            Your gateway to understanding air travel incidents and promoting a safer flying future.
+            Your gateway to understanding air travel incidents and promoting a
+            safer flying future.
           </p>
         </div>
         <div className="max-w-4xl mx-auto">
           {accidents.map((accident) => (
-            <div key={accident.id} className="border-b-2 py-4 flex items-center">
+            <div
+              key={accident.id}
+              className="border-b-2 py-4 flex items-center"
+            >
               <div className="flex-1">
                 <span className="text-gray-500 text-sm block lg:text-base mb-1">
                   {formatDate(accident.entry_date)}
@@ -64,7 +74,8 @@ const Home = () => {
                 <Link legacyBehavior href={`/accidents/${accident.id}`}>
                   <a>
                     <h3 className="text-xl font-semibold mb-1">
-                      {accident.aircraftDetails?.registration_number}: {accident.aircraftDetails?.aircraft_make_name}{' '}
+                      {accident.aircraftDetails?.registration_number}:{' '}
+                      {accident.aircraftDetails?.aircraft_make_name}{' '}
                       {accident.aircraftDetails?.aircraft_model_name}
                     </h3>
                     {accident.fatal_flag === 'Yes' && (
@@ -95,17 +106,30 @@ const Home = () => {
               <div className="w-1/4 flex justify-end">
                 {/* Thumbnails */}
                 <div className="flex flex-col items-end">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/e/e2/BK-117_Polizei-NRW_D-HNWL.jpg"
-                    alt="Thumbnail"
-                    className="w-16 h-16 object-cover mb-2"
-                  />
+                  {accident.imageUrl ? (
+                    <img
+                      src={accident.imageUrl}
+                      alt={`Thumbnail for ${accident.aircraft_id}`}
+                      className="w-16 h-16 object-cover mb-2"
+                    />
+                  ) : (
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/e/e2/BK-117_Polizei-NRW_D-HNWL.jpg" 
+                      alt="Default Thumbnail"
+                      className="w-16 h-16 object-cover mb-2"
+                    />
+                  )}
                 </div>
               </div>
             </div>
           ))}
         </div>
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} darkMode={true} />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          darkMode={true}
+        />
       </main>
     </>
   );

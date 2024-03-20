@@ -1,5 +1,4 @@
 export interface Aircraft {
-    // accidents: Accident[];
     aircraft_make_name: string;
     aircraft_model_name: string;
     aircraft_operator: string;
@@ -39,5 +38,6 @@ export interface Accident {
     ground_injury_fatal: number;
     ground_injury_unknown: number;
     aircraft_id: number;
+    imageUrl: string;
     aircraftDetails?: Aircraft
 }
