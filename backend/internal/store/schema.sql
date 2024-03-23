@@ -4,11 +4,12 @@ USE airaccidentdata;
 
 -- Create Aircrafts Table
 CREATE TABLE IF NOT EXISTS Aircrafts (
-    id INT AUTO_INCREMENT UNIQUE PRIMARY KEY,
-    registration_number VARCHAR(255) UNIQUE,
-    aircraft_make_name VARCHAR(255),
-    aircraft_model_name VARCHAR(255),
-    aircraft_operator VARCHAR(255)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    registration_number VARCHAR(255) NOT NULL,
+    aircraft_make_name VARCHAR(255) NOT NULL,
+    aircraft_model_name VARCHAR(255) NOT NULL,
+    aircraft_operator VARCHAR(255),
+    unique_identifier VARCHAR(255) AS (CONCAT(aircraft_make_name, ' ', aircraft_model_name, ' ', registration_number)) STORED UNIQUE
 );
 
 -- Create Aircraft Images Table
