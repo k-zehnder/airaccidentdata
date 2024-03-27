@@ -1,3 +1,4 @@
+// Package main provides functionality to process CSV data and insert it into a MySQL database.
 package main
 
 import (
@@ -18,27 +19,27 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// main is the entry point of the application.
 func main() {
-	// Load environment variables
+	// Load environment variables from .env file.
 	if err := loadEnv(); err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
-	// Database setup
+	// Setup database connection.
 	db, err := setupDatabase()
 	if err != nil {
 		log.Fatalf("Database setup failed: %v", err)
 	}
 	defer db.Close()
 
-	// Open CSV file
+	// Open and process CSV file.
 	file, err := os.Open("downloaded_file.csv")
 	if err != nil {
 		log.Fatalf("Failed to open file: %v", err)
 	}
 	defer file.Close()
 
-	// Read and process CSV file
 	if err := processCSV(file, db); err != nil {
 		log.Fatalf("Failed to process CSV: %v", err)
 	}
@@ -48,29 +49,26 @@ func main() {
 
 // setupDatabase establishes a connection to the MySQL database.
 func setupDatabase() (*sql.DB, error) {
-	// Retrieve mysql environment variables.
+	// Retrieve MySQL environment variables.
 	user := os.Getenv("MYSQL_USER")
 	pass := os.Getenv("MYSQL_PASSWORD")
 	host := os.Getenv("MYSQL_HOST")
 	database := os.Getenv("MYSQL_DATABASE")
 
-	// Construct the Data Source Name (DSN) for the database connection.
+	// Construct DSN for database connection.
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s", user, pass, host, database)
 
-	// Attempt to open a connection to the database with the specified DSN.
+	// Open a connection to the database.
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		// Return an error if the database connection cannot be established.
 		return nil, fmt.Errorf("could not open database: %w", err)
 	}
 
-	// Ping the database to verify the connection is established and reachable.
+	// Ping the database to verify connectivity.
 	if err := db.Ping(); err != nil {
-		// Return an error if the database is not responding.
 		return nil, fmt.Errorf("database is not reachable: %w", err)
 	}
 
-	// Return the database connection handle.
 	return db, nil
 }
 
@@ -78,48 +76,44 @@ func setupDatabase() (*sql.DB, error) {
 func processCSV(file *os.File, db *sql.DB) error {
 	reader := csv.NewReader(file)
 
-	// Skip header row
+	// Skip header row.
 	if _, err := reader.Read(); err != nil {
 		return fmt.Errorf("failed to read headers: %w", err)
 	}
 
-	// Read all records into memory
+	// Read all records into memory.
 	var records [][]string
 	for {
 		record, err := reader.Read()
 		if err != nil {
 			if err == io.EOF {
-				break // End of file reached
+				break
 			}
 			return fmt.Errorf("error reading record: %w", err)
 		}
 		records = append(records, record)
 	}
 
-	// Sort records by ENTRY_DATE in descending order
+	// Sort records by ENTRY_DATE in descending order.
 	sort.Slice(records, func(i, j int) bool {
 		entryDate1 := parseDate(records[i][1])
 		entryDate2 := parseDate(records[j][1])
 		return entryDate1.After(entryDate2)
 	})
 
-	// Iteratively insert sorted records into the database
+	// Insert sorted records into the database.
 	for _, record := range records {
-		// Attempt to parse the current CSV record into an Aircraft and AircraftAccident structures.
 		aircraft, incident, err := parseRecordToIncident(record)
 		if err != nil {
-			// Log any errors encountered during parsing and skip to the next record.
 			log.Printf("Error parsing record: %v", err)
 			continue
 		}
 
-		// Check if the aircraft exists in the database
 		aircraftID, err := getAircraftIDByRegistration(context.Background(), db, aircraft.RegistrationNumber)
 		if err != nil {
 			return fmt.Errorf("error checking aircraft existence: %w", err)
 		}
 
-		// If the aircraft does not exist, add it to the database
 		if aircraftID == 0 {
 			aircraftID, err = insertAircraft(context.Background(), db, aircraft.RegistrationNumber, aircraft.AircraftMakeName, aircraft.AircraftModelName, aircraft.AircraftOperator)
 			if err != nil {
@@ -127,79 +121,66 @@ func processCSV(file *os.File, db *sql.DB) error {
 			}
 		}
 
-		// Insert the accident associated with the aircraft
 		if err := insertAccident(context.Background(), db, aircraftID, incident); err != nil {
 			return fmt.Errorf("error inserting accident: %w", err)
 		}
 	}
 
-	// Successfully processed all records without critical errors.
 	return nil
 }
 
 // loadEnv searches for the .env file starting in the current directory and moving up.
 func loadEnv() error {
-	// Get the current working directory
 	dir, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 
 	for {
-		// Check if .env exists in this directory.
 		if _, err := os.Stat(filepath.Join(dir, ".env")); err == nil {
-			// Load the .env file.
 			return godotenv.Load(filepath.Join(dir, ".env"))
 		}
 
-		// Move up to the parent directory.
 		parentDir := filepath.Dir(dir)
 		if parentDir == dir {
-			// Root of the filesystem reached, .env not found
 			return fmt.Errorf("root directory reached, .env file not found")
 		}
 		dir = parentDir
 	}
 }
 
-// Converts string to int, returns 0 if conversion fails.
+// atoiSafe converts string to int, returns 0 if conversion fails or the string is empty.
 func atoiSafe(s string) int {
-	// Attempt to convert the string to an integer.
+	if s == "" {
+		return 0
+	}
 	value, err := strconv.Atoi(s)
 	if err != nil {
-		// Log and handle any conversion error, returning 0 as a safe fallback.
 		log.Printf("Error converting string to int: %v", err)
 		return 0
 	}
-	// Return the successfully converted integer value.
 	return value
 }
 
 // Helper function to parse a date string into time.Time, returns zero value on error.
 func parseDate(dateStr string) time.Time {
-	// Define the expected date format and attempt to parse the string.
 	layout := "02-Jan-06"
 	t, err := time.Parse(layout, dateStr)
 	if err != nil {
-		// If parsing fails, log the error and return the zero time value.
 		log.Printf("Error parsing date: %v", err)
 		return time.Time{}
 	}
-	// Return the parsed time value.
 	return t
 }
 
 // Helper function to format a time string, returns empty string on error.
 func parseTime(timeStr string) string {
-	// Define the expected time format and attempt to parse the string.
 	layout := "15:04:05Z"
 	t, err := time.Parse(layout, timeStr)
 	if err != nil {
-		// Log any parsing errors and return an empty string as a fallback.
 		log.Printf("Error parsing time: %v", err)
 		return ""
 	}
-	// Format and return the time in a MySQL-compatible format.
 	return t.Format("15:04:05")
 }
 
@@ -211,52 +192,52 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.AircraftA
 
 	// Parse the fields for Aircraft struct
 	aircraft := &models.Aircraft{
-		RegistrationNumber: record[10], // REGIST_NBR
-		AircraftMakeName:   record[13], // ACFT_MAKE_NAME
-		AircraftModelName:  record[14], // ACFT_MODEL_NAME
-		AircraftOperator:   record[12], // ACFT_OPRTR
+		RegistrationNumber: record[10],
+		AircraftMakeName:   record[13],
+		AircraftModelName:  record[14],
+		AircraftOperator:   record[12],
 	}
 
 	// Parse the fields for AircraftAccident struct
 	incident := &models.AircraftAccident{
-		Updated:                   record[0],            // UPDATED
-		EntryDate:                 parseDate(record[1]), // ENTRY_DATE
-		EventLocalDate:            parseDate(record[2]), // EVENT_LCL_DATE
-		EventLocalTime:            parseTime(record[3]), // EVENT_LCL_TIME
-		LocationCityName:          record[4],            // LOC_CITY_NAME
-		LocationStateName:         record[5],            // LOC_STATE_NAME
-		LocationCountryName:       record[6],            // LOC_CNTRY_NAME
-		RemarkText:                record[7],            // RMK_TEXT
-		EventTypeDescription:      record[8],            // EVENT_TYPE_DESC
-		FSDODescription:           record[9],            // FSDO_DESC
-		FlightNumber:              record[11],           // FLT_NBR
-		AircraftMissingFlag:       record[15],           // ACFT_MISSING_FLAG
-		AircraftDamageDescription: record[16],           // ACFT_DMG_DESC
-		FlightActivity:            record[17],           // FLT_ACTIVITY
-		FlightPhase:               record[18],           // FLT_PHASE
-		FARPart:                   record[19],           // FAR_PART
-		MaxInjuryLevel:            record[20],           // MAX_INJ_LVL
-		FatalFlag:                 record[21],           // FATAL_FLAG
-		FlightCrewInjuryNone:      atoiSafe(record[22]), // FLT_CRW_INJ_NONE
-		FlightCrewInjuryMinor:     atoiSafe(record[23]), // FLT_CRW_INJ_MINOR
-		FlightCrewInjurySerious:   atoiSafe(record[24]), // FLT_CRW_INJ_SERIOUS
-		FlightCrewInjuryFatal:     atoiSafe(record[25]), // FLT_CRW_INJ_FATAL
-		FlightCrewInjuryUnknown:   atoiSafe(record[26]), // FLT_CRW_INJ_UNK
-		CabinCrewInjuryNone:       atoiSafe(record[27]), // CBN_CRW_INJ_NONE
-		CabinCrewInjuryMinor:      atoiSafe(record[28]), // CBN_CRW_INJ_MINOR
-		CabinCrewInjurySerious:    atoiSafe(record[29]), // CBN_CRW_INJ_SERIOUS
-		CabinCrewInjuryFatal:      atoiSafe(record[30]), // CBN_CRW_INJ_FATAL
-		CabinCrewInjuryUnknown:    atoiSafe(record[31]), // CBN_CRW_INJ_UNK
-		PassengerInjuryNone:       atoiSafe(record[32]), // PAX_INJ_NONE
-		PassengerInjuryMinor:      atoiSafe(record[33]), // PAX_INJ_MINOR
-		PassengerInjurySerious:    atoiSafe(record[34]), // PAX_INJ_SERIOUS
-		PassengerInjuryFatal:      atoiSafe(record[35]), // PAX_INJ_FATAL
-		PassengerInjuryUnknown:    atoiSafe(record[36]), // PAX_INJ_UNK
-		GroundInjuryNone:          atoiSafe(record[37]), // GRND_INJ_NONE
-		GroundInjuryMinor:         atoiSafe(record[38]), // GRND_INJ_MINOR
-		GroundInjurySerious:       atoiSafe(record[39]), // GRND_INJ_SERIOUS
-		GroundInjuryFatal:         atoiSafe(record[40]), // GRND_INJ_FATAL
-		GroundInjuryUnknown:       atoiSafe(record[41]), // GRND_INJ_UNK
+		Updated:                   record[0],
+		EntryDate:                 parseDate(record[1]),
+		EventLocalDate:            parseDate(record[2]),
+		EventLocalTime:            parseTime(record[3]),
+		LocationCityName:          record[4],
+		LocationStateName:         record[5],
+		LocationCountryName:       record[6],
+		RemarkText:                record[7],
+		EventTypeDescription:      record[8],
+		FSDODescription:           record[9],
+		FlightNumber:              record[11],
+		AircraftMissingFlag:       record[15],
+		AircraftDamageDescription: record[16],
+		FlightActivity:            record[17],
+		FlightPhase:               record[18],
+		FARPart:                   record[19],
+		MaxInjuryLevel:            record[20],
+		FatalFlag:                 record[21],
+		FlightCrewInjuryNone:      atoiSafe(record[22]),
+		FlightCrewInjuryMinor:     atoiSafe(record[23]),
+		FlightCrewInjurySerious:   atoiSafe(record[24]),
+		FlightCrewInjuryFatal:     atoiSafe(record[25]),
+		FlightCrewInjuryUnknown:   atoiSafe(record[26]),
+		CabinCrewInjuryNone:       atoiSafe(record[27]),
+		CabinCrewInjuryMinor:      atoiSafe(record[28]),
+		CabinCrewInjurySerious:    atoiSafe(record[29]),
+		CabinCrewInjuryFatal:      atoiSafe(record[30]),
+		CabinCrewInjuryUnknown:    atoiSafe(record[31]),
+		PassengerInjuryNone:       atoiSafe(record[32]),
+		PassengerInjuryMinor:      atoiSafe(record[33]),
+		PassengerInjurySerious:    atoiSafe(record[34]),
+		PassengerInjuryFatal:      atoiSafe(record[35]),
+		PassengerInjuryUnknown:    atoiSafe(record[36]),
+		GroundInjuryNone:          atoiSafe(record[37]),
+		GroundInjuryMinor:         atoiSafe(record[38]),
+		GroundInjurySerious:       atoiSafe(record[39]),
+		GroundInjuryFatal:         atoiSafe(record[40]),
+		GroundInjuryUnknown:       atoiSafe(record[41]),
 	}
 
 	return aircraft, incident, nil
@@ -456,9 +437,7 @@ func getAircraftIDByRegistration(ctx context.Context, db *sql.DB, registrationNu
 			// Aircraft does not exist in the database.
 			return 0, nil
 		}
-		// Return the error if any other error occurs.
 		return 0, fmt.Errorf("error querying database: %w", err)
 	}
-	// Return the aircraft ID if found.
 	return aircraftID, nil
 }
