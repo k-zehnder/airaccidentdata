@@ -40,7 +40,7 @@ export const useAccidentData = (currentPage: number) => {
               }/api/v1/aircrafts/${accident.aircraft_id}/images`;
               const imageResponse = await axios.get<{ images: { s3_url: string }[] }>(imageUrl);
               const images = imageResponse.data.images;
-              const aircraftImageUrl = images.length > 0 ? images[0].s3_url : ''; // Use the first S3 URL
+              const aircraftImageUrl = images.length > 0 ? images[0].s3_url : ''; 
 
               return {
                 ...accident,

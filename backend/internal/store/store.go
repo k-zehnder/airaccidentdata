@@ -286,7 +286,7 @@ func (s *Store) GetAccidentById(id int) (*models.AircraftAccident, error) {
 // GetAllImagesForAircraft fetches all images associated with an aircraft by its ID.
 func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]*models.AircraftImage, error) {
 	// Query to fetch all images associated with the aircraft.
-	query := `SELECT id, image_url, s3_url FROM AircraftImages WHERE aircraft_id = ?`
+	query := `SELECT id, aircraft_id, image_url, s3_url FROM AircraftImages WHERE aircraft_id = ?`
 
 	// Perform the database query
 	rows, err := s.db.Query(query, aircraftID)
@@ -301,7 +301,7 @@ func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]*models.AircraftImage
 	// Iterate over the rows and scan the image details into the slice.
 	for rows.Next() {
 		var image models.AircraftImage
-		err := rows.Scan(&image.ID, &image.ImageURL, &image.S3URL) // Fix: Add scanning for S3URL
+		err := rows.Scan(&image.ID, &image.AircraftID, &image.ImageURL, &image.S3URL)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning image details: %w", err)
 		}
@@ -326,7 +326,7 @@ func (s *Store) GetImageForAircraft(aircraftID, imageID int) (*models.AircraftIm
 	var image models.AircraftImage
 
 	// Scan the values from the row into the image struct.
-	err := row.Scan(&image.ID, &image.ImageURL, &image.S3URL) // Fix: Add scanning for S3URL
+	err := row.Scan(&image.ID, &image.ImageURL, &image.S3URL)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Return nil for the image if not found.
