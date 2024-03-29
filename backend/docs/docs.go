@@ -272,7 +272,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Image IDs and URLs",
+                        "description": "Image IDs, Image URLs, and S3 URLs",
                         "schema": {
                             "$ref": "#/definitions/models.ImagesForAircraftResponse"
                         }

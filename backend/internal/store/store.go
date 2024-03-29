@@ -286,7 +286,7 @@ func (s *Store) GetAccidentById(id int) (*models.AircraftAccident, error) {
 // GetAllImagesForAircraft fetches all images associated with an aircraft by its ID.
 func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]*models.AircraftImage, error) {
 	// Query to fetch all images associated with the aircraft.
-	query := `SELECT id, image_url FROM AircraftImages WHERE aircraft_id = ?`
+	query := `SELECT id, image_url, s3_url FROM AircraftImages WHERE aircraft_id = ?`
 
 	// Perform the database query
 	rows, err := s.db.Query(query, aircraftID)
@@ -301,7 +301,7 @@ func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]*models.AircraftImage
 	// Iterate over the rows and scan the image details into the slice.
 	for rows.Next() {
 		var image models.AircraftImage
-		err := rows.Scan(&image.ID, &image.ImageURL)
+		err := rows.Scan(&image.ID, &image.ImageURL, &image.S3URL) // Fix: Add scanning for S3URL
 		if err != nil {
 			return nil, fmt.Errorf("error scanning image details: %w", err)
 		}
@@ -317,27 +317,23 @@ func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]*models.AircraftImage
 }
 
 // GetImageForAircraft fetches a specific image associated with an aircraft by its ID.
-func (s *Store) GetImageForAircraft(aircraftID, imageID int) (string, error) {
-	// Query to fetch a specific image associated with the aircraft.
-	query := `SELECT image_url FROM AircraftImages WHERE aircraft_id = ? AND id = ?`
+func (s *Store) GetImageForAircraft(aircraftID, imageID int) (*models.AircraftImage, error) {
+	query := `SELECT id, image_url, s3_url FROM AircraftImages WHERE aircraft_id = ? AND id = ?`
 
-	// Perform the database query.
 	row := s.db.QueryRow(query, aircraftID, imageID)
 
-	// Create a variable to hold the scanned image URL.
-	var imageUrl string
+	// Create a variable to hold the scanned image details.
+	var image models.AircraftImage
 
-	// Scan the value from the row into the imageUrl variable.
-	err := row.Scan(&imageUrl)
+	// Scan the values from the row into the image struct.
+	err := row.Scan(&image.ID, &image.ImageURL, &image.S3URL) // Fix: Add scanning for S3URL
 	if err != nil {
 		if err == sql.ErrNoRows {
-			// Return empty string for the imageUrl if image not found.
-			return "", nil
+			// Return nil for the image if not found.
+			return nil, nil
 		}
-		// Return the error if any other error occurred.
-		return "", fmt.Errorf("error scanning image URL: %w", err)
+		return nil, fmt.Errorf("error scanning image details: %w", err)
 	}
 
-	// Return the scanned image URL.
-	return imageUrl, nil
+	return &image, nil
 }
