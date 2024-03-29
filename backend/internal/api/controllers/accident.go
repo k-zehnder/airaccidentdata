@@ -14,7 +14,7 @@ import (
 // GetAllAccidentsHandler creates a gin.HandlerFunc that handles requests to fetch a list of aviation accidents.
 // It utilizes pagination to efficiently return a subset of accidents based on the provided query parameters.
 // @Summary Get a list of accidents
-// @Description Get a list of all aviation accidents 
+// @Description Get a list of all aviation accidents
 // @Tags Accidents
 // @Produce json
 // @Param page query int false "Page number"
@@ -213,7 +213,7 @@ func GetAircraftByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 // @Tags Aircrafts
 // @Produce json
 // @Param id path int true "Aircraft ID"
-// @Success 200 {object} models.ImagesForAircraftResponse "Image IDs and URLs"
+// @Success 200 {object} models.ImagesForAircraftResponse "Image IDs, Image URLs, and S3 URLs"
 // @Failure 400 {object} models.ErrorResponse "Invalid aircraft ID"
 // @Failure 404 {object} models.ErrorResponse "Aircraft not found"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
@@ -237,9 +237,15 @@ func GetAllImagesForAircraftHandler(store *store.Store, log *logrus.Logger) gin.
 		}
 
 		// Construct the response data.
-		response := make(map[string]string)
-		for _, image := range images {
-			response[strconv.Itoa(image.ID)] = image.ImageURL
+		response := make([]gin.H, len(images))
+		for i, image := range images {
+			response[i] = gin.H{
+				"id":          image.ID,
+				"aircraft_id": image.AircraftID,
+				"image_url":   image.ImageURL,
+				"s3_url":      image.S3URL,
+				"description": image.Description,
+			}
 		}
 
 		c.JSON(http.StatusOK, gin.H{

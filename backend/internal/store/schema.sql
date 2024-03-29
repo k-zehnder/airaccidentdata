@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS AircraftImages (
     id INT AUTO_INCREMENT UNIQUE PRIMARY KEY,
     aircraft_id INT,
     image_url TEXT,
+    s3_url VARCHAR(255),
     FOREIGN KEY (aircraft_id) REFERENCES Aircrafts(id)
 );
 
