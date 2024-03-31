@@ -317,16 +317,13 @@ func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]*models.AircraftImage
 }
 
 // GetImageForAircraft fetches a specific image associated with an aircraft by its ID.
-func (s *Store) GetImageForAircraft(aircraftID, imageID int) (*models.AircraftImage, error) {
-	query := `SELECT id, image_url, s3_url FROM AircraftImages WHERE aircraft_id = ? AND id = ?`
+func (s *Store) GetImageForAircraft(aircraftID, imageID int) (*models.ImageResponse, error) {
+	query := `SELECT id, aircraft_id, image_url, s3_url FROM AircraftImages WHERE aircraft_id = ? AND id = ?`
 
 	row := s.db.QueryRow(query, aircraftID, imageID)
 
-	// Create a variable to hold the scanned image details.
-	var image models.AircraftImage
-
-	// Scan the values from the row into the image struct.
-	err := row.Scan(&image.ID, &image.ImageURL, &image.S3URL)
+	var image models.ImageResponse
+	err := row.Scan(&image.ID, &image.AircraftID, &image.ImageURL, &image.S3URL)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Return nil for the image if not found.

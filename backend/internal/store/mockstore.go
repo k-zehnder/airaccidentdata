@@ -9,6 +9,8 @@ import (
 type MockStore struct {
 	Aircrafts  []*models.Aircraft
 	Accidents  []*models.AircraftAccident
+	Images     []*models.ImagesForAircraftResponse
+	Image      *models.ImageResponse
 	QueryError error // Used to simulate database query errors
 }
 
@@ -74,4 +76,38 @@ func (ms *MockStore) GetAircraftWithAccidents(registrationNumber string) (*model
 	aircraftWithAccidents.Accidents = aircraftAccidents
 
 	return aircraftWithAccidents, nil
+}
+
+func (ms *MockStore) GetAllImagesForAircraft(aircraftID int) ([]*models.ImagesForAircraftResponse, error) {
+	if ms.QueryError != nil {
+		return nil, ms.QueryError
+	}
+
+	var imagesForAircraft []*models.ImagesForAircraftResponse
+
+	for _, imageResponse := range ms.Images {
+		if imageResponse.AircraftID == aircraftID {
+			imagesForAircraft = append(imagesForAircraft, imageResponse)
+		}
+	}
+
+	return imagesForAircraft, nil 
+}
+
+func (ms *MockStore) GetImageForAircraft(aircraftID, imageID int) (*models.ImageResponse, error) {
+	if ms.QueryError != nil {
+		return nil, ms.QueryError
+	}
+
+	for _, imageResponse := range ms.Images {
+		if imageResponse.AircraftID == aircraftID {
+			for _, img := range imageResponse.Images {
+				if img.ID == imageID {
+					return &img, nil
+				}
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("image with ID %d for aircraft ID %d not found", imageID, aircraftID)
 }

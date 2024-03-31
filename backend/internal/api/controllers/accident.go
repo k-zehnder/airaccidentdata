@@ -262,7 +262,7 @@ func GetAllImagesForAircraftHandler(store *store.Store, log *logrus.Logger) gin.
 // @Produce json
 // @Param id path int true "Aircraft ID"
 // @Param imageID path int true "Image ID"
-// @Success 200 {string} string "Image URL"
+// @Success 200 {object} models.ImageResponse "Image URL"
 // @Failure 400 {object} models.ErrorResponse "Invalid aircraft or image ID"
 // @Failure 404 {object} models.ErrorResponse "Aircraft or image not found"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Header } from '@/components/header';
 import { buttonVariants } from '@/components/ui/button';
 import { useFetchAccidentDetails } from '@/hooks/useAccidentData';
+import MapComponent from '@/components/MapComponent';
 
 const AccidentDetail = ({
   params,
@@ -71,6 +72,7 @@ const AccidentDetail = ({
               {accidentDetails?.location_city_name}, {accidentDetails?.location_state_name}, {accidentDetails?.location_country_name}
             </p>
             {/* Insert map or location details here */}
+            <MapComponent />
           </div>
         </div>
 
