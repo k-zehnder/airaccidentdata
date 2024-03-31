@@ -96,6 +96,6 @@ type ImageResponse struct {
 
 // ImagesForAircraftResponse represents the response format for all images associated with an aircraft.
 type ImagesForAircraftResponse struct {
-	AircraftID int             `json:"aircraft_id"`
+	AircraftID int              `json:"aircraft_id"`
 	Images     []ImageResponse `json:"images"`
 }
