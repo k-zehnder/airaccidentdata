@@ -195,3 +195,116 @@ func TestMockStore_GetAircraftWithAccidents_NotFound(t *testing.T) {
 		t.Errorf("Expected error '%s', got '%v'", expectedErrorMessage, err)
 	}
 }
+
+// TestMockStore_GetAllImagesForAircraft tests the GetAllImagesForAircraft method.
+// It verifies that the method returns all images associated with a specific aircraft ID correctly.
+func TestMockStore_GetAllImagesForAircraft(t *testing.T) {
+	mockImages := []*models.ImagesForAircraftResponse{
+		{
+			AircraftID: 1,
+			Images: []models.ImageResponse{
+				{ID: 101, AircraftID: 1, ImageURL: "http://example.com/img1.jpg", S3URL: "http://s3.example.com/img1.jpg"},
+				{ID: 102, AircraftID: 1, ImageURL: "http://example.com/img2.jpg", S3URL: "http://s3.example.com/img2.jpg"},
+			},
+		},
+		{
+			AircraftID: 2,
+			Images: []models.ImageResponse{
+				{ID: 201, AircraftID: 2, ImageURL: "http://example.com/img3.jpg", S3URL: "http://s3.example.com/img3.jpg"},
+			},
+		},
+	}
+
+	ms := NewMockStore(nil, nil, nil)
+	ms.Images = mockImages
+
+	results, err := ms.GetAllImagesForAircraft(1)
+	if err != nil {
+		t.Errorf("GetAllImagesForAircraft() error = %v, wantErr nil", err)
+	}
+
+	if len(results) != 1 {
+		t.Errorf("GetAllImagesForAircraft() got %v results, want 1", len(results))
+	}
+
+	if len(results[0].Images) != 2 {
+		t.Errorf("GetAllImagesForAircraft() got %v images, want 2", len(results[0].Images))
+	}
+}
+
+// TestMockStore_GetImageForAircraft tests the GetImageForAircraft method.
+// It ensures that the method correctly retrieves a specific image by aircraft and image IDs.
+func TestMockStore_GetImageForAircraft(t *testing.T) {
+	mockImages := []*models.ImagesForAircraftResponse{
+		{
+			AircraftID: 1,
+			Images: []models.ImageResponse{
+				{ID: 101, AircraftID: 1, ImageURL: "http://example.com/img1.jpg", S3URL: "http://s3.example.com/img1.jpg"},
+				{ID: 102, AircraftID: 1, ImageURL: "http://example.com/img2.jpg", S3URL: "http://s3.example.com/img2.jpg"},
+			},
+		},
+		{
+			AircraftID: 2,
+			Images: []models.ImageResponse{
+				{ID: 201, AircraftID: 2, ImageURL: "http://example.com/img3.jpg", S3URL: "http://s3.example.com/img3.jpg"},
+			},
+		},
+	}
+
+	ms := NewMockStore(nil, nil, nil)
+	ms.Images = mockImages
+
+	// Test retrieving an existing image
+	img, err := ms.GetImageForAircraft(1, 101)
+	if err != nil {
+		t.Errorf("GetImageForAircraft() error = %v, wantErr nil", err)
+	}
+	if img == nil {
+		t.Fatal("GetImageForAircraft() got nil, want non-nil image")
+	}
+	if img.ID != 101 || img.AircraftID != 1 {
+		t.Errorf("GetImageForAircraft() got wrong image, want ID=101, AircraftID=1, got ID=%d, AircraftID=%d", img.ID, img.AircraftID)
+	}
+}
+
+// TestMockStore_GetAllImagesForAircraft_Error tests error handling in the GetAllImagesForAircraft method of the MockStore.
+// It checks if the method correctly handles and returns the predefined error.
+func TestMockStore_GetAllImagesForAircraft_Error(t *testing.T) {
+	simulatedError := errors.New("simulated error")
+	ms := NewMockStore(nil, nil, simulatedError)
+
+	_, err := ms.GetAllImagesForAircraft(1)
+	if err != simulatedError {
+		t.Errorf("GetAllImagesForAircraft() expected error `%v`, got `%v`", simulatedError, err)
+	}
+}
+
+// TestMockStore_GetImageForAircraft_Error tests error handling in the GetImageForAircraft method of the MockStore.
+// It checks if the method correctly handles scenarios where the requested image ID does not exist for a given aircraft.
+func TestMockStore_GetImageForAircraft_Error(t *testing.T) {
+	ms := NewMockStore(nil, nil, nil)
+	ms.Images = []*models.ImagesForAircraftResponse{
+		{
+			AircraftID: 1,
+			Images: []models.ImageResponse{
+				{ID: 101, AircraftID: 1, ImageURL: "http://example.com/img1.jpg", S3URL: "http://s3.example.com/img1.jpg"},
+			},
+		},
+	}
+
+	_, err := ms.GetImageForAircraft(1, 999) // Non-existent image ID
+	if err == nil {
+		t.Error("GetImageForAircraft() expected error for non-existing image, got nil")
+	}
+}
+
+// TestMockStore_GetImageForAircraft_QueryError tests the GetImageForAircraft method of the MockStore when a query error is simulated
+func TestMockStore_GetImageForAircraft_QueryError(t *testing.T) {
+	simulatedError := errors.New("simulated query error")
+	ms := NewMockStore(nil, nil, simulatedError)
+
+	_, err := ms.GetImageForAircraft(1, 101)
+	if err != simulatedError {
+		t.Errorf("GetImageForAircraft() expected error `%v`, got `%v`", simulatedError, err)
+	}
+}

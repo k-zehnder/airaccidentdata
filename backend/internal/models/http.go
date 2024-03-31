@@ -86,8 +86,16 @@ type AircraftAccidentResponse struct {
 	AircraftID              int       `json:"aircraft_id"`
 }
 
+// ImageResponse represents the response format for one image associated with an aircraft.
+type ImageResponse struct {
+	ID         int    `json:"id"`
+	AircraftID int    `json:"aircraft_id"`
+	ImageURL   string `json:"image_url"`
+	S3URL      string `json:"s3_url"`
+}
+
 // ImagesForAircraftResponse represents the response format for all images associated with an aircraft.
 type ImagesForAircraftResponse struct {
-	AircraftID int            `json:"aircraft_id"`
-	Images     map[int]string `json:"images"`
+	AircraftID int              `json:"aircraft_id"`
+	Images     []ImageResponse `json:"images"`
 }

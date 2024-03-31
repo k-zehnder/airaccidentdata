@@ -210,14 +210,25 @@ definitions:
       message:
         type: string
     type: object
+  models.ImageResponse:
+    properties:
+      aircraft_id:
+        type: integer
+      id:
+        type: integer
+      image_url:
+        type: string
+      s3_url:
+        type: string
+    type: object
   models.ImagesForAircraftResponse:
     properties:
       aircraft_id:
         type: integer
       images:
-        additionalProperties:
-          type: string
-        type: object
+        items:
+          $ref: '#/definitions/models.ImageResponse'
+        type: array
     type: object
 info:
   contact: {}
@@ -432,7 +443,7 @@ paths:
         "200":
           description: Image URL
           schema:
-            type: string
+            $ref: '#/definitions/models.ImageResponse'
         "400":
           description: Invalid aircraft or image ID
           schema:

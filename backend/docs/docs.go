@@ -328,7 +328,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Image URL",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.ImageResponse"
                         }
                     },
                     "400": {
@@ -672,6 +672,23 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ImageResponse": {
+            "type": "object",
+            "properties": {
+                "aircraft_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "s3_url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ImagesForAircraftResponse": {
             "type": "object",
             "properties": {
@@ -679,9 +696,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "images": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ImageResponse"
                     }
                 }
             }
