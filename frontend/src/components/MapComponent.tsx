@@ -1,51 +1,66 @@
 import React, { useRef, useEffect } from 'react';
-import * as d3 from 'd3';
-import { Topology, GeometryCollection } from 'topojson-specification';
-import { feature } from 'topojson-client';
+import maplibregl from 'maplibre-gl';
+import dotenv from 'dotenv';
 
-const MapComponent: React.FC = () => {
-  const svgRef = useRef<SVGSVGElement>(null);
+dotenv.config();
+
+interface MapComponentProps {
+  latitude: number;
+  longitude: number;
+}
+
+const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<maplibregl.Map | null>(null); 
+  const circleLayerId = 'circle-layer';
 
   useEffect(() => {
-    // Define the type for your specific TopoJSON structure
-    type USATopoJson = Topology<{ states: GeometryCollection }>;
+    const apiKey = process.env.NEXT_PUBLIC_AWS_LOCATION_API_KEY; 
 
-    const width = 975;
-    const height = 610;
-    const projection = d3.geoAlbersUsa().scale(1300).translate([width / 2, height / 2]);
-    const path = d3.geoPath(projection);
+    if (mapContainer.current && apiKey && !mapInstance.current) {
+      mapInstance.current = new maplibregl.Map({
+        container: mapContainer.current,
+        center: [longitude, latitude],
+        zoom: 16,
+        style: `https://maps.geo.us-west-2.amazonaws.com/maps/v0/maps/airaccidentdatamap/style-descriptor?key=${apiKey}`
+      });
 
-    d3.json<USATopoJson>('/states-10m.json').then((us) => {
-      if (us && svgRef.current) {
-        const states = feature(us, us.objects.states as GeometryCollection).features;
+      // Add navigation control to the top-left corner of the map
+      mapInstance.current.addControl(new maplibregl.NavigationControl(), 'top-left');
 
-        const svg = d3.select(svgRef.current)
-          .attr('viewBox', [0, 0, width, height]);
+      mapInstance.current.on('load', () => {
+        // Add a circle layer at the center of the map
+        mapInstance.current?.addLayer({
+          'id': circleLayerId,
+          'type': 'circle',
+          'source': {
+            'type': 'geojson',
+            'data': {
+              'type': 'Feature',
+              'geometry': {
+                'type': 'Point',
+                'coordinates': [longitude, latitude]
+              }
+            } as GeoJSON.Feature<GeoJSON.Point> 
+          },
+          'paint': {
+            'circle-radius': 50, // in meters
+            'circle-color': '#FF0000' // red color
+          }
+        });
+      });
+    }
 
-        svg.selectAll('path')
-          .data(states)
-          .enter().append('path')
-            .attr('fill', '#444')
-            .attr('d', path);
-
-        // Hardcoded coordinates for New York, NY
-        const nyCoords: [number, number] = [-74.0060, 40.7128];
-        const projectedNYCoords = projection(nyCoords);
-
-        if (projectedNYCoords) {
-          svg.append('circle')
-            .attr('cx', projectedNYCoords[0])
-            .attr('cy', projectedNYCoords[1])
-            .attr('r', 5)
-            .attr('fill', 'red');
-        }
+    // Cleanup function to remove the map instance and circle layer when component unmounts
+    return () => {
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
       }
-    });
-  }, []);
+    };
+  }, [latitude, longitude]);
 
-  return (
-    <svg ref={svgRef}></svg>
-  );
+  return <div ref={mapContainer} style={{ width: '100%', height: '500px', overflow: 'hidden' }} />;
 };
 
 export default MapComponent;
