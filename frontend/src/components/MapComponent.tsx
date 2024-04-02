@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import maplibregl from 'maplibre-gl';
 import { withIdentityPoolId } from "@aws/amazon-location-utilities-auth-helper";
 
@@ -8,7 +8,6 @@ interface MapComponentProps {
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
-  const [mapInitialized, setMapInitialized] = useState<boolean>(false);
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<maplibregl.Map | null>(null);
   const circleLayerId = 'circle-layer';
@@ -21,7 +20,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
 
       const authHelper = await withIdentityPoolId(identityPoolId);
 
-      if (!mapContainer.current || mapInitialized) return;
+      if (!mapContainer.current) return;
 
       const map = new maplibregl.Map({
         container: mapContainer.current,
@@ -34,7 +33,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
       map.addControl(new maplibregl.NavigationControl(), 'top-left');
 
       mapInstance.current = map;
-      setMapInitialized(true);
 
       map.on('load', () => {
         // Add a circle layer at the center of the map
@@ -65,10 +63,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
       if (mapInstance.current) {
         mapInstance.current.remove();
         mapInstance.current = null;
-        setMapInitialized(false);
       }
     };
-  }, [mapInitialized]);
+  }, []);
 
   return <div ref={mapContainer} style={{ width: '100%', height: '500px', overflow: 'hidden' }} />;
 };
