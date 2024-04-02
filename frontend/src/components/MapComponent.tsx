@@ -1,8 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import maplibregl from 'maplibre-gl';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { withIdentityPoolId } from "@aws/amazon-location-utilities-auth-helper";
 
 interface MapComponentProps {
   latitude: number;
@@ -10,27 +8,37 @@ interface MapComponentProps {
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
+  const [mapInitialized, setMapInitialized] = useState<boolean>(false);
   const mapContainer = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<maplibregl.Map | null>(null); 
+  const mapInstance = useRef<maplibregl.Map | null>(null);
   const circleLayerId = 'circle-layer';
 
   useEffect(() => {
-    const apiKey = process.env.NEXT_PUBLIC_AWS_LOCATION_API_KEY; 
+    async function initializeMap() {
+      const identityPoolId = process.env.NEXT_PUBLIC_IDENTITY_POOL_ID || '';
+      const mapName = process.env.NEXT_PUBLIC_MAP_NAME || '';
+      const region = process.env.NEXT_PUBLIC_REGION || '';
 
-    if (mapContainer.current && apiKey && !mapInstance.current) {
-      mapInstance.current = new maplibregl.Map({
+      const authHelper = await withIdentityPoolId(identityPoolId);
+
+      if (!mapContainer.current || mapInitialized) return;
+
+      const map = new maplibregl.Map({
         container: mapContainer.current,
-        center: [longitude, latitude],
-        zoom: 16,
-        style: `https://maps.geo.us-west-2.amazonaws.com/maps/v0/maps/airaccidentdatamap/style-descriptor?key=${apiKey}`
+        center: [longitude, latitude], // Original coordinates
+        zoom: 10,
+        style: `https://maps.geo.${region}.amazonaws.com/maps/v0/maps/${mapName}/style-descriptor`,
+        ...authHelper.getMapAuthenticationOptions(),
       });
 
-      // Add navigation control to the top-left corner of the map
-      mapInstance.current.addControl(new maplibregl.NavigationControl(), 'top-left');
+      map.addControl(new maplibregl.NavigationControl(), 'top-left');
 
-      mapInstance.current.on('load', () => {
+      mapInstance.current = map;
+      setMapInitialized(true);
+
+      map.on('load', () => {
         // Add a circle layer at the center of the map
-        mapInstance.current?.addLayer({
+        map.addLayer({
           'id': circleLayerId,
           'type': 'circle',
           'source': {
@@ -44,21 +52,23 @@ const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
             } as GeoJSON.Feature<GeoJSON.Point> 
           },
           'paint': {
-            'circle-radius': 50, // in meters
-            'circle-color': '#FF0000' // red color
+            'circle-radius': 20, 
+            'circle-color': '#FF0000' 
           }
         });
       });
     }
 
-    // Cleanup function to remove the map instance and circle layer when component unmounts
+    initializeMap();
+
     return () => {
       if (mapInstance.current) {
         mapInstance.current.remove();
         mapInstance.current = null;
+        setMapInitialized(false);
       }
     };
-  }, [latitude, longitude]);
+  }, [mapInitialized]);
 
   return <div ref={mapContainer} style={{ width: '100%', height: '500px', overflow: 'hidden' }} />;
 };
