@@ -72,8 +72,7 @@ const AccidentDetail = ({
               {accidentDetails?.location_city_name}, {accidentDetails?.location_state_name}, {accidentDetails?.location_country_name}
             </p>
             {/* Insert map or location details here */}
-            {/* <MapComponent /> */}
-            <MapComponent latitude={32.954568} longitude={-97.015008} />
+            <MapComponent latitude={40.7128} longitude={-74.0060} />
           </div>
         </div>
 
