@@ -79,12 +79,17 @@ export const useFetchAccidentDetails = (accidentId: string) => {
     const fetchAccidentDetails = async () => {
       setLoading(true);
       try {
-        const apiUrl = `https://airaccidentdata.com/api/v1/accidents/${accidentId}`;
+        // Determine the base URL based on environment
+        const baseUrl = process.env.NEXT_PUBLIC_ENV === 'development'
+          ? 'http://localhost:8080'
+          : 'https://airaccidentdata.com';
+
+        const apiUrl = `${baseUrl}/api/v1/accidents/${accidentId}`;
         const response = await axios.get<Accident>(apiUrl);
         const accidentData = response.data;
 
         // Fetch aircraft details using aircraft ID
-        const aircraftApiUrl = `https://airaccidentdata.com/api/v1/aircrafts/${accidentData.aircraft_id}`;
+        const aircraftApiUrl = `${baseUrl}/api/v1/aircrafts/${accidentData.aircraft_id}`;
         const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
         const aircraftData = aircraftResponse.data;
 
