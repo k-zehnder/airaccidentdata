@@ -457,6 +457,9 @@
                 "id": {
                     "type": "integer"
                 },
+                "latitude": {
+                    "type": "number"
+                },
                 "location_city_name": {
                     "type": "string"
                 },
@@ -465,6 +468,9 @@
                 },
                 "location_state_name": {
                     "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
                 },
                 "max_injury_level": {
                     "type": "string"
@@ -582,6 +588,9 @@
                 "id": {
                     "type": "integer"
                 },
+                "latitude": {
+                    "type": "number"
+                },
                 "location_city_name": {
                     "type": "string"
                 },
@@ -590,6 +599,9 @@
                 },
                 "location_state_name": {
                     "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
                 },
                 "max_injury_level": {
                     "type": "string"

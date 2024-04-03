@@ -148,3 +148,6 @@ sorted_downloaded_file.csv
 downloaded_file.csv
 venv
 NonSerialized.txt
+
+# Debug
+debug/

@@ -73,12 +73,16 @@ definitions:
         type: integer
       id:
         type: integer
+      latitude:
+        type: number
       location_city_name:
         type: string
       location_country_name:
         type: string
       location_state_name:
         type: string
+      longitude:
+        type: number
       max_injury_level:
         type: string
       passenger_injury_fatal:
@@ -156,12 +160,16 @@ definitions:
         type: integer
       id:
         type: integer
+      latitude:
+        type: number
       location_city_name:
         type: string
       location_country_name:
         type: string
       location_state_name:
         type: string
+      longitude:
+        type: number
       max_injury_level:
         type: string
       passenger_injury_fatal:

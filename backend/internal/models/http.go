@@ -52,6 +52,8 @@ type AircraftAccidentResponse struct {
 	LocationCityName        string    `json:"location_city_name"`
 	LocationStateName       string    `json:"location_state_name"`
 	LocationCountryName     string    `json:"location_country_name"`
+	Latitude                float64   `json:"latitude"`
+	Longitude               float64   `json:"longitude"`
 	RemarkText              string    `json:"remark_text"`
 	EventTypeDescription    string    `json:"event_type_description"`
 	FSDODescription         string    `json:"fsdo_description"`
@@ -96,6 +98,17 @@ type ImageResponse struct {
 
 // ImagesForAircraftResponse represents the response format for all images associated with an aircraft.
 type ImagesForAircraftResponse struct {
-	AircraftID int              `json:"aircraft_id"`
+	AircraftID int             `json:"aircraft_id"`
 	Images     []ImageResponse `json:"images"`
+}
+
+type GeoResponse struct {
+	Results []struct {
+		Geometry struct {
+			Location struct {
+				Lat float64 `json:"lat"`
+				Lng float64 `json:"lng"`
+			} `json:"location"`
+		} `json:"geometry"`
+	} `json:"results"`
 }

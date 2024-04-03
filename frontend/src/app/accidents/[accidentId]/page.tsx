@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import { buttonVariants } from '@/components/ui/button';
@@ -41,11 +41,8 @@ const AccidentDetail = ({
       <Header />
       <section className="container flex flex-col space-y-10 mt-10">
         <div className="text-4xl font-bold">Air Accident Details</div>
-        {/* <div className="mt-10">Some information about {registrationNumber}</div> */}
 
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left Column */}
           <div className="md:col-span-1 bg-white dark:bg-background/50 shadow-md rounded border p-6 mb-6">
             <h2 className="text-2xl font-semibold mb-4">Incident Overview</h2>
             <p>
@@ -60,10 +57,8 @@ const AccidentDetail = ({
             <p>
               <strong>Remark:</strong> {accidentDetails?.remark_text}
             </p>
-            {/* <p>{accidentDetails.summary}</p> */}
           </div>
 
-          {/* Right Column */}
           <div className="md:col-span-1 bg-white dark:bg-background/50 shadow-md rounded border p-6 mb-6">
             <h2 className="text-2xl font-semibold mb-4">
               Location Information
@@ -71,18 +66,14 @@ const AccidentDetail = ({
             <p>
               {accidentDetails?.location_city_name}, {accidentDetails?.location_state_name}, {accidentDetails?.location_country_name}
             </p>
-            {/* Insert map or location details here */}
-            <MapComponent latitude={40.7128} longitude={-74.0060} />
+              <MapComponent latitude={accidentDetails?.latitude} longitude={accidentDetails?.longitude} />
           </div>
         </div>
 
-        {/* Reports and Analysis Section */}
         <section className="bg-white dark:bg-background/50 shadow-md rounded border p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-4">Reports & Analysis</h2>
-          {/* Insert links to reports or summaries here */}
         </section>
 
-        {/* Safety Measures / Recommendations Section */}
         <section className="bg-white dark:bg-background/50 shadow-md rounded border p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-4">
             Safety Recommendations

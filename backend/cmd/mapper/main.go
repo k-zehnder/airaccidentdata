@@ -5,9 +5,12 @@ import (
 	"context"
 	"database/sql"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -109,6 +112,14 @@ func processCSV(file *os.File, db *sql.DB) error {
 			continue
 		}
 
+		// Fetch coordinates
+		location := fmt.Sprintf("%s, %s, %s", incident.LocationCityName, incident.LocationStateName, incident.LocationCountryName)
+		lat, lng, err := getCoordinates(location)
+		if err != nil {
+			log.Printf("Failed to get coordinates for %s: %v", location, err)
+			continue
+		}
+
 		aircraftID, err := getAircraftIDByRegistration(context.Background(), db, aircraft.RegistrationNumber)
 		if err != nil {
 			return fmt.Errorf("error checking aircraft existence: %w", err)
@@ -121,7 +132,7 @@ func processCSV(file *os.File, db *sql.DB) error {
 			}
 		}
 
-		if err := insertAccident(context.Background(), db, aircraftID, incident); err != nil {
+		if err := insertAccident(context.Background(), db, aircraftID, incident, lat, lng); err != nil {
 			return fmt.Errorf("error inserting accident: %w", err)
 		}
 	}
@@ -271,7 +282,7 @@ func insertAircraft(ctx context.Context, db *sql.DB, registrationNumber, aircraf
 }
 
 // insertAccident inserts or updates an accident associated with an aircraft in the database.
-func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *models.AircraftAccident) error {
+func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *models.AircraftAccident, lat float64, lng float64) error {
 	// Check if the accident already exists based on unique constraints
 	var existingAccidentID int
 	checkStmt := `
@@ -286,11 +297,51 @@ func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *m
 	if existingAccidentID != 0 {
 		// Accident already exists, update the existing entry
 		updateStmt := `
-            UPDATE Accidents
-            SET updated = ?, entry_date = ?, event_local_date = ?, event_local_time = ?, location_city_name = ?, location_state_name = ?, location_country_name = ?, remark_text = ?, event_type_description = ?, fsdo_description = ?, flight_number = ?, aircraft_missing_flag = ?, aircraft_damage_description = ?, flight_activity = ?, flight_phase = ?, far_part = ?, max_injury_level = ?, fatal_flag = ?, flight_crew_injury_none = ?, flight_crew_injury_minor = ?, flight_crew_injury_serious = ?, flight_crew_injury_fatal = ?, flight_crew_injury_unknown = ?, cabin_crew_injury_none = ?, cabin_crew_injury_minor = ?, cabin_crew_injury_serious = ?, cabin_crew_injury_fatal = ?, cabin_crew_injury_unknown = ?, passenger_injury_none = ?, passenger_injury_minor = ?, passenger_injury_serious = ?, passenger_injury_fatal = ?, passenger_injury_unknown = ?, ground_injury_none = ?, ground_injury_minor = ?, ground_injury_serious = ?, ground_injury_fatal = ?, ground_injury_unknown = ?
-            WHERE id = ?
-        `
-		_, err := db.ExecContext(ctx, updateStmt, incident.Updated, incident.EntryDate, incident.EventLocalDate, incident.EventLocalTime, incident.LocationCityName, incident.LocationStateName, incident.LocationCountryName, incident.RemarkText, incident.EventTypeDescription, incident.FSDODescription, incident.FlightNumber, incident.AircraftMissingFlag, incident.AircraftDamageDescription, incident.FlightActivity, incident.FlightPhase, incident.FARPart, incident.MaxInjuryLevel, incident.FatalFlag, incident.FlightCrewInjuryNone, incident.FlightCrewInjuryMinor, incident.FlightCrewInjurySerious, incident.FlightCrewInjuryFatal, incident.FlightCrewInjuryUnknown, incident.CabinCrewInjuryNone, incident.CabinCrewInjuryMinor, incident.CabinCrewInjurySerious, incident.CabinCrewInjuryFatal, incident.CabinCrewInjuryUnknown, incident.PassengerInjuryNone, incident.PassengerInjuryMinor, incident.PassengerInjurySerious, incident.PassengerInjuryFatal, incident.PassengerInjuryUnknown, incident.GroundInjuryNone, incident.GroundInjuryMinor, incident.GroundInjurySerious, incident.GroundInjuryFatal, incident.GroundInjuryUnknown, existingAccidentID)
+		UPDATE Accidents
+		SET updated = ?, 
+			entry_date = ?, 
+			event_local_date = ?, 
+			event_local_time = ?, 
+			location_city_name = ?, 
+			location_state_name = ?, 
+			location_country_name = ?, 
+			latitude = ?, 
+			longitude = ?, 
+			remark_text = ?, 
+			event_type_description = ?, 
+			fsdo_description = ?, 
+			flight_number = ?, 
+			aircraft_missing_flag = ?, 
+			aircraft_damage_description = ?, 
+			flight_activity = ?, 
+			flight_phase = ?, 
+			far_part = ?, 
+			max_injury_level = ?, 
+			fatal_flag = ?, 
+			flight_crew_injury_none = ?, 
+			flight_crew_injury_minor = ?, 
+			flight_crew_injury_serious = ?, 
+			flight_crew_injury_fatal = ?, 
+			flight_crew_injury_unknown = ?, 
+			cabin_crew_injury_none = ?, 
+			cabin_crew_injury_minor = ?, 
+			cabin_crew_injury_serious = ?, 
+			cabin_crew_injury_fatal = ?, 
+			cabin_crew_injury_unknown = ?, 
+			passenger_injury_none = ?, 
+			passenger_injury_minor = ?, 
+			passenger_injury_serious = ?, 
+			passenger_injury_fatal = ?, 
+			passenger_injury_unknown = ?, 
+			ground_injury_none = ?, 
+			ground_injury_minor = ?, 
+			ground_injury_serious = ?, 
+			ground_injury_fatal = ?, 
+			ground_injury_unknown = ?
+		WHERE id = ?
+	`
+
+		_, err := db.ExecContext(ctx, updateStmt, incident.Updated, incident.EntryDate, incident.EventLocalDate, incident.EventLocalTime, incident.LocationCityName, incident.LocationStateName, incident.LocationCountryName, lat, lng, incident.RemarkText, incident.EventTypeDescription, incident.FSDODescription, incident.FlightNumber, incident.AircraftMissingFlag, incident.AircraftDamageDescription, incident.FlightActivity, incident.FlightPhase, incident.FARPart, incident.MaxInjuryLevel, incident.FatalFlag, incident.FlightCrewInjuryNone, incident.FlightCrewInjuryMinor, incident.FlightCrewInjurySerious, incident.FlightCrewInjuryFatal, incident.FlightCrewInjuryUnknown, incident.CabinCrewInjuryNone, incident.CabinCrewInjuryMinor, incident.CabinCrewInjurySerious, incident.CabinCrewInjuryFatal, incident.CabinCrewInjuryUnknown, incident.PassengerInjuryNone, incident.PassengerInjuryMinor, incident.PassengerInjurySerious, incident.PassengerInjuryFatal, incident.PassengerInjuryUnknown, incident.GroundInjuryNone, incident.GroundInjuryMinor, incident.GroundInjurySerious, incident.GroundInjuryFatal, incident.GroundInjuryUnknown, existingAccidentID)
 		if err != nil {
 			return fmt.Errorf("error updating existing accident: %w", err)
 		}
@@ -307,6 +358,8 @@ func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *m
         location_city_name,
         location_state_name,
         location_country_name,
+		latitude,
+		longitude,
         remark_text,
         event_type_description,
         fsdo_description,
@@ -339,7 +392,7 @@ func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *m
         ground_injury_fatal,
         ground_injury_unknown,
         aircraft_id
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON DUPLICATE KEY UPDATE
         updated = VALUES(updated),
         entry_date = VALUES(entry_date),
@@ -348,6 +401,8 @@ func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *m
         location_city_name = VALUES(location_city_name),
         location_state_name = VALUES(location_state_name),
         location_country_name = VALUES(location_country_name),
+		latitude = VALUES(latitude),
+        longitude = VALUES(longitude),
         remark_text = VALUES(remark_text),
         event_type_description = VALUES(event_type_description),
         fsdo_description = VALUES(fsdo_description),
@@ -389,6 +444,8 @@ func insertAccident(ctx context.Context, db *sql.DB, aircraftID int, incident *m
 		incident.LocationCityName,
 		incident.LocationStateName,
 		incident.LocationCountryName,
+		lat,
+		lng,
 		incident.RemarkText,
 		incident.EventTypeDescription,
 		incident.FSDODescription,
@@ -440,4 +497,34 @@ func getAircraftIDByRegistration(ctx context.Context, db *sql.DB, registrationNu
 		return 0, fmt.Errorf("error querying database: %w", err)
 	}
 	return aircraftID, nil
+}
+
+func getCoordinates(place string) (float64, float64, error) {
+	apiKey := os.Getenv("GOOGLE_MAPS_API_KEY")
+	baseUrl := "https://maps.googleapis.com/maps/api/geocode/json"
+
+	// Construct request URL
+	requestUrl := fmt.Sprintf("%s?address=%s&key=%s", baseUrl, url.QueryEscape(place), apiKey)
+
+	// Make the HTTP request
+	resp, err := http.Get(requestUrl)
+	if err != nil {
+		return 0, 0, err
+	}
+	defer resp.Body.Close()
+
+	// Parse the JSON response
+	var geoResp models.GeoResponse
+	if err := json.NewDecoder(resp.Body).Decode(&geoResp); err != nil {
+		return 0, 0, err
+	}
+
+	if len(geoResp.Results) == 0 {
+		return 0, 0, fmt.Errorf("no results found for %s", place)
+	}
+
+	lat := geoResp.Results[0].Geometry.Location.Lat
+	lng := geoResp.Results[0].Geometry.Location.Lng
+
+	return lat, lng, nil
 }

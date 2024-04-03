@@ -464,6 +464,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "latitude": {
+                    "type": "number"
+                },
                 "location_city_name": {
                     "type": "string"
                 },
@@ -472,6 +475,9 @@ const docTemplate = `{
                 },
                 "location_state_name": {
                     "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
                 },
                 "max_injury_level": {
                     "type": "string"
@@ -589,6 +595,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "latitude": {
+                    "type": "number"
+                },
                 "location_city_name": {
                     "type": "string"
                 },
@@ -597,6 +606,9 @@ const docTemplate = `{
                 },
                 "location_state_name": {
                     "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
                 },
                 "max_injury_level": {
                     "type": "string"

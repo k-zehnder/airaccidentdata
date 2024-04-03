@@ -45,8 +45,7 @@ func (s *Store) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, 
 	query := `
 		SELECT 
 			id, updated, entry_date, event_local_date, event_local_time,
-			location_city_name, location_state_name, location_country_name, 
-			remark_text, event_type_description, fsdo_description,
+			location_city_name, location_state_name, location_country_name, latitude, longitude, remark_text, event_type_description, fsdo_description,
 			flight_number, aircraft_missing_flag, aircraft_damage_description,
 			flight_activity, flight_phase, far_part, max_injury_level, fatal_flag,
 			flight_crew_injury_none, flight_crew_injury_minor, flight_crew_injury_serious, 
@@ -60,7 +59,7 @@ func (s *Store) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, 
 		ORDER BY id LIMIT ? OFFSET ?;
 	`
 
-	// Fetch the accidents from the database
+	// Fetch the accidents from the database.
 	rows, err := s.db.Query(query, limit, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("query execution error: %w", err)
@@ -73,7 +72,7 @@ func (s *Store) GetAccidents(page, limit int) ([]*models.AircraftAccident, int, 
 		if err := rows.Scan(
 			&incident.ID, &incident.Updated, &incident.EntryDate, &incident.EventLocalDate,
 			&incident.EventLocalTime, &incident.LocationCityName, &incident.LocationStateName,
-			&incident.LocationCountryName, &incident.RemarkText, &incident.EventTypeDescription,
+			&incident.LocationCountryName, &incident.Latitude, &incident.Longitude, &incident.RemarkText, &incident.EventTypeDescription,
 			&incident.FSDODescription, &incident.FlightNumber, &incident.AircraftMissingFlag,
 			&incident.AircraftDamageDescription, &incident.FlightActivity, &incident.FlightPhase,
 			&incident.FARPart, &incident.MaxInjuryLevel, &incident.FatalFlag,
@@ -130,7 +129,7 @@ func (s *Store) GetAccidentByIdHandler(id int) (*models.Aircraft, error) {
 		if err := rows.Scan(
 			&accident.ID, &accident.Updated, &accident.EntryDate, &accident.EventLocalDate,
 			&accident.EventLocalTime, &accident.LocationCityName, &accident.LocationStateName,
-			&accident.LocationCountryName, &accident.RemarkText, &accident.EventTypeDescription,
+			&accident.LocationCountryName, &accident.Latitude, &accident.Longitude, &accident.RemarkText, &accident.EventTypeDescription,
 			&accident.FSDODescription, &accident.FlightNumber, &accident.AircraftMissingFlag,
 			&accident.AircraftDamageDescription, &accident.FlightActivity, &accident.FlightPhase,
 			&accident.FARPart, &accident.MaxInjuryLevel, &accident.FatalFlag,
@@ -248,7 +247,7 @@ func (s *Store) GetAccidentById(id int) (*models.AircraftAccident, error) {
 		SELECT 
 			id, updated, entry_date, event_local_date, event_local_time,
 			location_city_name, location_state_name, location_country_name, 
-			remark_text, event_type_description, fsdo_description,
+			latitude, longitude, remark_text, event_type_description, fsdo_description,
 			flight_number, aircraft_missing_flag, aircraft_damage_description,
 			flight_activity, flight_phase, far_part, max_injury_level, fatal_flag, aircraft_id
 		FROM Accidents
@@ -265,7 +264,7 @@ func (s *Store) GetAccidentById(id int) (*models.AircraftAccident, error) {
 	err := row.Scan(
 		&accident.ID, &accident.Updated, &accident.EntryDate, &accident.EventLocalDate,
 		&accident.EventLocalTime, &accident.LocationCityName, &accident.LocationStateName,
-		&accident.LocationCountryName, &accident.RemarkText, &accident.EventTypeDescription,
+		&accident.LocationCountryName, &accident.Latitude, &accident.Longitude, &accident.RemarkText, &accident.EventTypeDescription,
 		&accident.FSDODescription, &accident.FlightNumber, &accident.AircraftMissingFlag,
 		&accident.AircraftDamageDescription, &accident.FlightActivity, &accident.FlightPhase,
 		&accident.FARPart, &accident.MaxInjuryLevel, &accident.FatalFlag, &accident.AircraftID,

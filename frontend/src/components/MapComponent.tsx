@@ -4,8 +4,8 @@ import { Topology, GeometryCollection } from 'topojson-specification';
 import { feature } from 'topojson-client';
 
 interface MapComponentProps {
-  latitude: number;
-  longitude: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
@@ -32,20 +32,21 @@ const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
             .attr('fill', '#444')
             .attr('d', path);
 
-        // Hardcoded coordinates for New York, NY
-        const nyCoords: [number, number] = [longitude, latitude];
-        const projectedNYCoords = projection(nyCoords);
+        if (latitude !== undefined && longitude !== undefined) {
+          const coords: [number, number] = [longitude, latitude];
+          const projectedCoords = projection(coords);
 
-        if (projectedNYCoords) {
-          svg.append('circle')
-            .attr('cx', projectedNYCoords[0])
-            .attr('cy', projectedNYCoords[1])
-            .attr('r', 5)
-            .attr('fill', 'red');
+          if (projectedCoords) {
+            svg.append('circle')
+              .attr('cx', projectedCoords[0])
+              .attr('cy', projectedCoords[1])
+              .attr('r', 5)
+              .attr('fill', 'red');
+          }
         }
       }
     });
-  }, []);
+  }, [latitude, longitude]); // Dependency array to re-run effect when latitude or longitude change
 
   return (
     <svg ref={svgRef}></svg>
