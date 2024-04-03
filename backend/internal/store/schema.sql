@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS Accidents (
     location_city_name VARCHAR(255),
     location_state_name VARCHAR(255),
     location_country_name VARCHAR(255),
+    latitude FLOAT,
+    longitude FLOAT,
     remark_text TEXT,
     event_type_description VARCHAR(255),
     fsdo_description VARCHAR(255),
@@ -81,7 +83,7 @@ INSERT INTO AircraftImages (aircraft_id, image_url, s3_url) VALUES
 -- Insert into Accidents Table
 INSERT INTO Accidents (
     updated, entry_date, event_local_date, event_local_time, location_city_name, location_state_name, 
-    location_country_name, remark_text, event_type_description, fsdo_description, flight_number, 
+    location_country_name, lat, lng, remark_text, event_type_description, fsdo_description, flight_number, 
     aircraft_missing_flag, aircraft_damage_description, flight_activity, flight_phase, far_part, 
     max_injury_level, fatal_flag, flight_crew_injury_none, flight_crew_injury_minor, 
     flight_crew_injury_serious, flight_crew_injury_fatal, flight_crew_injury_unknown, 
@@ -90,7 +92,7 @@ INSERT INTO Accidents (
     passenger_injury_fatal, passenger_injury_unknown, ground_injury_none, ground_injury_minor, 
     ground_injury_serious, ground_injury_fatal, ground_injury_unknown, aircraft_id
 ) VALUES (
-    'No', '2023-01-15', '2023-01-14', '13:30:00', 'New York', 'New York', 'USA', 
+    'No', '2023-01-15', '2023-01-14', '13:30:00', 'New York', 'New York', 'USA', 40.7128, -74.0060, 
     'Inclement weather conditions.', 'Crash landing', 'FAA', 'AA123', 'N', 'Minor damage to fuselage.', 
     'Scheduled passenger service', 'Landing', 'Part 121', 'Minor', 'N', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 1

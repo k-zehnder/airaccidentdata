@@ -14,6 +14,8 @@ export interface Accident {
     location_city_name: string;
     location_state_name: string;
     location_country_name: string;
+    latitude?: number; 
+    longitude?: number; 
     remark_text: string;
     event_type_description: string;
     fatal_flag: string;
@@ -39,5 +41,5 @@ export interface Accident {
     ground_injury_unknown: number;
     aircraft_id: number;
     imageUrl: string;
-    aircraftDetails?: Aircraft
+    aircraftDetails?: Aircraft;
 }

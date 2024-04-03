@@ -20,6 +20,8 @@ type AircraftAccident struct {
 	LocationCityName          string    `json:"location_city_name"`
 	LocationStateName         string    `json:"location_state_name"`
 	LocationCountryName       string    `json:"location_country_name"`
+	Latitude                  float64   `json:"latitude"`
+	Longitude                 float64   `json:"longitude"`
 	RemarkText                string    `json:"remark_text"`
 	EventTypeDescription      string    `json:"event_type_description"`
 	FSDODescription           string    `json:"fsdo_description"`
