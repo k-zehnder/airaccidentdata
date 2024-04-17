@@ -114,7 +114,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
               .append('circle') // Add a circle to mark the location
               .attr('cx', projectedCoords[0])
               .attr('cy', projectedCoords[1])
-              .attr('r', 5) // Radius of the circle
+              .attr('r', 15) // Radius of the circle
               .attr('fill', 'red'); // Color of the circle
           }
         }
