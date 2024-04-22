@@ -25,15 +25,8 @@ const Home = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center rounded-lg bg-muted px-3 py-1 text-sm font-medium justify-center"
           >
-            <span className="inline-flex items-center">
-              🔗
-              <div
-                className="ml-2 mr-2 w-1 h-4 bg-border dark:hidden"
-                data-orientation="vertical"
-                role="none"
-              ></div>
-            </span>
-            <span className="dark:ml-2">Check out the API Documentation</span>
+            <span className="inline-flex items-center">🔗</span>
+            <span className="ml-2">Check out the API Documentation</span>
             <svg
               width="15"
               height="15"
