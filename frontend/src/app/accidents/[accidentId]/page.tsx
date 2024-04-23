@@ -7,11 +7,13 @@ import { buttonVariants } from '@/components/ui/button';
 import { useFetchAccidentDetails } from '@/hooks/useAccidentData';
 import MapComponent from '@/components/MapComponent';
 
-const AccidentDetail = ({
-  params,
-}: {
-  params: { accidentId: string };
-}) => {
+interface AccidentDetailProps {
+  params: {
+    accidentId: string;
+  };
+}
+
+const AccidentDetail: React.FC<AccidentDetailProps> = ({ params }) => {
   const { accidentId } = params;
   const { accidentDetails, isLoading } = useFetchAccidentDetails(accidentId);
 
@@ -41,7 +43,7 @@ const AccidentDetail = ({
       <Header />
       <section className="container flex flex-col space-y-5 mt-10">
         <div className="text-4xl font-bold">Air Accident Details</div>
-        <div className="text-xl mt-0 text-slate-700 dark:text-slate-200">{accidentDetails?.remark_text}</div>
+        <div className="text-xl mt-0 text-muted-foreground dark:text-slate-200">{accidentDetails?.remark_text}</div>
         <hr className="my-4"></hr>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
