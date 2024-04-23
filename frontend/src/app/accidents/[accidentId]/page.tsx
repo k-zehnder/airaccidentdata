@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
@@ -39,10 +39,16 @@ const AccidentDetail = ({
   return (
     <>
       <Header />
-      <section className="container flex flex-col space-y-10 mt-10">
+      <section className="container flex flex-col space-y-5 mt-10">
         <div className="text-4xl font-bold">Air Accident Details</div>
+        <div className="text-xl mt-0 text-slate-700 dark:text-slate-200">{accidentDetails?.remark_text}</div>
+        <hr className="my-4"></hr>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="md:col-span-1">
+            <img src={accidentDetails?.imageUrl} alt="Aircraft Image" className="max-w-full h-auto rounded-lg shadow-md mb-6" />
+          </div>
+
           <div className="md:col-span-1 bg-white dark:bg-background/50 shadow-md rounded border p-6 mb-6">
             <h2 className="text-2xl font-semibold mb-4">Incident Overview</h2>
             <p>
@@ -58,17 +64,15 @@ const AccidentDetail = ({
               <strong>Remark:</strong> {accidentDetails?.remark_text}
             </p>
           </div>
-
-          <div className="md:col-span-1 bg-white dark:bg-background/50 shadow-md rounded border p-6 mb-6">
-            <h2 className="text-2xl font-semibold mb-4">
-              Location Information
-            </h2>
-            <p>
-              {accidentDetails?.location_city_name}, {accidentDetails?.location_state_name}, {accidentDetails?.location_country_name}
-            </p>
-              <MapComponent latitude={accidentDetails?.latitude} longitude={accidentDetails?.longitude} />
-          </div>
         </div>
+
+        <section className="bg-white dark:bg-background/50 shadow-md rounded border p-6 mb-6">
+          <h2 className="text-2xl font-semibold mb-4">Location Information</h2>
+          <p>
+            {accidentDetails?.location_city_name}, {accidentDetails?.location_state_name}, {accidentDetails?.location_country_name}
+          </p>
+          <MapComponent latitude={accidentDetails?.latitude} longitude={accidentDetails?.longitude} />
+        </section>
 
         <section className="bg-white dark:bg-background/50 shadow-md rounded border p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-4">Reports & Analysis</h2>
@@ -84,6 +88,7 @@ const AccidentDetail = ({
             ))}
           </ul>
         </section>
+        
         <Link legacyBehavior href="/" passHref>
           <a className={buttonVariants({ variant: 'outline' })}>Home</a>
         </Link>
