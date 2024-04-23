@@ -1,4 +1,3 @@
-// Pagination component
 import React from 'react';
 
 interface PaginationProps {

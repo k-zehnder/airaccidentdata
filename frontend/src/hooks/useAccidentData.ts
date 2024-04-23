@@ -80,9 +80,10 @@ export const useFetchAccidentDetails = (accidentId: string) => {
       setLoading(true);
       try {
         // Determine the base URL based on environment
-        const baseUrl = process.env.NEXT_PUBLIC_ENV === 'development'
-          ? 'http://localhost:8080'
-          : 'https://airaccidentdata.com';
+        const baseUrl =
+          process.env.NEXT_PUBLIC_ENV === 'development'
+            ? 'http://localhost:8080'
+            : 'https://airaccidentdata.com';
 
         const apiUrl = `${baseUrl}/api/v1/accidents/${accidentId}`;
         const response = await axios.get<Accident>(apiUrl);
@@ -93,10 +94,17 @@ export const useFetchAccidentDetails = (accidentId: string) => {
         const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
         const aircraftData = aircraftResponse.data;
 
-        // Combine accident and aircraft details
+        // Fetching the stored S3 URL for the aircraft image
+        const imageUrl = `${baseUrl}/api/v1/aircrafts/${accidentData.aircraft_id}/images`;
+        const imageResponse = await axios.get<{ images: { s3_url: string }[] }>(imageUrl);
+        const images = imageResponse.data.images;
+        const aircraftImageUrl = images.length > 0 ? images[0].s3_url : '';
+
+        // Combine accident, aircraft details, and image URL
         const combinedData = {
           ...accidentData,
           aircraftDetails: aircraftData,
+          imageUrl: aircraftImageUrl,
         };
 
         setAccidentDetails(combinedData);
