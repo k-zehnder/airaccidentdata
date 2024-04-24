@@ -6,6 +6,7 @@ export const useAccidentData = (currentPage: number) => {
   const [accidents, setAccidents] = useState<Accident[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isFetching, setFetching] = useState(false);
+  const accidentsPerPage = 10;
 
   useEffect(() => {
     const fetchAccidents = async () => {
@@ -15,7 +16,7 @@ export const useAccidentData = (currentPage: number) => {
           process.env.NEXT_PUBLIC_ENV === 'development'
             ? 'http://localhost:8080'
             : 'https://airaccidentdata.com'
-        }/api/v1/accidents?page=${currentPage}`;
+        }/api/v1/accidents?page=${Math.max(1, Math.floor(currentPage))}`;
         const response = await axios.get<{
           accidents: Accident[];
           total: number;
@@ -30,7 +31,8 @@ export const useAccidentData = (currentPage: number) => {
                   ? 'http://localhost:8080'
                   : 'https://airaccidentdata.com'
               }/api/v1/aircrafts/${accident.aircraft_id}`;
-              const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
+              const aircraftResponse =
+                await axios.get<Aircraft>(aircraftApiUrl);
 
               // Fetching the stored S3 URL for the aircraft image
               const imageUrl = `${
@@ -38,9 +40,12 @@ export const useAccidentData = (currentPage: number) => {
                   ? 'http://localhost:8080'
                   : 'https://airaccidentdata.com'
               }/api/v1/aircrafts/${accident.aircraft_id}/images`;
-              const imageResponse = await axios.get<{ images: { s3_url: string }[] }>(imageUrl);
+              const imageResponse = await axios.get<{
+                images: { s3_url: string }[];
+              }>(imageUrl);
               const images = imageResponse.data.images;
-              const aircraftImageUrl = images.length > 0 ? images[0].s3_url : ''; 
+              const aircraftImageUrl =
+                images.length > 0 ? images[0].s3_url : '';
 
               return {
                 ...accident,
@@ -48,17 +53,24 @@ export const useAccidentData = (currentPage: number) => {
                 imageUrl: aircraftImageUrl,
               };
             } catch (error) {
-              console.error(`Error fetching accident details for ID ${accident.id}:`, error);
+              console.error(
+                `Error fetching accident details for ID ${accident.id}:`,
+                error,
+              );
               return null;
             }
-          })
+          }),
         );
 
-        // Filter out null values (if any)
-        const filteredAccidents = accidentsWithAircraftDetails.filter((accident) => accident !== null);
+        // Filter out null values (if any) and cast to Accident[]
+        const filteredAccidents = accidentsWithAircraftDetails.filter(
+          (accident): accident is Accident => accident !== null,
+        ) as Accident[];
 
         setAccidents(filteredAccidents);
-        setTotalPages(Math.ceil(response.data.total) / 10); // 10 accidents per page
+
+        // Calculate total pages based on the total number of accidents and accidents per page
+        setTotalPages(Math.ceil(response.data.total / accidentsPerPage));
       } catch (error) {
         console.error('Error fetching accidents:', error);
       }
@@ -96,7 +108,9 @@ export const useFetchAccidentDetails = (accidentId: string) => {
 
         // Fetching the stored S3 URL for the aircraft image
         const imageUrl = `${baseUrl}/api/v1/aircrafts/${accidentData.aircraft_id}/images`;
-        const imageResponse = await axios.get<{ images: { s3_url: string }[] }>(imageUrl);
+        const imageResponse = await axios.get<{ images: { s3_url: string }[] }>(
+          imageUrl,
+        );
         const images = imageResponse.data.images;
         const aircraftImageUrl = images.length > 0 ? images[0].s3_url : '';
 
