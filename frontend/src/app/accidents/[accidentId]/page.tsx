@@ -6,6 +6,7 @@ import { Header } from '@/components/header';
 import { buttonVariants } from '@/components/ui/button';
 import { useFetchAccidentDetails } from '@/hooks/useAccidentData';
 import MapComponent from '@/components/MapComponent';
+import Loader from '@/components/Loader';
 
 interface AccidentDetailProps {
   params: {
@@ -27,7 +28,7 @@ const AccidentDetail: React.FC<AccidentDetailProps> = ({ params }) => {
     return (
       <>
         <Header />
-        <div>Loading accident details...</div>
+        <Loader />
       </>
     );
   }

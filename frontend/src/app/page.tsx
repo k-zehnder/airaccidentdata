@@ -6,13 +6,21 @@ import { Header } from '@/components/header';
 import Pagination from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
 import { useAccidentData } from '../hooks/useAccidentData';
+import Loader from '@/components/Loader';
 import { formatDate } from '../lib/utils';
 
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { accidents, totalPages, isFetching } = useAccidentData(currentPage);
 
-  if (isFetching) return <div>Loading...</div>;
+  if (isFetching) {
+    return (
+      <>
+        <Header />
+        <Loader />
+      </>
+    );
+  }
 
   return (
     <>
