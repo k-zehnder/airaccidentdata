@@ -95,6 +95,13 @@ const Home = () => {
                     accident.ground_injury_minor !== 0) && (
                     <Badge className="bg-green-500 mb-1">Minor Injuries</Badge>
                   )}
+                  {accident.remark_text.toLowerCase().includes('bird') && (
+                    <Badge className="bg-blue-500 mb-1">Birds Present</Badge>
+                  )}
+                  {(accident.remark_text.toLowerCase().includes('stall') ||
+                    accident.remark_text.toLowerCase().includes('stalled')) && (
+                    <Badge className="bg-orange-500 mb-1">Stall</Badge>
+                  )}
                   <p className="text-gray-500">{accident.remark_text}</p>
                 </div>
                 <div className="w-1/4 flex justify-end">
