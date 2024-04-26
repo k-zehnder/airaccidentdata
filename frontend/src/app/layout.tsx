@@ -14,8 +14,8 @@ const metadata = {
   title: 'airaccidentdata.com',
   description: 'Latest plane crash accidents and incident news!',
   siteUrl: 'http://airaccidentdata.com',
-  ogImage:
-    'https://s3.us-west-1.amazonaws.com/s.airaccidentdata.com/og-image.png',
+  s3BucketUrl: 'https://s3.us-west-1.amazonaws.com/s.airaccidentdata.com',
+  ogImage: '/og-image.png',
 };
 
 interface RootLayoutProps {
@@ -38,19 +38,19 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <meta property="og:title" content={metadata.title} />
         <meta
           property="og:image"
-          content={`${metadata.siteUrl}${metadata.ogImage}`}
+          content={`${metadata.s3BucketUrl}${metadata.ogImage}`}
         />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={metadata.title} />
         <meta name="twitter:description" content={metadata.description} />
         <meta
           name="twitter:image"
-          content={`${metadata.siteUrl}${metadata.ogImage}`}
+          content={`${metadata.s3BucketUrl}${metadata.ogImage}`}
         />
         <link rel="canonical" href={`${metadata.siteUrl}${pathname}`} />
         <link
           rel="icon"
-          href={`${metadata.siteUrl}/favicon.ico`}
+          href={`${metadata.s3BucketUrl}/favicon.ico`}
           type="image/x-icon"
           sizes="16x16"
         />
