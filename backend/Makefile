@@ -14,7 +14,7 @@ run:
 	docker-compose up -d backend
 
 .PHONY: test
-test_coverage:
+test:
 	@echo "Running Go tests with coverage..."
 	go test -v -coverprofile=coverage.out ./...
 	@echo "Generating coverage report..."
