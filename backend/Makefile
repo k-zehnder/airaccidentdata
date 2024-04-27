@@ -1,15 +1,22 @@
-.PHONY: build_backend
-build_backend:
+.PHONY: build
+build:
+	@echo "Building backend Docker image..."
 	docker build -t $(BACKEND_IMAGE_TAG) .
 
-.PHONY: run_backend
-run_backend:
+.PHONY: push
+push:
+	@echo "Pushing backend Docker image..."
+	docker push $(BACKEND_IMAGE_TAG)
+
+.PHONY: run
+run:
+	@echo "Starting backend service..."
 	docker-compose up -d backend
 
-.PHONY: test_backend
-test_backend:
+.PHONY: test
+test:
+	@echo "Running backend tests..."
 	go test -v -coverprofile=coverage.out ./...
-	go tool cover -html=coverage.out -o coverage.html
 
 .PHONY: test_coverage
 test_coverage:
