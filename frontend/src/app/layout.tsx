@@ -1,60 +1,45 @@
-'use client';
-
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '../lib/utils';
-import Head from 'next/head';
-import { usePathname } from 'next/navigation';
 
 const fontStyling = {
   fontFamily: '"Inter", sans-serif',
 };
 
-const metadata = {
+interface Metadata {
+  title: string;
+  description: string;
+  faviconUrl: string;
+  ogImageUrl: string;
+}
+
+export const metadata: Metadata = {
   title: 'airaccidentdata.com',
   description: 'Latest plane crash accidents and incident news!',
-  siteUrl: 'http://airaccidentdata.com',
-  ogImage:
-    'https://s3.us-west-1.amazonaws.com/s.airaccidentdata.com/og-image.png',
+  faviconUrl: 'https://s.airaccidentdata.com/favicon.ico',
+  ogImageUrl: 'https://s.airaccidentdata.com/og-image.png',
 };
 
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
-  const pathname = usePathname();
-
+export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <Head>
+      <head>
         <title>{metadata.title}</title>
-        <meta name="robots" content="follow, index" />
         <meta name="description" content={metadata.description} />
-        <meta property="og:url" content={`${metadata.siteUrl}${pathname}`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content={metadata.title} />
-        <meta property="og:description" content={metadata.description} />
         <meta property="og:title" content={metadata.title} />
-        <meta
-          property="og:image"
-          content={`${metadata.siteUrl}${metadata.ogImage}`}
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={metadata.title} />
-        <meta name="twitter:description" content={metadata.description} />
-        <meta
-          name="twitter:image"
-          content={`${metadata.siteUrl}${metadata.ogImage}`}
-        />
-        <link rel="canonical" href={`${metadata.siteUrl}${pathname}`} />
+        <meta property="og:description" content={metadata.description} />
+        <meta property="og:image" content={metadata.ogImageUrl} />
         <link
           rel="icon"
-          href={`${metadata.siteUrl}/favicon.ico`}
+          href={metadata.faviconUrl}
           type="image/x-icon"
           sizes="16x16"
         />
-      </Head>
+      </head>
       <body
         className={cn('min-h-screen bg-background antialiased')}
         style={fontStyling}
