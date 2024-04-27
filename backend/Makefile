@@ -14,15 +14,8 @@ run:
 	docker-compose up -d backend
 
 .PHONY: test
-test:
-	@echo "Running backend tests..."
-	go test -v -coverprofile=coverage.out ./...
-
-.PHONY: test_coverage
 test_coverage:
 	@echo "Running Go tests with coverage..."
-	go test -coverprofile=coverage.out ./...
+	go test -v -coverprofile=coverage.out ./...
 	@echo "Generating coverage report..."
 	go tool cover -html=coverage.out -o coverage.html
-	@echo "Opening coverage report..."
-	open coverage.html
