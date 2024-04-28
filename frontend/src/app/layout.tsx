@@ -39,6 +39,22 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           type="image/x-icon"
           sizes="16x16"
         />
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-D9DT897WDG"
+        ></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-D9DT897WDG', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
       </head>
       <body
         className={cn('min-h-screen bg-background antialiased')}
