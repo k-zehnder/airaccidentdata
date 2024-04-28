@@ -1,6 +1,7 @@
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '../lib/utils';
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const fontStyling = {
   fontFamily: '"Inter", sans-serif',
@@ -24,7 +25,7 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default async function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <head>
@@ -51,6 +52,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             </div>
           </div>
         </ThemeProvider>
+        <GoogleAnalytics gaId="G-D9DT897WDG" />
       </body>
     </html>
   );
