@@ -136,8 +136,16 @@ dist
 .DS_Store
 coverage.out
 coverage.html
+test_output.txt
+sample_makefile
+nginx-dev.conf/
 mysql_setup.log
+ssl
+nginx
+ca.pem
 reminders.txt
+sorted_downloaded_file.csv
+backend/downloaded_file.csv
 
 # Debug
 debug/
