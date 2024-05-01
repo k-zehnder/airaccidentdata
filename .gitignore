@@ -145,3 +145,4 @@ backend/downloaded_file.csv
 
 # Debug
 debug/
+debug.ts
