@@ -1,54 +1,47 @@
-version: '3.8'
-
 services:
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - ./frontend:/app           # Mounts the host frontend directory to /app in the container
+      - /app/node_modules         # An anonymous volume to prevent overwriting node_modules from the container
     ports:
       - 3000:3000
+    env_file:
+      - ./frontend/.env
     depends_on:
       - backend
-    networks:
-      - app-network
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
     volumes:
-      - ./backend:/app
+      - ./backend:/app            # Mounts the host backend directory to /app in the container
     ports:
       - 8080:8080
-    networks:
-      - app-network
     env_file:
-      - .env
+      - ./backend/.env
     environment:
       - MYSQL_DSN
       - SERVER_ADDRESS
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
 
   mysql:
     image: mysql:latest
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
     ports:
       - 3306:3306
     volumes:
-      - mysql_gophersignal:/var/lib/mysql
-    networks:
-      - app-network
+      - mysql_airaccidentdata_dev:/var/lib/mysql    # Persistent volume for MySQL data
     env_file:
-      - .env
+      - ./backend/.env  # MySQL uses the same .env file as backend
     environment:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
@@ -57,10 +50,28 @@ services:
       - MYSQL_HOST
       - MYSQL_PORT
 
-networks:
-  app-network:
-    driver: bridge
+  scraper:
+    build:
+      context: ./scraper
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./scraper:/app            # Mounts the host scraper directory to /app in the container
+      - /app/node_modules         # An anonymous volume to prevent overwriting node_modules from the container
+    depends_on:
+      - mysql
+    env_file:
+      - ./scraper/.env
+    environment:
+      - MYSQL_HOST
+      - MYSQL_PORT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_DATABASE
+      - AWS_REGION
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_S3_BUCKET
 
 volumes:
-  mysql_gophersignal:
+  mysql_airaccidentdata_dev:
     driver: local

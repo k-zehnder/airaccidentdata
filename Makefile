@@ -2,8 +2,9 @@ VERSION ?= latest
 DOCKERHUB_REPO := computers33333/airaccidentdata
 FRONTEND_IMAGE_TAG := $(DOCKERHUB_REPO)-frontend:$(VERSION)
 BACKEND_IMAGE_TAG := $(DOCKERHUB_REPO)-backend:$(VERSION)
+SCRAPER_IMAGE_TAG := $(DOCKERHUB_REPO)-scraper:$(VERSION)
 
-export FRONTEND_IMAGE_TAG BACKEND_IMAGE_TAG
+export FRONTEND_IMAGE_TAG BACKEND_IMAGE_TAG SCRAPER_IMAGE_TAG
 
 .PHONY: all
 all: build test push
@@ -13,6 +14,7 @@ build:
 	@echo "Building all components..."
 	$(MAKE) -C frontend build
 	$(MAKE) -C backend build
+	$(MAKE) -C scraper build
 
 .PHONY: test
 test:
@@ -24,6 +26,7 @@ push:
 	@echo "Pushing all images..."
 	$(MAKE) -C frontend push
 	$(MAKE) -C backend push
+	$(MAKE) -C scraper push
 
 .PHONY: deploy
 deploy:
@@ -33,3 +36,8 @@ deploy:
 	docker pull $(BACKEND_IMAGE_TAG)
 	docker compose up -d
 	@echo "Application deployed successfully."
+
+.PHONY: dev
+dev:
+	@echo "Starting development environment..."
+	docker compose -f docker-compose-dev.yml up -d --build
