@@ -1,10 +1,47 @@
 basePath: /api/v1
 definitions:
+  models.Accident:
+    properties:
+      aircraft_damage_description:
+        type: string
+      aircraft_id:
+        type: integer
+      aircraft_missing_flag:
+        type: string
+      entry_date:
+        type: string
+      event_local_date:
+        type: string
+      event_local_time:
+        type: string
+      event_type_description:
+        type: string
+      far_part:
+        type: string
+      fatal_flag:
+        type: string
+      flight_activity:
+        type: string
+      flight_number:
+        type: string
+      flight_phase:
+        type: string
+      fsdo_description:
+        type: string
+      id:
+        type: integer
+      location_id:
+        type: integer
+      remark_text:
+        type: string
+      updated:
+        type: string
+    type: object
   models.AccidentPaginatedResponse:
     properties:
       accidents:
         items:
-          $ref: '#/definitions/models.AircraftAccident'
+          $ref: '#/definitions/models.Accident'
         type: array
       limit:
         type: integer
@@ -13,194 +50,7 @@ definitions:
       total:
         type: integer
     type: object
-  models.AircraftAccident:
-    properties:
-      aircraft_damage_description:
-        type: string
-      aircraft_id:
-        type: integer
-      aircraft_missing_flag:
-        type: string
-      cabin_crew_injury_fatal:
-        type: integer
-      cabin_crew_injury_minor:
-        type: integer
-      cabin_crew_injury_none:
-        type: integer
-      cabin_crew_injury_serious:
-        type: integer
-      cabin_crew_injury_unknown:
-        type: integer
-      entry_date:
-        type: string
-      event_local_date:
-        type: string
-      event_local_time:
-        type: string
-      event_type_description:
-        type: string
-      far_part:
-        type: string
-      fatal_flag:
-        type: string
-      flight_activity:
-        type: string
-      flight_crew_injury_fatal:
-        type: integer
-      flight_crew_injury_minor:
-        type: integer
-      flight_crew_injury_none:
-        type: integer
-      flight_crew_injury_serious:
-        type: integer
-      flight_crew_injury_unknown:
-        type: integer
-      flight_number:
-        type: string
-      flight_phase:
-        type: string
-      fsdo_description:
-        type: string
-      ground_injury_fatal:
-        type: integer
-      ground_injury_minor:
-        type: integer
-      ground_injury_none:
-        type: integer
-      ground_injury_serious:
-        type: integer
-      ground_injury_unknown:
-        type: integer
-      id:
-        type: integer
-      latitude:
-        type: number
-      location_city_name:
-        type: string
-      location_country_name:
-        type: string
-      location_state_name:
-        type: string
-      longitude:
-        type: number
-      max_injury_level:
-        type: string
-      passenger_injury_fatal:
-        type: integer
-      passenger_injury_minor:
-        type: integer
-      passenger_injury_none:
-        type: integer
-      passenger_injury_serious:
-        type: integer
-      passenger_injury_unknown:
-        type: integer
-      remark_text:
-        type: string
-      updated:
-        type: string
-    type: object
-  models.AircraftAccidentResponse:
-    properties:
-      aircraft_damage_description:
-        type: string
-      aircraft_id:
-        type: integer
-      aircraft_missing_flag:
-        type: string
-      cabin_crew_injury_fatal:
-        type: integer
-      cabin_crew_injury_minor:
-        type: integer
-      cabin_crew_injury_none:
-        type: integer
-      cabin_crew_injury_serious:
-        type: integer
-      cabin_crew_injury_unknown:
-        type: integer
-      entry_date:
-        type: string
-      event_local_date:
-        type: string
-      event_local_time:
-        type: string
-      event_type_description:
-        type: string
-      far_part:
-        type: string
-      fatal_flag:
-        type: string
-      flight_activity:
-        type: string
-      flight_crew_injury_fatal:
-        type: integer
-      flight_crew_injury_minor:
-        type: integer
-      flight_crew_injury_none:
-        type: integer
-      flight_crew_injury_serious:
-        type: integer
-      flight_crew_injury_unknown:
-        type: integer
-      flight_number:
-        type: string
-      flight_phase:
-        type: string
-      fsdo_description:
-        type: string
-      ground_injury_fatal:
-        type: integer
-      ground_injury_minor:
-        type: integer
-      ground_injury_none:
-        type: integer
-      ground_injury_serious:
-        type: integer
-      ground_injury_unknown:
-        type: integer
-      id:
-        type: integer
-      latitude:
-        type: number
-      location_city_name:
-        type: string
-      location_country_name:
-        type: string
-      location_state_name:
-        type: string
-      longitude:
-        type: number
-      max_injury_level:
-        type: string
-      passenger_injury_fatal:
-        type: integer
-      passenger_injury_minor:
-        type: integer
-      passenger_injury_none:
-        type: integer
-      passenger_injury_serious:
-        type: integer
-      passenger_injury_unknown:
-        type: integer
-      remark_text:
-        type: string
-      updated:
-        type: string
-    type: object
-  models.AircraftPaginatedResponse:
-    properties:
-      aircrafts:
-        items:
-          $ref: '#/definitions/models.AircraftResponse'
-        type: array
-      limit:
-        type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-    type: object
-  models.AircraftResponse:
+  models.Aircraft:
     properties:
       aircraft_make_name:
         type: string
@@ -213,20 +63,35 @@ definitions:
       registration_number:
         type: string
     type: object
-  models.ErrorResponse:
-    properties:
-      message:
-        type: string
-    type: object
-  models.ImageResponse:
+  models.AircraftImage:
     properties:
       aircraft_id:
         type: integer
+      description:
+        type: string
       id:
         type: integer
       image_url:
         type: string
       s3_url:
+        type: string
+    type: object
+  models.AircraftPaginatedResponse:
+    properties:
+      aircrafts:
+        items:
+          $ref: '#/definitions/models.Aircraft'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  models.ErrorResponse:
+    properties:
+      message:
         type: string
     type: object
   models.ImagesForAircraftResponse:
@@ -235,8 +100,21 @@ definitions:
         type: integer
       images:
         items:
-          $ref: '#/definitions/models.ImageResponse'
+          $ref: '#/definitions/models.AircraftImage'
         type: array
+    type: object
+  models.Injury:
+    properties:
+      accident_id:
+        type: integer
+      count:
+        type: integer
+      id:
+        type: integer
+      injury_severity:
+        type: string
+      person_type:
+        type: string
     type: object
 info:
   contact: {}
@@ -289,7 +167,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AircraftAccidentResponse'
+            $ref: '#/definitions/models.Aircraft'
         "400":
           description: Invalid accident ID
           schema:
@@ -350,7 +228,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AircraftResponse'
+            $ref: '#/definitions/models.Aircraft'
         "400":
           description: Invalid aircraft ID
           schema:
@@ -364,39 +242,6 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Get details about an aircraft by ID
-      tags:
-      - Aircrafts
-  /aircrafts/{id}/accidents:
-    get:
-      description: Get aviation accidents for an aircraft ID.
-      parameters:
-      - description: ID of the aircraft
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Accidents details
-          schema:
-            items:
-              $ref: '#/definitions/models.AircraftAccidentResponse'
-            type: array
-        "400":
-          description: Invalid ID number
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Accident not found
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Get a list of accidents by aircraft ID
       tags:
       - Aircrafts
   /aircrafts/{id}/images:
@@ -430,41 +275,35 @@ paths:
       summary: Get all images for an aircraft
       tags:
       - Aircrafts
-  /aircrafts/{id}/images/{imageID}:
+  /injuries/{id}:
     get:
-      description: Retrieve details of a specific image associated with a specific
-        aircraft.
+      description: Retrieve injuries for an accident.
       parameters:
       - description: Aircraft ID
         in: path
         name: id
         required: true
         type: integer
-      - description: Image ID
-        in: path
-        name: imageID
-        required: true
-        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: Image URL
+          description: OK
           schema:
-            $ref: '#/definitions/models.ImageResponse'
+            $ref: '#/definitions/models.Injury'
         "400":
-          description: Invalid aircraft or image ID
+          description: Invalid accident ID
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "404":
-          description: Aircraft or image not found
+          description: Accident not found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get a specific image for an aircraft
+      summary: Get injuries for an accident
       tags:
-      - Aircrafts
+      - Injuries
 swagger: "2.0"

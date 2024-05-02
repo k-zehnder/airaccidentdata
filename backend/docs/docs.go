@@ -84,7 +84,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.AircraftAccidentResponse"
+                            "$ref": "#/definitions/models.Aircraft"
                         }
                     },
                     "400": {
@@ -177,7 +177,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.AircraftResponse"
+                            "$ref": "#/definitions/models.Aircraft"
                         }
                     },
                     "400": {
@@ -188,56 +188,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Aircraft not found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/aircrafts/{id}/accidents": {
-            "get": {
-                "description": "Get aviation accidents for an aircraft ID.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Aircrafts"
-                ],
-                "summary": "Get a list of accidents by aircraft ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID of the aircraft",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Accidents details",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.AircraftAccidentResponse"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid ID number",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Accident not found",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -298,16 +248,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/aircrafts/{id}/images/{imageID}": {
+        "/injuries/{id}": {
             "get": {
-                "description": "Retrieve details of a specific image associated with a specific aircraft.",
+                "description": "Retrieve injuries for an accident.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Aircrafts"
+                    "Injuries"
                 ],
-                "summary": "Get a specific image for an aircraft",
+                "summary": "Get injuries for an accident",
                 "parameters": [
                     {
                         "type": "integer",
@@ -315,30 +265,23 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Image ID",
-                        "name": "imageID",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Image URL",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ImageResponse"
+                            "$ref": "#/definitions/models.Injury"
                         }
                     },
                     "400": {
-                        "description": "Invalid aircraft or image ID",
+                        "description": "Invalid accident ID",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "Aircraft or image not found",
+                        "description": "Accident not found",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -354,13 +297,69 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Accident": {
+            "type": "object",
+            "properties": {
+                "aircraft_damage_description": {
+                    "type": "string"
+                },
+                "aircraft_id": {
+                    "type": "integer"
+                },
+                "aircraft_missing_flag": {
+                    "type": "string"
+                },
+                "entry_date": {
+                    "type": "string"
+                },
+                "event_local_date": {
+                    "type": "string"
+                },
+                "event_local_time": {
+                    "type": "string"
+                },
+                "event_type_description": {
+                    "type": "string"
+                },
+                "far_part": {
+                    "type": "string"
+                },
+                "fatal_flag": {
+                    "type": "string"
+                },
+                "flight_activity": {
+                    "type": "string"
+                },
+                "flight_number": {
+                    "type": "string"
+                },
+                "flight_phase": {
+                    "type": "string"
+                },
+                "fsdo_description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "location_id": {
+                    "type": "integer"
+                },
+                "remark_text": {
+                    "type": "string"
+                },
+                "updated": {
+                    "type": "string"
+                }
+            }
+        },
         "models.AccidentPaginatedResponse": {
             "type": "object",
             "properties": {
                 "accidents": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.AircraftAccident"
+                        "$ref": "#/definitions/models.Accident"
                     }
                 },
                 "limit": {
@@ -374,289 +373,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.AircraftAccident": {
-            "type": "object",
-            "properties": {
-                "aircraft_damage_description": {
-                    "type": "string"
-                },
-                "aircraft_id": {
-                    "type": "integer"
-                },
-                "aircraft_missing_flag": {
-                    "type": "string"
-                },
-                "cabin_crew_injury_fatal": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_minor": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_none": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_serious": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_unknown": {
-                    "type": "integer"
-                },
-                "entry_date": {
-                    "type": "string"
-                },
-                "event_local_date": {
-                    "type": "string"
-                },
-                "event_local_time": {
-                    "type": "string"
-                },
-                "event_type_description": {
-                    "type": "string"
-                },
-                "far_part": {
-                    "type": "string"
-                },
-                "fatal_flag": {
-                    "type": "string"
-                },
-                "flight_activity": {
-                    "type": "string"
-                },
-                "flight_crew_injury_fatal": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_minor": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_none": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_serious": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_unknown": {
-                    "type": "integer"
-                },
-                "flight_number": {
-                    "type": "string"
-                },
-                "flight_phase": {
-                    "type": "string"
-                },
-                "fsdo_description": {
-                    "type": "string"
-                },
-                "ground_injury_fatal": {
-                    "type": "integer"
-                },
-                "ground_injury_minor": {
-                    "type": "integer"
-                },
-                "ground_injury_none": {
-                    "type": "integer"
-                },
-                "ground_injury_serious": {
-                    "type": "integer"
-                },
-                "ground_injury_unknown": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "location_city_name": {
-                    "type": "string"
-                },
-                "location_country_name": {
-                    "type": "string"
-                },
-                "location_state_name": {
-                    "type": "string"
-                },
-                "longitude": {
-                    "type": "number"
-                },
-                "max_injury_level": {
-                    "type": "string"
-                },
-                "passenger_injury_fatal": {
-                    "type": "integer"
-                },
-                "passenger_injury_minor": {
-                    "type": "integer"
-                },
-                "passenger_injury_none": {
-                    "type": "integer"
-                },
-                "passenger_injury_serious": {
-                    "type": "integer"
-                },
-                "passenger_injury_unknown": {
-                    "type": "integer"
-                },
-                "remark_text": {
-                    "type": "string"
-                },
-                "updated": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.AircraftAccidentResponse": {
-            "type": "object",
-            "properties": {
-                "aircraft_damage_description": {
-                    "type": "string"
-                },
-                "aircraft_id": {
-                    "type": "integer"
-                },
-                "aircraft_missing_flag": {
-                    "type": "string"
-                },
-                "cabin_crew_injury_fatal": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_minor": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_none": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_serious": {
-                    "type": "integer"
-                },
-                "cabin_crew_injury_unknown": {
-                    "type": "integer"
-                },
-                "entry_date": {
-                    "type": "string"
-                },
-                "event_local_date": {
-                    "type": "string"
-                },
-                "event_local_time": {
-                    "type": "string"
-                },
-                "event_type_description": {
-                    "type": "string"
-                },
-                "far_part": {
-                    "type": "string"
-                },
-                "fatal_flag": {
-                    "type": "string"
-                },
-                "flight_activity": {
-                    "type": "string"
-                },
-                "flight_crew_injury_fatal": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_minor": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_none": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_serious": {
-                    "type": "integer"
-                },
-                "flight_crew_injury_unknown": {
-                    "type": "integer"
-                },
-                "flight_number": {
-                    "type": "string"
-                },
-                "flight_phase": {
-                    "type": "string"
-                },
-                "fsdo_description": {
-                    "type": "string"
-                },
-                "ground_injury_fatal": {
-                    "type": "integer"
-                },
-                "ground_injury_minor": {
-                    "type": "integer"
-                },
-                "ground_injury_none": {
-                    "type": "integer"
-                },
-                "ground_injury_serious": {
-                    "type": "integer"
-                },
-                "ground_injury_unknown": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "location_city_name": {
-                    "type": "string"
-                },
-                "location_country_name": {
-                    "type": "string"
-                },
-                "location_state_name": {
-                    "type": "string"
-                },
-                "longitude": {
-                    "type": "number"
-                },
-                "max_injury_level": {
-                    "type": "string"
-                },
-                "passenger_injury_fatal": {
-                    "type": "integer"
-                },
-                "passenger_injury_minor": {
-                    "type": "integer"
-                },
-                "passenger_injury_none": {
-                    "type": "integer"
-                },
-                "passenger_injury_serious": {
-                    "type": "integer"
-                },
-                "passenger_injury_unknown": {
-                    "type": "integer"
-                },
-                "remark_text": {
-                    "type": "string"
-                },
-                "updated": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.AircraftPaginatedResponse": {
-            "type": "object",
-            "properties": {
-                "aircrafts": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.AircraftResponse"
-                    }
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.AircraftResponse": {
+        "models.Aircraft": {
             "type": "object",
             "properties": {
                 "aircraft_make_name": {
@@ -676,19 +393,14 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.ImageResponse": {
+        "models.AircraftImage": {
             "type": "object",
             "properties": {
                 "aircraft_id": {
                     "type": "integer"
+                },
+                "description": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
@@ -697,6 +409,34 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "s3_url": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AircraftPaginatedResponse": {
+            "type": "object",
+            "properties": {
+                "aircrafts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Aircraft"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
                     "type": "string"
                 }
             }
@@ -710,8 +450,28 @@ const docTemplate = `{
                 "images": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.ImageResponse"
+                        "$ref": "#/definitions/models.AircraftImage"
                     }
+                }
+            }
+        },
+        "models.Injury": {
+            "type": "object",
+            "properties": {
+                "accident_id": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "injury_severity": {
+                    "type": "string"
+                },
+                "person_type": {
+                    "type": "string"
                 }
             }
         }
