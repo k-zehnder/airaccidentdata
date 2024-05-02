@@ -129,7 +129,7 @@ func processCSV(file *os.File, db *sql.DB) error {
 // Read and parse each CSV row into a structured format
 func processRecord(ctx context.Context, db *sql.DB, record []string) error {
 	// Parse the record to get aircraft and accident data
-	aircraft, accident, err := parseRecordToIncident(record)
+	aircraft, accident, location, err := parseRecordToIncident(record)
 	if err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func processRecord(ctx context.Context, db *sql.DB, record []string) error {
 	}
 
 	// Ensure location is in the database and get its ID
-	locationID, err := ensureLocation(ctx, db, nil)
+	locationID, err := ensureLocation(ctx, db, location)
 	if err != nil {
 		return err
 	}
@@ -223,9 +223,9 @@ func parseTime(timeStr string) (string, error) {
 }
 
 // parseRecordToIncident converts a CSV record to an Accident struct
-func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident, error) {
+func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident, *models.Location, error) {
 	if len(record) < 42 { // Ensure there are enough columns to parse
-		return nil, nil, fmt.Errorf("record does not have enough columns")
+		return nil, nil, nil, fmt.Errorf("record does not have enough columns")
 	}
 
 	// Parse the fields for Aircraft struct
@@ -239,15 +239,15 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident,
 	// Parse the fields for Accident struct
 	entryDate, err := parseDate(record[1])
 	if err != nil {
-		return nil, nil, fmt.Errorf("error parsing entry date: %v", err)
+		return nil, nil, nil, fmt.Errorf("error parsing entry date: %v", err)
 	}
 	eventLocalDate, err := parseDate(record[2])
 	if err != nil {
-		return nil, nil, fmt.Errorf("error parsing event local date: %v", err)
+		return nil, nil, nil, fmt.Errorf("error parsing event local date: %v", err)
 	}
 	eventLocalTime, err := parseTime(record[3])
 	if err != nil {
-		return nil, nil, fmt.Errorf("error parsing event local time: %v", err)
+		return nil, nil, nil, fmt.Errorf("error parsing event local time: %v", err)
 	}
 
 	incident := &models.Accident{
@@ -267,7 +267,22 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident,
 		FatalFlag:                 record[21],
 	}
 
-	return aircraft, incident, nil
+	// // Parse the fields for Location struct
+	place := fmt.Sprintf("%s, %s, %s", record[4], record[5], record[6]) // Combine city, state, and country names
+	latitude, longitude, err := getCoordinates(place)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("error getting coordinates for %s: %v", place, err)
+	}
+
+	location := &models.Location{
+		CityName:    record[4],
+		StateName:   record[5],
+		CountryName: record[6],
+		Latitude:    latitude,
+		Longitude:   longitude,
+	}
+
+	return aircraft, incident, location, nil
 }
 
 // insertAircraft inserts a new aircraft into the database or updates it if it already exists

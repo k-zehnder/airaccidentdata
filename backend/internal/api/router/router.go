@@ -43,17 +43,22 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 		aircrafts := v1.Group("/aircrafts")
 		{
 			aircrafts.GET("", controllers.GetAircraftsHandler(store, log))
-			// aircrafts.GET("/:id", controllers.GetAircraftByIdHandler(store, log))
-			// aircrafts.GET("/:id/accidents", controllers.GetAccidentByIdHandler(store, log))
-			// aircrafts.GET("/:id/images", controllers.GetAllImagesForAircraftHandler(store, log))
-			// aircrafts.GET("/:id/images/:imageID", controllers.GetImageForAircraftHandler(store, log))
+			aircrafts.GET("/:id", controllers.GetAircraftByIdHandler(store, log))
+			aircrafts.GET("/:id/accidents", controllers.GetAccidentByIdHandler(store, log))
+			aircrafts.GET("/:id/images", controllers.GetAllImagesForAircraftHandler(store, log))
 		}
 
 		// Set up accidents route
 		accidents := v1.Group("/accidents")
 		{
 			accidents.GET("", controllers.GetAccidentsHandler(store, log))
-			// accidents.GET("/:id", controllers.GetAccidentByIdHandler(store, log))
+			accidents.GET("/:id", controllers.GetAccidentByIdHandler(store, log))
+		}
+
+		injuries := v1.Group("/injuries")
+		{
+			injuries.GET("/:id", controllers.GetInjuriesByAccidentIdHandler(store, log))
+
 		}
 	}
 

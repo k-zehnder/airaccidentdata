@@ -61,6 +61,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/accidents/{id}": {
+            "get": {
+                "description": "Retrieve details of an accident by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accidents"
+                ],
+                "summary": "Get an accident by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Accident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aircraft"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid accident ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Accident not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/aircrafts": {
             "get": {
                 "description": "Retrieve a list of all aircrafts.",
@@ -94,6 +141,147 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/aircrafts/{id}": {
+            "get": {
+                "description": "Retrieve details of an aircraft by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aircrafts"
+                ],
+                "summary": "Get details about an aircraft by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Aircraft ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Aircraft"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid aircraft ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Aircraft not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/aircrafts/{id}/images": {
+            "get": {
+                "description": "Retrieve all images associated with a specific aircraft.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aircrafts"
+                ],
+                "summary": "Get all images for an aircraft",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Aircraft ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image IDs, Image URLs, and S3 URLs",
+                        "schema": {
+                            "$ref": "#/definitions/models.ImagesForAircraftResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid aircraft ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Aircraft not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/injuries/{id}": {
+            "get": {
+                "description": "Retrieve injuries for an accident.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Injuries"
+                ],
+                "summary": "Get injuries for an accident",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Aircraft ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Injury"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid accident ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Accident not found",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -205,6 +393,26 @@ const docTemplate = `{
                 }
             }
         },
+        "models.AircraftImage": {
+            "type": "object",
+            "properties": {
+                "aircraft_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "s3_url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.AircraftPaginatedResponse": {
             "type": "object",
             "properties": {
@@ -229,6 +437,40 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ImagesForAircraftResponse": {
+            "type": "object",
+            "properties": {
+                "aircraft_id": {
+                    "type": "integer"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.AircraftImage"
+                    }
+                }
+            }
+        },
+        "models.Injury": {
+            "type": "object",
+            "properties": {
+                "accident_id": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "injury_severity": {
+                    "type": "string"
+                },
+                "person_type": {
                     "type": "string"
                 }
             }

@@ -177,6 +177,38 @@ func (s *Store) GetAccidents(page, limit int) ([]*models.Accident, int, error) {
 	return accidents, totalCount, nil
 }
 
+// GetAccidentById fetches an accident by its ID from the database
+func (s *Store) GetAccidentById(id int) (*models.Aircraft, error) {
+	// Query to fetch the aircraft by ID
+	query := `SELECT id, registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator FROM Aircrafts WHERE id = ?`
+
+	// Perform the database query
+	row := s.db.QueryRow(query, id)
+
+	// Create a variable to hold the scanned aircraft
+	var aircraft models.Aircraft
+
+	// Scan the values from the row into the aircraft struct
+	err := row.Scan(
+		&aircraft.ID,
+		&aircraft.RegistrationNumber,
+		&aircraft.AircraftMakeName,
+		&aircraft.AircraftModelName,
+		&aircraft.AircraftOperator,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// Return nil for the aircraft if not found
+			return nil, nil
+		}
+		// Return the error if any other error occurred
+		return nil, fmt.Errorf("error scanning aircraft row: %w", err)
+	}
+
+	// Return the scanned aircraft
+	return &aircraft, nil
+}
+
 // GetAllImagesForAircraft fetches all images associated with an aircraft by its ID
 func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]*models.AircraftImage, error) {
 	// Query to fetch all images associated with the aircraft.
@@ -227,4 +259,24 @@ func (s *Store) GetImageForAircraft(aircraftID, imageID int) (*models.AircraftIm
 	}
 
 	return &image, nil
+}
+
+// GetInjuriesByAccidentIdHandler fetches injuries about an accident by its ID
+func (s *Store) GetInjuriesByAccidentIdHandler(aircraftId int) (*models.Injury, error) {
+	query := `SELECT id, person_type, injury_severity, count, accident_id FROM Injuries WHERE accident_id = ?`
+
+	row := s.db.QueryRow(query, aircraftId)
+
+	var injury models.Injury
+	err := row.Scan(&injury.ID, &injury.PersonType, &injury.InjurySeverity, &injury.Count, &injury.AccidentID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// Return nil for the injury if not found
+			return nil, nil
+		}
+		return nil, fmt.Errorf("error scanning injury details: %w", err)
+
+	}
+
+	return &injury, nil
 }

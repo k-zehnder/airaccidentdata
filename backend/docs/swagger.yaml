@@ -63,6 +63,19 @@ definitions:
       registration_number:
         type: string
     type: object
+  models.AircraftImage:
+    properties:
+      aircraft_id:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      s3_url:
+        type: string
+    type: object
   models.AircraftPaginatedResponse:
     properties:
       aircrafts:
@@ -79,6 +92,28 @@ definitions:
   models.ErrorResponse:
     properties:
       message:
+        type: string
+    type: object
+  models.ImagesForAircraftResponse:
+    properties:
+      aircraft_id:
+        type: integer
+      images:
+        items:
+          $ref: '#/definitions/models.AircraftImage'
+        type: array
+    type: object
+  models.Injury:
+    properties:
+      accident_id:
+        type: integer
+      count:
+        type: integer
+      id:
+        type: integer
+      injury_severity:
+        type: string
+      person_type:
         type: string
     type: object
 info:
@@ -117,6 +152,37 @@ paths:
       summary: Get a list of accidents
       tags:
       - Accidents
+  /accidents/{id}:
+    get:
+      description: Retrieve details of an accident by its ID
+      parameters:
+      - description: Accident ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aircraft'
+        "400":
+          description: Invalid accident ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Accident not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get an accident by ID
+      tags:
+      - Accidents
   /aircrafts:
     get:
       description: Retrieve a list of all aircrafts.
@@ -147,4 +213,97 @@ paths:
       summary: Get a list of aircrafts
       tags:
       - Aircrafts
+  /aircrafts/{id}:
+    get:
+      description: Retrieve details of an aircraft by its ID
+      parameters:
+      - description: Aircraft ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Aircraft'
+        "400":
+          description: Invalid aircraft ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Aircraft not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get details about an aircraft by ID
+      tags:
+      - Aircrafts
+  /aircrafts/{id}/images:
+    get:
+      description: Retrieve all images associated with a specific aircraft.
+      parameters:
+      - description: Aircraft ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Image IDs, Image URLs, and S3 URLs
+          schema:
+            $ref: '#/definitions/models.ImagesForAircraftResponse'
+        "400":
+          description: Invalid aircraft ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Aircraft not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get all images for an aircraft
+      tags:
+      - Aircrafts
+  /injuries/{id}:
+    get:
+      description: Retrieve injuries for an accident.
+      parameters:
+      - description: Aircraft ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Injury'
+        "400":
+          description: Invalid accident ID
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Accident not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get injuries for an accident
+      tags:
+      - Injuries
 swagger: "2.0"
