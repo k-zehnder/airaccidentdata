@@ -1,15 +1,14 @@
 // Package config handles configuration management.
-
 package config
 
 import "os"
 
 // AppConfig represents the application's configuraton.
 type AppConfig struct {
-	DataSourceName string // Database connection string
-	Environment    string // Apllication environment (e.g., "dev", "prod")
-	ServerAddress  string // Address on which the server should listen
-	SwaggerHost    string // Host for Swagger documentation
+	DataSourceName string
+	Environment    string
+	ServerAddress  string
+	SwaggerHost    string
 }
 
 // NewConfig initializes and returns a new AppConfig with default values obtained from environment variables.

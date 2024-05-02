@@ -1,3 +1,5 @@
+// MockStore tests validate the mock implementation used for isolating and testing
+// database-related logic in controllers and other components without a real database connection.
 package store
 
 import (
@@ -131,8 +133,6 @@ func TestMockStore_GetAccidentById(t *testing.T) {
 		})
 	}
 }
-
-// Error handling tests for accidents
 
 // TestMockStore_GetAccidents_Error tests error handling in the GetAccidents method of the MockStore.
 func TestMockStore_GetAccidents_Error(t *testing.T) {
