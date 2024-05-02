@@ -1,8 +1,6 @@
--- Create Database if not exists
 CREATE DATABASE IF NOT EXISTS airaccidentdata;
 USE airaccidentdata;
 
--- Create Aircrafts Table
 CREATE TABLE IF NOT EXISTS Aircrafts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     registration_number VARCHAR(255),
@@ -11,7 +9,6 @@ CREATE TABLE IF NOT EXISTS Aircrafts (
     aircraft_operator VARCHAR(255)
 );
 
--- Create Locations Table
 CREATE TABLE IF NOT EXISTS Locations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     city_name VARCHAR(255),
@@ -21,7 +18,6 @@ CREATE TABLE IF NOT EXISTS Locations (
     longitude FLOAT
 );
 
--- Create Accidents Table
 CREATE TABLE IF NOT EXISTS Accidents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     updated VARCHAR(255),
@@ -44,17 +40,15 @@ CREATE TABLE IF NOT EXISTS Accidents (
     FOREIGN KEY (location_id) REFERENCES Locations(id)
 );
 
--- Create Injuries Table
 CREATE TABLE IF NOT EXISTS Injuries (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    person_type VARCHAR(50),  -- Examples: 'passenger', 'crew', 'ground_personnel'
-    injury_severity VARCHAR(50),  -- Examples: 'none', 'minor', 'serious', 'fatal', 'unknown'
+    person_type VARCHAR(50),
+    injury_severity VARCHAR(50),
     count INT,
     accident_id INT,
     FOREIGN KEY (accident_id) REFERENCES Accidents(id)
 );
 
--- Create Aircraft Images Table
 CREATE TABLE IF NOT EXISTS AircraftImages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     image_url VARCHAR(2048),

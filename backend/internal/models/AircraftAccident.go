@@ -1,3 +1,5 @@
+// Package models defines data structures for aircraft, accidents, and related entities,
+// supporting data storage and manipulation across the application.
 package models
 
 import "time"

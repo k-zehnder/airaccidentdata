@@ -12,40 +12,26 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"sort"
 	"strconv"
-	"time"
 
 	"github.com/computers33333/airaccidentdata/internal/models"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/joho/godotenv"
+	"github.com/computers33333/airaccidentdata/internal/shared"
+	_ "github.com/go-sql-driver/mysql" // Blank identifier imports MySQL driver to initialize and register it.
 )
 
-var personTypeBaseIndex = map[string]int{
-	"flight_crew": 22, // Starting index for flight crew injuries
-	"cabin_crew":  27, // Starting index for cabin crew injuries
-	"passengers":  32, // Starting index for passenger injuries
-	"ground":      37, // Starting index for ground personnel injuries
-}
-
-var injurySeverities = []string{"none", "minor", "serious", "fatal", "unknown"}
-
-// main is the entry point of the application
+// main is the entry point of the application, responsible for processing CSV data and inserting it into a MySQL database.
 func main() {
-	// Load environment variables from .env file
-	if err := loadEnv(); err != nil {
+	if err := shared.LoadEnv(); err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
-	// Setup database connection.
-	db, err := setupDatabase()
+	db, err := shared.SetupDatabase()
 	if err != nil {
 		log.Fatalf("Database setup failed: %v", err)
 	}
 	defer db.Close()
 
-	// Open and process CSV file.
 	file, err := os.Open("downloaded_file.csv")
 	if err != nil {
 		log.Fatalf("Failed to open file: %v", err)
@@ -59,32 +45,7 @@ func main() {
 	log.Println("File processing completed successfully.")
 }
 
-// setupDatabase establishes a connection to the MySQL database
-func setupDatabase() (*sql.DB, error) {
-	// Retrieve MySQL environment variables
-	user := os.Getenv("MYSQL_USER")
-	pass := os.Getenv("MYSQL_PASSWORD")
-	host := os.Getenv("MYSQL_HOST")
-	database := os.Getenv("MYSQL_DATABASE")
-
-	// Construct DSN for database connection
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s", user, pass, host, database)
-
-	// Open a connection to the database
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		return nil, fmt.Errorf("could not open database: %w", err)
-	}
-
-	// Ping the database to verify connectivity
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("database is not reachable: %w", err)
-	}
-
-	return db, nil
-}
-
-// processCSV reads and processes the CSV file, inserting data into the database
+// processCSV reads and processes the CSV file, inserting data into the database.
 func processCSV(file *os.File, db *sql.DB) error {
 	reader := csv.NewReader(file)
 	if _, err := reader.Read(); err != nil { // Skip header
@@ -102,133 +63,68 @@ func processCSV(file *os.File, db *sql.DB) error {
 		records = append(records, record)
 	}
 
-	// Sort records by ENTRY_DATE in descending order.
+	// Sort records by ENTRY_DATE in descending order
 	sort.Slice(records, func(i, j int) bool {
-		entryDate1, err1 := parseDate(records[i][1])
-		entryDate2, err2 := parseDate(records[j][1])
+		entryDate1, err1 := shared.ParseDate(records[i][1])
+		entryDate2, err2 := shared.ParseDate(records[j][1])
 		if err1 != nil || err2 != nil {
 			return false
 		}
 		return entryDate1.After(entryDate2)
 	})
 
-	for i, record := range records {
-		if i < 3 {
-			fmt.Println(record)
-
-			if err := processRecord(context.Background(), db, record); err != nil {
-				log.Printf("Failed to process record: %v", err)
-				continue
-			}
+	for _, record := range records {
+		if err := processRecord(context.Background(), db, record); err != nil {
+			log.Printf("Failed to process record: %v", err)
+			continue
 		}
 	}
 
 	return nil
 }
 
-// Read and parse each CSV row into a structured format
+// Read and parse each CSV row into a structured format.
 func processRecord(ctx context.Context, db *sql.DB, record []string) error {
-	// Parse the record to get aircraft and accident data
 	aircraft, accident, location, err := parseRecordToIncident(record)
 	if err != nil {
 		return err
 	}
 
-	// Ensure aircraft is in the database and get its ID
 	aircraftID, err := ensureAircraft(ctx, db, aircraft)
 	if err != nil {
 		return err
 	}
 
-	// Ensure location is in the database and get its ID
 	locationID, err := ensureLocation(ctx, db, location)
 	if err != nil {
 		return err
 	}
 
-	// Insert the accident with references to aircraft_id and location_id, and get accident ID
 	accidentID, err := insertAccident(ctx, db, aircraftID, locationID, accident)
 	if err != nil {
 		return err
 	}
 
-	// Extract and insert injuries associated with the accident ID
 	injuries, err := extractInjuriesFromRecord(record, accidentID)
 	if err != nil {
 		return err
 	}
 
-	// Proceed to insert injuries
 	err = insertInjuries(ctx, db, accidentID, injuries)
 	if err != nil {
 		log.Printf("Failed to insert injuries: %v", err)
 		return err
 	}
 
-	// If everything executed correctly, return nil
 	return nil
 }
 
-// loadEnv searches for the .env file starting in the current directory and moving up
-func loadEnv() error {
-	dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	for {
-		if _, err := os.Stat(filepath.Join(dir, ".env")); err == nil {
-			return godotenv.Load(filepath.Join(dir, ".env"))
-		}
-
-		parentDir := filepath.Dir(dir)
-		if parentDir == dir {
-			return fmt.Errorf("root directory reached, .env file not found")
-		}
-		dir = parentDir
-	}
-}
-
-// atoiSafe converts string to int, returns 0 if conversion fails or the string is empty
-func atoiSafe(s string) int {
-	if s == "" {
-		return 0
-	}
-	value, err := strconv.Atoi(s)
-	if err != nil {
-		log.Printf("Error converting string to int: %v", err)
-		return 0
-	}
-	return value
-}
-
-// Helper function to parse a date string into time.Time, returns time.Time and error
-func parseDate(dateStr string) (time.Time, error) {
-	layout := "02-Jan-06"
-	t, err := time.Parse(layout, dateStr)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("error parsing date '%s': %v", dateStr, err)
-	}
-	return t, nil
-}
-
-// Helper function to format a time string into time.Time, returns time.Time and error
-func parseTime(timeStr string) (string, error) {
-	layout := "15:04:05Z"
-	t, err := time.Parse(layout, timeStr)
-	if err != nil {
-		return "", fmt.Errorf("error parsing time '%s': %v", timeStr, err)
-	}
-	return t.Format("15:04:05"), nil
-}
-
-// parseRecordToIncident converts a CSV record to an Accident struct
+// parseRecordToIncident converts a CSV record to an Accident struct.
 func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident, *models.Location, error) {
 	if len(record) < 42 { // Ensure there are enough columns to parse
 		return nil, nil, nil, fmt.Errorf("record does not have enough columns")
 	}
 
-	// Parse the fields for Aircraft struct
 	aircraft := &models.Aircraft{
 		RegistrationNumber: record[10],
 		AircraftMakeName:   record[13],
@@ -236,16 +132,15 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident,
 		AircraftOperator:   record[12],
 	}
 
-	// Parse the fields for Accident struct
-	entryDate, err := parseDate(record[1])
+	entryDate, err := shared.ParseDate(record[1])
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("error parsing entry date: %v", err)
 	}
-	eventLocalDate, err := parseDate(record[2])
+	eventLocalDate, err := shared.ParseDate(record[2])
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("error parsing event local date: %v", err)
 	}
-	eventLocalTime, err := parseTime(record[3])
+	eventLocalTime, err := shared.ParseTime(record[3])
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("error parsing event local time: %v", err)
 	}
@@ -267,7 +162,6 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident,
 		FatalFlag:                 record[21],
 	}
 
-	// // Parse the fields for Location struct
 	place := fmt.Sprintf("%s, %s, %s", record[4], record[5], record[6]) // Combine city, state, and country names
 	latitude, longitude, err := getCoordinates(place)
 	if err != nil {
@@ -285,20 +179,18 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident,
 	return aircraft, incident, location, nil
 }
 
-// insertAircraft inserts a new aircraft into the database or updates it if it already exists
+// insertAircraft inserts a new aircraft into the database or updates it if it already exists.
 func insertAircraft(ctx context.Context, db *sql.DB, registrationNumber, aircraftMake, aircraftModel, aircraftOperator string) (int, error) {
 	stmt := `
 		INSERT INTO Aircrafts (registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator) 
 		VALUES (?, ?, ?, ?);
 	`
 
-	// Execute the SQL statement
 	_, err := db.ExecContext(ctx, stmt, registrationNumber, aircraftMake, aircraftModel, aircraftOperator)
 	if err != nil {
 		return 0, fmt.Errorf("error inserting or updating aircraft: %w", err)
 	}
 
-	// Retrieve the ID of the inserted or updated aircraft
 	var aircraftID int
 	err = db.QueryRowContext(ctx, "SELECT id FROM Aircrafts WHERE registration_number = ?", registrationNumber).Scan(&aircraftID)
 	if err != nil {
@@ -308,7 +200,7 @@ func insertAircraft(ctx context.Context, db *sql.DB, registrationNumber, aircraf
 	return aircraftID, nil
 }
 
-// insertAccident inserts or updates an accident associated with an aircraft in the database
+// insertAccident inserts or updates an accident associated with an aircraft in the database.
 func insertAccident(ctx context.Context, db *sql.DB, aircraftID, locationID int, accident *models.Accident) (int, error) {
 	stmt := `
     INSERT INTO Accidents (updated, entry_date, event_local_date, event_local_time, remark_text, event_type_description, fsdo_description, flight_number, aircraft_missing_flag, aircraft_damage_description, flight_activity, flight_phase, far_part, fatal_flag, location_id, aircraft_id)
@@ -329,7 +221,7 @@ func insertAccident(ctx context.Context, db *sql.DB, aircraftID, locationID int,
 	return accidentID, nil
 }
 
-// Ensures the aircraft is in the Aircrafts table and returns the ID
+// Ensures the aircraft is in the Aircrafts table and returns the ID.
 func ensureAircraft(ctx context.Context, db *sql.DB, aircraft *models.Aircraft) (int, error) {
 	stmt := `
     INSERT INTO Aircrafts (registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator)
@@ -350,7 +242,7 @@ func ensureAircraft(ctx context.Context, db *sql.DB, aircraft *models.Aircraft) 
 	return aircraftID, nil
 }
 
-// Ensures the location is in the Locations table and returns the ID
+// Ensures the location is in the Locations table and returns the ID.
 func ensureLocation(ctx context.Context, db *sql.DB, location *models.Location) (int, error) {
 	// If the location is nil, insert a default location
 	if location == nil {
@@ -386,13 +278,28 @@ func ensureLocation(ctx context.Context, db *sql.DB, location *models.Location) 
 	return locationID, nil
 }
 
-// Function to extract injuries from a record
+// extractInjuriesFromRecord extracts injuries from a record.
 func extractInjuriesFromRecord(record []string, accidentID int) ([]*models.Injury, error) {
+	// Constants defining base indexes for each person type
+	personTypeBaseIndex := map[string]int{
+		"flight_crew": 22,
+		"cabin_crew":  27,
+		"passengers":  32,
+		"ground":      37,
+	}
+
+	// Severity levels for injuries
+	injurySeverities := []string{"none", "minor", "serious", "fatal", "unknown"}
+
 	var injuries []*models.Injury
 
 	for personType, baseIndex := range personTypeBaseIndex {
 		for offset, severity := range injurySeverities {
 			countIndex := baseIndex + offset
+			// Check if the count string is empty
+			if record[countIndex] == "" {
+				continue // Skip empty strings
+			}
 			count, err := strconv.Atoi(record[countIndex])
 			if err != nil {
 				log.Printf("Error converting string to int for %s %s: %v", personType, severity, err)
@@ -410,7 +317,7 @@ func extractInjuriesFromRecord(record []string, accidentID int) ([]*models.Injur
 	return injuries, nil
 }
 
-// Function that takes injury objects and inserts them into the database using the accident_id to link them
+// Function that takes injury objects and inserts them into the database using the accident_id to link them.
 func insertInjuries(ctx context.Context, db *sql.DB, accidentID int, injuries []*models.Injury) error {
 	stmt := `INSERT INTO Injuries (accident_id, person_type, injury_severity, count) VALUES (?, ?, ?, ?)`
 	for _, injury := range injuries {
@@ -422,13 +329,13 @@ func insertInjuries(ctx context.Context, db *sql.DB, accidentID int, injuries []
 	return nil
 }
 
-// getAircraftIDByRegistration retrieves the aircraft ID from the database based on the registration number
+// getAircraftIDByRegistration retrieves the aircraft ID from the database based on the registration number.
 func getAircraftIDByRegistration(ctx context.Context, db *sql.DB, registrationNumber string) (int, error) {
 	var aircraftID int
 	err := db.QueryRowContext(ctx, "SELECT id FROM Aircrafts WHERE registration_number = ?", registrationNumber).Scan(&aircraftID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			// Aircraft does not exist in the database.
+			// Aircraft does not exist in the database
 			return 0, nil
 		}
 		return 0, fmt.Errorf("error querying database: %w", err)
@@ -436,21 +343,19 @@ func getAircraftIDByRegistration(ctx context.Context, db *sql.DB, registrationNu
 	return aircraftID, nil
 }
 
+// getCoordinates retrieves the latitude and longitude coordinates of a given place using the Google Maps Geocoding API.
 func getCoordinates(place string) (float64, float64, error) {
 	apiKey := os.Getenv("GOOGLE_MAPS_API_KEY")
 	baseUrl := "https://maps.googleapis.com/maps/api/geocode/json"
 
-	// Construct request URL
 	requestUrl := fmt.Sprintf("%s?address=%s&key=%s", baseUrl, url.QueryEscape(place), apiKey)
 
-	// Make the HTTP request
 	resp, err := http.Get(requestUrl)
 	if err != nil {
 		return 0, 0, err
 	}
 	defer resp.Body.Close()
 
-	// Parse the JSON response
 	var geoResp models.GeoResponse
 	if err := json.NewDecoder(resp.Body).Decode(&geoResp); err != nil {
 		return 0, 0, err

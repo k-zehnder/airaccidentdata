@@ -1,3 +1,4 @@
+// Package router sets up the Gin router with routes and middleware.
 package router
 
 import (
@@ -13,55 +14,60 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// SetupRouter sets up the Gin router with routes and middleware
+// SetupRouter configures a Gin router with necessary routes, middleware, and CORS policies.
 func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
-	// Initialize a new Gin router.
 	router := gin.Default()
 
-	// Configure CORS.
+	// Configure CORS
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:3000", "http://localhost:8080", "https://airaccidentdata.com", "https://www.airaccidentdata.com"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	router.Use(cors.New(config))
 
-	// Serve Swagger documentation.
+	// Swagger API documentation
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// Apply the custom logging middleware.
+	// Apply custom logging middleware
 	router.Use(middleware.LoggingMiddleware(log))
 
-	// Serve a debug route at :8080.
-	router.GET("", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, "meow")
+	// Simple root GET
+	router.GET("/", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "API is running"})
 	})
 
-	// Set up the v1 routes group
+	// API version 1 routes
 	v1 := router.Group("/api/v1")
 	{
-		// Set up aircrafts route
-		aircrafts := v1.Group("/aircrafts")
-		{
-			aircrafts.GET("", controllers.GetAircraftsHandler(store, log))
-			aircrafts.GET("/:id", controllers.GetAircraftByIdHandler(store, log))
-			aircrafts.GET("/:id/accidents", controllers.GetAccidentByIdHandler(store, log))
-			aircrafts.GET("/:id/images", controllers.GetAllImagesForAircraftHandler(store, log))
-		}
-
-		// Set up accidents route
-		accidents := v1.Group("/accidents")
-		{
-			accidents.GET("", controllers.GetAccidentsHandler(store, log))
-			accidents.GET("/:id", controllers.GetAccidentByIdHandler(store, log))
-		}
-
-		injuries := v1.Group("/injuries")
-		{
-			injuries.GET("/:id", controllers.GetInjuriesByAccidentIdHandler(store, log))
-
-		}
+		setupAircraftRoutes(v1, store, log)
+		setupAccidentRoutes(v1, store, log)
+		setupInjuryRoutes(v1, store, log)
 	}
 
-	// Return configured router.
 	return router
+}
+
+func setupAircraftRoutes(r *gin.RouterGroup, store *store.Store, log *logrus.Logger) {
+	aircrafts := r.Group("/aircrafts")
+	{
+		aircrafts.GET("/", controllers.GetAircraftsHandler(store, log))
+		aircrafts.GET("/:id", controllers.GetAircraftByIdHandler(store, log))
+		aircrafts.GET("/:id/accidents", controllers.GetAccidentByIdHandler(store, log))
+		aircrafts.GET("/:id/images", controllers.GetAllImagesForAircraftHandler(store, log))
+	}
+}
+
+func setupAccidentRoutes(r *gin.RouterGroup, store *store.Store, log *logrus.Logger) {
+	accidents := r.Group("/accidents")
+	{
+		accidents.GET("/", controllers.GetAccidentsHandler(store, log))
+		accidents.GET("/:id", controllers.GetAccidentByIdHandler(store, log))
+	}
+}
+
+func setupInjuryRoutes(r *gin.RouterGroup, store *store.Store, log *logrus.Logger) {
+	injuries := r.Group("/injuries")
+	{
+		injuries.GET("/:id", controllers.GetInjuriesByAccidentIdHandler(store, log))
+	}
 }
