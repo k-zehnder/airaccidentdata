@@ -7,8 +7,8 @@ import { createCheerioParser } from './htmlParser/aircraftDataParser';
 import { createScraper } from './wikiScraper/aircraftImageScraper';
 import { createS3BucketUploader } from './awsIntegration/awsClient';
 import { createDatabaseConnection } from './database/dbConnector';
-import { processImages } from './processor/processImages';
-import { uploadImagesAndUpdateDb } from './processor/uploadImages';
+import { processImages } from './imageProcessor/imageProcessor';
+import { uploadImagesAndUpdateDb } from './imageProcessor/imageUploader';
 
 const main = async (): Promise<void> => {
   try {
