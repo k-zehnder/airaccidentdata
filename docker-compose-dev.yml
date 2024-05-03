@@ -50,17 +50,17 @@ services:
       - MYSQL_HOST
       - MYSQL_PORT
 
-  aviation_scraper:
+  aircraft_scraper:
     build:
-      context: ./aviation_scraper
+      context: ./aircraft_scraper
       dockerfile: Dockerfile.dev
     volumes:
-      - ./aviation_scraper:/app # Mounts the host scraper directory to /app in the container
+      - ./aircraft_scraper:/app # Mounts the host scraper directory to /app in the container
       - /app/node_modules # An anonymous volume to prevent overwriting node_modules from the container
     depends_on:
       - mysql
     env_file:
-      - ./aviation_scraper/.env
+      - ./aircraft_scraper/.env
     environment:
       - MYSQL_HOST
       - MYSQL_PORT
