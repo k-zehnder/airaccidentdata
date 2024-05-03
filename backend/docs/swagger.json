@@ -1,16 +1,12 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API server for airaccidentdata.com",
-        "title": "AirAccidentData API",
-        "contact": {},
-        "version": "1.0"
+        "contact": {}
     },
-    "basePath": "/api/v1",
     "paths": {
         "/accidents": {
             "get": {
-                "description": "Get a list of all aviation accidents",
+                "description": "Get a list of all aviation accidents with pagination.",
                 "produces": [
                     "application/json"
                 ],
@@ -34,7 +30,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Accidents data with pagination details",
                         "schema": {
                             "$ref": "#/definitions/models.AccidentPaginatedResponse"
                         }
@@ -75,9 +71,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Detailed accident data",
                         "schema": {
-                            "$ref": "#/definitions/models.Aircraft"
+                            "$ref": "#/definitions/models.Accident"
                         }
                     },
                     "400": {
@@ -103,7 +99,7 @@
         },
         "/aircrafts": {
             "get": {
-                "description": "Retrieve a list of all aircrafts.",
+                "description": "Retrieve a list of all aircrafts with pagination.",
                 "produces": [
                     "application/json"
                 ],
@@ -168,7 +164,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Detailed aircraft data",
                         "schema": {
                             "$ref": "#/definitions/models.Aircraft"
                         }
@@ -215,9 +211,12 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Image IDs, Image URLs, and S3 URLs",
+                        "description": "List of aircraft images",
                         "schema": {
-                            "$ref": "#/definitions/models.ImagesForAircraftResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AircraftImage"
+                            }
                         }
                     },
                     "400": {
@@ -243,7 +242,7 @@
         },
         "/injuries/{id}": {
             "get": {
-                "description": "Retrieve injuries for an accident.",
+                "description": "Retrieve injury details for an accident based on the provided ID.",
                 "produces": [
                     "application/json"
                 ],
@@ -254,7 +253,7 @@
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Aircraft ID",
+                        "description": "Accident ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -262,19 +261,22 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "List of injuries associated with the accident",
                         "schema": {
-                            "$ref": "#/definitions/models.Injury"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Injury"
+                            }
                         }
                     },
                     "400": {
-                        "description": "Invalid accident ID",
+                        "description": "Invalid accident ID provided",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "Accident not found",
+                        "description": "No injuries found for the specified accident ID",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -431,20 +433,6 @@
             "properties": {
                 "message": {
                     "type": "string"
-                }
-            }
-        },
-        "models.ImagesForAircraftResponse": {
-            "type": "object",
-            "properties": {
-                "aircraft_id": {
-                    "type": "integer"
-                },
-                "images": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.AircraftImage"
-                    }
                 }
             }
         },

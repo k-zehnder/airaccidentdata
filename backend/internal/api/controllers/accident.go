@@ -3,6 +3,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -187,27 +188,39 @@ func GetAllImagesForAircraftHandler(store *store.Store, log *logrus.Logger) gin.
 
 // GetInjuriesByAccidentIdHandler returns a handler for fetching injury details associated with a specific accident.
 // @Summary Get injuries for an accident
-// @Description Retrieve injury details for an accident.
+// @Description Retrieve injury details for an accident based on the provided ID.
 // @Tags Injuries
 // @Produce json
 // @Param id path int true "Accident ID"
-// @Success 200 {array} models.Injury "List of injuries"
-// @Failure 400 {object} models.ErrorResponse "Invalid accident ID"
-// @Failure 404 {object} models.ErrorResponse "Accident not found"
+// @Success 200 {array} models.Injury "List of injuries associated with the accident"
+// @Failure 400 {object} models.ErrorResponse "Invalid accident ID provided"
+// @Failure 404 {object} models.ErrorResponse "No injuries found for the specified accident ID"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
 // @Router /injuries/{id} [get]
 func GetInjuriesByAccidentIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
+			log.WithField("accidentID", c.Param("id")).WithError(err).Error("Invalid accident ID format")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid accident ID"})
 			return
 		}
 
 		injuries, err := store.GetInjuriesByAccidentIdHandler(id)
 		if err != nil {
-			log.WithError(err).Error("Failed to fetch injuries")
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch injuries"})
+			if err == sql.ErrNoRows {
+				log.WithField("accidentID", id).Info("No injuries found for the accident ID")
+				c.JSON(http.StatusNotFound, gin.H{"error": "No injuries found for the specified accident ID"})
+			} else {
+				log.WithField("accidentID", id).WithError(err).Error("Failed to fetch injuries")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch injuries"})
+			}
+			return
+		}
+
+		if len(injuries) == 0 {
+			log.WithField("accidentID", id).Info("No injuries found for the accident ID")
+			c.JSON(http.StatusNotFound, gin.H{"error": "No injuries found for the specified accident ID"})
 			return
 		}
 

@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/accidents": {
             "get": {
-                "description": "Get a list of all aviation accidents",
+                "description": "Get a list of all aviation accidents with pagination.",
                 "produces": [
                     "application/json"
                 ],
@@ -41,7 +41,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Accidents data with pagination details",
                         "schema": {
                             "$ref": "#/definitions/models.AccidentPaginatedResponse"
                         }
@@ -82,9 +82,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Detailed accident data",
                         "schema": {
-                            "$ref": "#/definitions/models.Aircraft"
+                            "$ref": "#/definitions/models.Accident"
                         }
                     },
                     "400": {
@@ -110,7 +110,7 @@ const docTemplate = `{
         },
         "/aircrafts": {
             "get": {
-                "description": "Retrieve a list of all aircrafts.",
+                "description": "Retrieve a list of all aircrafts with pagination.",
                 "produces": [
                     "application/json"
                 ],
@@ -175,7 +175,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Detailed aircraft data",
                         "schema": {
                             "$ref": "#/definitions/models.Aircraft"
                         }
@@ -222,9 +222,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Image IDs, Image URLs, and S3 URLs",
+                        "description": "List of aircraft images",
                         "schema": {
-                            "$ref": "#/definitions/models.ImagesForAircraftResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AircraftImage"
+                            }
                         }
                     },
                     "400": {
@@ -250,7 +253,7 @@ const docTemplate = `{
         },
         "/injuries/{id}": {
             "get": {
-                "description": "Retrieve injuries for an accident.",
+                "description": "Retrieve injury details for an accident based on the provided ID.",
                 "produces": [
                     "application/json"
                 ],
@@ -261,7 +264,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Aircraft ID",
+                        "description": "Accident ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -269,19 +272,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "List of injuries associated with the accident",
                         "schema": {
-                            "$ref": "#/definitions/models.Injury"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Injury"
+                            }
                         }
                     },
                     "400": {
-                        "description": "Invalid accident ID",
+                        "description": "Invalid accident ID provided",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "Accident not found",
+                        "description": "No injuries found for the specified accident ID",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -441,20 +447,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ImagesForAircraftResponse": {
-            "type": "object",
-            "properties": {
-                "aircraft_id": {
-                    "type": "integer"
-                },
-                "images": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.AircraftImage"
-                    }
-                }
-            }
-        },
         "models.Injury": {
             "type": "object",
             "properties": {
@@ -480,12 +472,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "",
 	Host:             "",
-	BasePath:         "/api/v1",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "AirAccidentData API",
-	Description:      "API server for airaccidentdata.com",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
