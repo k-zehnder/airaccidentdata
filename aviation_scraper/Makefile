@@ -1,17 +1,17 @@
 .PHONY: build
 build:
 	@echo "Building scraper Docker image..."
-	docker build -t $(SCRAPER_IMAGE_TAG) .
+	docker build -t $(AVIATION_SCRAPER_IMAGE_TAG) .
 
 .PHONY: push
 push:
 	@echo "Pushing scraper Docker image..."
-	docker push $(SCRAPER_IMAGE_TAG)
+	docker push $(AVIATION_SCRAPER_IMAGE_TAG)
 
 .PHONY: run
 run:
 	@echo "Starting scraper service..."
-	docker-compose up -d scraper
+	docker-compose up -d aviation_scraper
 
 .PHONY: fetch-aircraft-images
 fetch-aircraft-images:
