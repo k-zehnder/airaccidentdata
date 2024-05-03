@@ -1,14 +1,14 @@
 /**
  * Orchestrates the image scraping and uploading pipeline for aircraft data.
-*/
+ */
 import config from './config/config';
-import { createAxiosFetcher } from './fetcher/fetcher';
-import { createCheerioParser } from './parser/parser';
-import { createScraper } from './scraper/scraper';
-import { createS3BucketUploader } from './aws/aws';
-import { createDatabaseConnection } from './database/connection';
-import { processImages } from './processor/processImages';
-import { uploadImagesAndUpdateDb } from './processor/uploadImages';
+import { createAxiosFetcher } from './imageFetcher/wikiImageFetcher';
+import { createCheerioParser } from './jsonParser/aircraftDataParser';
+import { createScraper } from './wikiScraper/aircraftImageScraper';
+import { createS3BucketUploader } from './awsIntegration/awsClient';
+import { createDatabaseConnection } from './databaseConnection/dbConnector';
+import { processImages } from './imageProcessor/imageProcessor';
+import { uploadImagesAndUpdateDb } from './imageProcessor/imageUploader';
 
 const main = async (): Promise<void> => {
   try {

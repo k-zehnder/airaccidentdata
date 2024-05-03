@@ -1,8 +1,8 @@
-import { Fetcher } from '../fetcher/fetcher';
-import { Parser } from '../parser/parser';
-import cheerio from 'cheerio';
 import fs from 'fs';
-import { Database } from '../database/connection';
+import cheerio from 'cheerio';
+import { Fetcher } from '../imageFetcher/wikiImageFetcher';
+import { Parser } from '../jsonParser/aircraftDataParser';
+import { Database } from '../databaseConnection/dbConnector';
 import { AircraftType, AircraftMapping } from '../types/aircraft';
 
 export interface Scraper {
@@ -17,7 +17,6 @@ export interface Scraper {
 // Function to create a scraper object with necessary dependencies and mapping data.
 export const createScraper = (db: Database): Scraper => {
   // Function to load the aircraft type mapping data from a JSON file.
-  // This data is used to determine the URL mapping for different aircraft types.
   const loadAircraftTypeMap = (
     filePath: string
   ): Map<string, AircraftMapping> => {
@@ -33,10 +32,9 @@ export const createScraper = (db: Database): Scraper => {
     }
   };
 
-  // Load the aircraft type mapping data from a specified JSON file.
   // This map will be used to find URLs for aircraft images based on their type.
   const aircraftTypeMap = loadAircraftTypeMap(
-    'src/parser/aircraftMapping.json'
+    'src/jsonParser/aircraftMapping.json'
   );
 
   // Function to fetch the original high-resolution image URL from a Wikipedia file page URL
@@ -57,6 +55,7 @@ export const createScraper = (db: Database): Scraper => {
     }
   };
 
+  // Function to fetch images from Wikipedia based on an aircraft's make and model
   const handleIndirectMapping = async (
     mappingUrl: string,
     fetcher: Fetcher,
