@@ -14,16 +14,16 @@ const main = async (): Promise<void> => {
   try {
     // Initialize database and functional component instances
     const db = await createDatabaseConnection(config);
-    const fetcher = createAxiosFetcher();
-    const parser = createCheerioParser();
-    const scraper = createScraper(db);
-    const awsUploader = createS3BucketUploader(config);
+    const imageFetcher = createAxiosFetcher();
+    const jsonParser = createCheerioParser();
+    const wikiSscraper = createScraper(db);
+    const awsClient = createS3BucketUploader(config);
 
     // Retrieve images from Wikipedia and store them in the database
-    await processImages(db, fetcher, parser, scraper, config);
+    await processImages(db, imageFetcher, jsonParser, wikiSscraper, config);
 
     // Upload images to S3 and update the database
-    await uploadImagesAndUpdateDb(db, awsUploader, fetcher);
+    await uploadImagesAndUpdateDb(db, awsClient, imageFetcher);
 
     // Close database to free resources
     await db.close();
