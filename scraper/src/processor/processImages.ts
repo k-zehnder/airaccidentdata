@@ -11,6 +11,7 @@ export const processImages = async (
   config: any
 ): Promise<void> => {
   try {
+    // Fetch all aircraft types including their IDs at the start
     const aircraftTypes = await db.getAircraftTypes();
 
     // Scrape images for each aircraft type
@@ -18,42 +19,34 @@ export const processImages = async (
       aircraftTypes,
       fetcher,
       parser,
-      config.aws.s3Bucket,
+      config.aws.s3Bucket
     );
 
-    // Log and save details for each aircraft type
-    for (const [type, details] of Object.entries(aircraftDetails)) {
-      console.log(`Aircraft Type: ${type}`);
-      console.log(`Image URLs: ${details.imageUrls}`);
-      console.log(`Scraping Failed: ${details.failed}`);
+    // Log and save details for each aircraft
+    for (const aircraft of aircraftTypes) {
+      const details =
+        aircraftDetails[
+          `${aircraft.make} ${aircraft.model} ${aircraft.registrationNumber}`
+        ];
 
-      if (!details.failed) {
-        const [make, model, registrationNumber] = type.split(' ');
-        const aircraftId = await db.getAircraftIdByType(
-          make,
-          model,
-          registrationNumber,
+      if (details && !details.failed) {
+        console.log(
+          `Aircraft ID: ${aircraft.id}, Image URLs: ${details.imageUrls.join(
+            ', '
+          )}`
         );
 
-        if (aircraftId) {
-          try {
-            // Save the Wikipedia URLs to the database
-            for (let i = 0; i < details.imageUrls.length; i++) {
-              const wikiUrl = details.imageUrls[i];
-              await db.insertAircraftImage(aircraftId, wikiUrl);
-              console.log(
-                `Saved image URL for aircraft: ${type} - Wiki URL: ${wikiUrl}`,
-              );
-            }
-          } catch (saveError) {
-            console.error(
-              'Error saving image URLs to the database:',
-              saveError,
-            );
-          }
-        } else {
-          console.log(`Aircraft ID not found for type: ${type}`);
+        // Save the image URLs to the database using the ID
+        for (const imageUrl of details.imageUrls) {
+          await db.insertAircraftImage(aircraft.id, imageUrl);
+          console.log(
+            `Saved image URL for aircraft ID: ${aircraft.id} - Image URL: ${imageUrl}`
+          );
         }
+      } else {
+        console.log(
+          `Scraping failed or no details found for Aircraft ID: ${aircraft.id}`
+        );
       }
     }
   } catch (error) {
