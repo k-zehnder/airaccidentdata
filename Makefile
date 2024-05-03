@@ -2,9 +2,9 @@ VERSION ?= latest
 DOCKERHUB_REPO := computers33333/airaccidentdata
 FRONTEND_IMAGE_TAG := $(DOCKERHUB_REPO)-frontend:$(VERSION)
 BACKEND_IMAGE_TAG := $(DOCKERHUB_REPO)-backend:$(VERSION)
-SCRAPER_IMAGE_TAG := $(DOCKERHUB_REPO)-scraper:$(VERSION)
+AVIATION_SCRAPER_IMAGE_TAG := $(DOCKERHUB_REPO)-aviation_scraper:$(VERSION)
 
-export FRONTEND_IMAGE_TAG BACKEND_IMAGE_TAG SCRAPER_IMAGE_TAG
+export FRONTEND_IMAGE_TAG BACKEND_IMAGE_TAG AVIATION_SCRAPER_IMAGE_TAG
 
 .PHONY: all
 all: build test push
@@ -14,7 +14,7 @@ build:
 	@echo "Building all components..."
 	$(MAKE) -C frontend build
 	$(MAKE) -C backend build
-	$(MAKE) -C scraper build
+	$(MAKE) -C aviationScraper build
 
 .PHONY: test
 test:
@@ -26,7 +26,7 @@ push:
 	@echo "Pushing all images..."
 	$(MAKE) -C frontend push
 	$(MAKE) -C backend push
-	$(MAKE) -C scraper push
+	$(MAKE) -C aviationScraper push
 
 .PHONY: deploy
 deploy:

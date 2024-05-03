@@ -1,11 +1,11 @@
-import { Database } from '../database/connection';
-import { AWSUploader } from '../aws/aws';
-import { Fetcher } from '../fetcher/fetcher';
+import { Database } from '../databaseConnection/dbConnector';
+import { AWSUploader } from '../awsIntegration/awsClient';
+import { Fetcher } from '../imageFetcher/wikiImageFetcher';
 
 export const uploadImagesAndUpdateDb = async (
   db: Database,
   awsUploader: AWSUploader,
-  fetcher: Fetcher,
+  fetcher: Fetcher
 ): Promise<void> => {
   try {
     // Fetch images from the saved URLs
@@ -30,11 +30,11 @@ export const uploadImagesAndUpdateDb = async (
           await db.updateAircraftImageWithS3Url(
             aircraftId,
             imageUrl,
-            modifiedS3Url,
+            modifiedS3Url
           );
 
           console.log(
-            `Updated image for aircraft with ID ${aircraftId} - S3 URL: ${modifiedS3Url}`,
+            `Updated image for aircraft with ID ${aircraftId} - S3 URL: ${modifiedS3Url}`
           );
         } else {
           console.error('Failed to upload image to S3.');

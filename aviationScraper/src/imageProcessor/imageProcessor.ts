@@ -1,7 +1,7 @@
-import { Database } from '../database/connection';
-import { Fetcher } from '../fetcher/fetcher';
-import { Parser } from '../parser/parser';
-import { Scraper } from '../scraper/scraper';
+import { Database } from '../databaseConnection/dbConnector';
+import { Fetcher } from '../imageFetcher/wikiImageFetcher';
+import { Parser } from '../jsonParser/aircraftDataParser';
+import { Scraper } from '../wikiScraper/aircraftImageScraper';
 
 export const processImages = async (
   db: Database,
