@@ -179,27 +179,6 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident,
 	return aircraft, incident, location, nil
 }
 
-// insertAircraft inserts a new aircraft into the database or updates it if it already exists.
-func insertAircraft(ctx context.Context, db *sql.DB, registrationNumber, aircraftMake, aircraftModel, aircraftOperator string) (int, error) {
-	stmt := `
-		INSERT INTO Aircrafts (registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator) 
-		VALUES (?, ?, ?, ?);
-	`
-
-	_, err := db.ExecContext(ctx, stmt, registrationNumber, aircraftMake, aircraftModel, aircraftOperator)
-	if err != nil {
-		return 0, fmt.Errorf("error inserting or updating aircraft: %w", err)
-	}
-
-	var aircraftID int
-	err = db.QueryRowContext(ctx, "SELECT id FROM Aircrafts WHERE registration_number = ?", registrationNumber).Scan(&aircraftID)
-	if err != nil {
-		return 0, fmt.Errorf("error retrieving aircraft ID: %w", err)
-	}
-
-	return aircraftID, nil
-}
-
 // insertAccident inserts or updates an accident associated with an aircraft in the database.
 func insertAccident(ctx context.Context, db *sql.DB, aircraftID, locationID int, accident *models.Accident) (int, error) {
 	stmt := `
@@ -244,32 +223,12 @@ func ensureAircraft(ctx context.Context, db *sql.DB, aircraft *models.Aircraft) 
 
 // Ensures the location is in the Locations table and returns the ID.
 func ensureLocation(ctx context.Context, db *sql.DB, location *models.Location) (int, error) {
-	// If the location is nil, insert a default location
-	if location == nil {
-		// Inserting a dummy location
-		_, err := db.ExecContext(ctx, "INSERT INTO Locations (city_name, state_name, country_name, latitude, longitude) VALUES (?, ?, ?, ?, ?)",
-			"Default City", "Default State", "Default Country", 0.0, 0.0)
-		if err != nil {
-			return 0, err
-		}
-
-		// Retrieve the ID of the inserted location
-		var locationID int
-		err = db.QueryRowContext(ctx, "SELECT LAST_INSERT_ID()").Scan(&locationID)
-		if err != nil {
-			return 0, err
-		}
-		return locationID, nil
-	}
-
-	// Insert the provided location
 	_, err := db.ExecContext(ctx, "INSERT INTO Locations (city_name, state_name, country_name, latitude, longitude) VALUES (?, ?, ?, ?, ?)",
 		location.CityName, location.StateName, location.CountryName, location.Latitude, location.Longitude)
 	if err != nil {
 		return 0, err
 	}
 
-	// Retrieve the ID of the inserted location
 	var locationID int
 	err = db.QueryRowContext(ctx, "SELECT LAST_INSERT_ID()").Scan(&locationID)
 	if err != nil {
@@ -278,7 +237,7 @@ func ensureLocation(ctx context.Context, db *sql.DB, location *models.Location) 
 	return locationID, nil
 }
 
-// extractInjuriesFromRecord extracts injuries from a record.
+// extractInjuriesFromRecord leverages indexed patterns in CSV to categorize injury data by personnel type and severity.
 func extractInjuriesFromRecord(record []string, accidentID int) ([]*models.Injury, error) {
 	// Constants defining base indexes for each person type
 	personTypeBaseIndex := map[string]int{
@@ -293,12 +252,12 @@ func extractInjuriesFromRecord(record []string, accidentID int) ([]*models.Injur
 
 	var injuries []*models.Injury
 
+	// Iterates over indexed data to extract and categorize injuries based on personnel type and severity.
 	for personType, baseIndex := range personTypeBaseIndex {
 		for offset, severity := range injurySeverities {
 			countIndex := baseIndex + offset
-			// Check if the count string is empty
 			if record[countIndex] == "" {
-				continue // Skip empty strings
+				continue
 			}
 			count, err := strconv.Atoi(record[countIndex])
 			if err != nil {
@@ -327,20 +286,6 @@ func insertInjuries(ctx context.Context, db *sql.DB, accidentID int, injuries []
 		}
 	}
 	return nil
-}
-
-// getAircraftIDByRegistration retrieves the aircraft ID from the database based on the registration number.
-func getAircraftIDByRegistration(ctx context.Context, db *sql.DB, registrationNumber string) (int, error) {
-	var aircraftID int
-	err := db.QueryRowContext(ctx, "SELECT id FROM Aircrafts WHERE registration_number = ?", registrationNumber).Scan(&aircraftID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			// Aircraft does not exist in the database
-			return 0, nil
-		}
-		return 0, fmt.Errorf("error querying database: %w", err)
-	}
-	return aircraftID, nil
 }
 
 // getCoordinates retrieves the latitude and longitude coordinates of a given place using the Google Maps Geocoding API.
