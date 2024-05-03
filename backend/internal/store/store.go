@@ -222,21 +222,26 @@ func (s *Store) GetImageForAircraft(aircraftID, imageID int) (*models.AircraftIm
 	return &image, nil
 }
 
-// GetInjuriesByAccidentIdHandler fetches injuries about an accident by its ID.
-func (s *Store) GetInjuriesByAccidentIdHandler(aircraftId int) (*models.Injury, error) {
+// GetInjuriesByAccidentIdHandler fetches all injuries associated with a specific accident by its ID.
+func (s *Store) GetInjuriesByAccidentIdHandler(accidentId int) ([]*models.Injury, error) {
 	query := `SELECT id, person_type, injury_severity, count, accident_id FROM Injuries WHERE accident_id = ?`
-
-	row := s.db.QueryRow(query, aircraftId)
-
-	var injury models.Injury
-	err := row.Scan(&injury.ID, &injury.PersonType, &injury.InjurySeverity, &injury.Count, &injury.AccidentID)
+	rows, err := s.db.Query(query, accidentId)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, fmt.Errorf("error scanning injury details: %w", err)
+		return nil, fmt.Errorf("error querying injuries: %w", err)
+	}
+	defer rows.Close()
 
+	var injuries []*models.Injury
+	for rows.Next() {
+		var injury models.Injury
+		if err := rows.Scan(&injury.ID, &injury.PersonType, &injury.InjurySeverity, &injury.Count, &injury.AccidentID); err != nil {
+			return nil, fmt.Errorf("error scanning injury details: %w", err)
+		}
+		injuries = append(injuries, &injury)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over injuries: %w", err)
 	}
 
-	return &injury, nil
+	return injuries, nil
 }
