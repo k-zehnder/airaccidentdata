@@ -11,7 +11,7 @@ push:
 .PHONY: run
 run:
 	@echo "Starting scraper service..."
-	docker-compose up -d scraper
+	docker-compose up -d aviation_scraper
 
 .PHONY: fetch-aircraft-images
 fetch-aircraft-images:

@@ -4,8 +4,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
     volumes:
-      - ./frontend:/app           # Mounts the host frontend directory to /app in the container
-      - /app/node_modules         # An anonymous volume to prevent overwriting node_modules from the container
+      - ./frontend:/app # Mounts the host frontend directory to /app in the container
+      - /app/node_modules # An anonymous volume to prevent overwriting node_modules from the container
     ports:
       - 3000:3000
     env_file:
@@ -18,7 +18,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.dev
     volumes:
-      - ./backend:/app            # Mounts the host backend directory to /app in the container
+      - ./backend:/app # Mounts the host backend directory to /app in the container
     ports:
       - 8080:8080
     env_file:
@@ -32,16 +32,16 @@ services:
   mysql:
     image: mysql:latest
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       interval: 10s
       timeout: 5s
       retries: 5
     ports:
       - 3306:3306
     volumes:
-      - mysql_airaccidentdata_dev:/var/lib/mysql    # Persistent volume for MySQL data
+      - mysql_airaccidentdata_dev:/var/lib/mysql # Persistent volume for MySQL data
     env_file:
-      - ./backend/.env  # MySQL uses the same .env file as backend
+      - ./backend/.env # MySQL uses the same .env file as backend
     environment:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
@@ -50,17 +50,17 @@ services:
       - MYSQL_HOST
       - MYSQL_PORT
 
-  scraper:
+  aviation_scraper:
     build:
-      context: ./scraper
+      context: ./aviationScraper
       dockerfile: Dockerfile.dev
     volumes:
-      - ./scraper:/app            # Mounts the host scraper directory to /app in the container
-      - /app/node_modules         # An anonymous volume to prevent overwriting node_modules from the container
+      - ./aviationScraper:/app # Mounts the host scraper directory to /app in the container
+      - /app/node_modules # An anonymous volume to prevent overwriting node_modules from the container
     depends_on:
       - mysql
     env_file:
-      - ./scraper/.env
+      - ./aviationScraper/.env
     environment:
       - MYSQL_HOST
       - MYSQL_PORT
