@@ -1,8 +1,8 @@
-import { Fetcher } from '../fetcher/fetcher';
-import { Parser } from '../parser/parser';
+import { Fetcher } from '../imageFetcher/wikiImageFetcher';
+import { Parser } from '../htmlParser/aircraftDataParser';
 import cheerio from 'cheerio';
 import fs from 'fs';
-import { Database } from '../database/connection';
+import { Database } from '../database/dbConnector';
 import { AircraftType, AircraftMapping } from '../types/aircraft';
 
 export interface Scraper {
