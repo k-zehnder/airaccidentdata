@@ -43,33 +43,32 @@ export const useAccidentData = (currentPage: number) => {
               const imageResponse = await axios.get<{
                 images: { s3_url: string }[];
               }>(imageUrl);
-              const images = imageResponse.data.images;
+              const images = imageResponse.data?.images;
               const aircraftImageUrl =
-                images.length > 0 ? images[0].s3_url : '';
+                images && images.length > 0 ? images[0].s3_url : '';
 
-              // Fetch injury information
               const injuriesUrl = `${
                 process.env.NEXT_PUBLIC_ENV === 'development'
                   ? 'http://localhost:8080'
                   : 'https://airaccidentdata.com'
               }/api/v1/injuries/${accident.id}`;
-              const injuriesResponse = await axios.get<{
-                injuries: Injury[];
-              }>(injuriesUrl);
-              const injuries = injuriesResponse.data.injuries;
+              const injuriesResponse = await axios.get<{ injuries: Injury[] }>(
+                injuriesUrl
+              );
+              const injuries = injuriesResponse.data?.injuries;
 
               return {
                 ...accident,
                 aircraftDetails: aircraftResponse.data,
                 imageUrl: aircraftImageUrl,
-                injuries,
+                injuries: injuries || [],
               };
             } catch (error) {
               console.error(
                 `Error fetching details for accident ID ${accident.id}:`,
                 error
               );
-              return null;
+              return null; // Returning null if any error occurs during the fetch for an accident
             }
           })
         );
