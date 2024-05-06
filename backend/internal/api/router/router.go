@@ -23,10 +23,8 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 	router.Use(cors.New(config))
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
 	router.Use(middleware.LoggingMiddleware(log))
 
-	// Set up the v1 routes group
 	v1 := router.Group("/api/v1")
 	{
 		aircrafts := v1.Group("/aircrafts")
@@ -49,6 +47,5 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 		}
 	}
 
-	// Return configured router
 	return router
 }

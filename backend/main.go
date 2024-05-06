@@ -1,4 +1,7 @@
 // Package main sets up and runs the AirAccidentData API server.
+// @title Air Accident Data API
+// @description This is the server for managing air accident data.
+// @BasePath /api/v1
 package main
 
 import (
