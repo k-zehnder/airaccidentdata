@@ -2,7 +2,9 @@
 // supporting data storage and manipulation across the application.
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Aircraft struct {
 	ID                 int    `json:"id"`
@@ -50,11 +52,10 @@ type Injury struct {
 }
 
 type AircraftImage struct {
-	ID          int    `json:"id"`
-	AircraftID  int    `json:"aircraft_id"`
-	ImageURL    string `json:"image_url"`
-	S3URL       string `json:"s3_url"`
-	Description string `json:"description"`
+	ID         int    `json:"id"`
+	AircraftID int    `json:"aircraft_id"`
+	ImageURL   string `json:"image_url"`
+	S3URL      string `json:"s3_url"`
 }
 
 type AircraftPaginatedResponse struct {

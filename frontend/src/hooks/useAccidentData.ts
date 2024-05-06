@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Aircraft, Accident } from '@/types/accident';
+import { Aircraft, Accident, Injury } from '@/types/accident';
 
 export const useAccidentData = (currentPage: number) => {
   const [accidents, setAccidents] = useState<Accident[]>([]);
@@ -22,19 +22,19 @@ export const useAccidentData = (currentPage: number) => {
           total: number;
         }>(apiUrl);
 
-        // Fetch aircraft details for each accident
-        const accidentsWithAircraftDetails = await Promise.all(
-          response.data.accidents.map(async (accident: any) => {
+        // Fetch additional details for each accident, including injuries
+        const accidentsWithDetails = await Promise.all(
+          response.data.accidents.map(async (accident) => {
             try {
               const aircraftApiUrl = `${
                 process.env.NEXT_PUBLIC_ENV === 'development'
                   ? 'http://localhost:8080'
                   : 'https://airaccidentdata.com'
               }/api/v1/aircrafts/${accident.aircraft_id}`;
-              const aircraftResponse =
-                await axios.get<Aircraft>(aircraftApiUrl);
+              const aircraftResponse = await axios.get<Aircraft>(
+                aircraftApiUrl
+              );
 
-              // Fetching the stored S3 URL for the aircraft image
               const imageUrl = `${
                 process.env.NEXT_PUBLIC_ENV === 'development'
                   ? 'http://localhost:8080'
@@ -47,29 +47,39 @@ export const useAccidentData = (currentPage: number) => {
               const aircraftImageUrl =
                 images.length > 0 ? images[0].s3_url : '';
 
+              // Fetch injury information
+              const injuriesUrl = `${
+                process.env.NEXT_PUBLIC_ENV === 'development'
+                  ? 'http://localhost:8080'
+                  : 'https://airaccidentdata.com'
+              }/api/v1/injuries/${accident.id}`;
+              const injuriesResponse = await axios.get<{
+                injuries: Injury[];
+              }>(injuriesUrl);
+              const injuries = injuriesResponse.data.injuries;
+
               return {
                 ...accident,
                 aircraftDetails: aircraftResponse.data,
                 imageUrl: aircraftImageUrl,
+                injuries,
               };
             } catch (error) {
               console.error(
-                `Error fetching accident details for ID ${accident.id}:`,
-                error,
+                `Error fetching details for accident ID ${accident.id}:`,
+                error
               );
               return null;
             }
-          }),
+          })
         );
 
-        // Filter out null values (if any) and cast to Accident[]
-        const filteredAccidents = accidentsWithAircraftDetails.filter(
-          (accident): accident is Accident => accident !== null,
+        // Filtering out null values from accidentsWithDetails array, assuming that any null values represent failed fetches or missing details
+        const filteredAccidents = accidentsWithDetails.filter(
+          Boolean
         ) as Accident[];
 
         setAccidents(filteredAccidents);
-
-        // Calculate total pages based on the total number of accidents and accidents per page
         setTotalPages(Math.ceil(response.data.total / accidentsPerPage));
       } catch (error) {
         console.error('Error fetching accidents:', error);
@@ -97,22 +107,22 @@ export const useFetchAccidentDetails = (accidentId: string) => {
             ? 'http://localhost:8080'
             : 'https://airaccidentdata.com';
 
-        const apiUrl = `${baseUrl}/api/v1/accidents/${accidentId}`;
-        const response = await axios.get<Accident>(apiUrl);
-        const accidentData = response.data;
+        const [accidentResponse, aircraftResponse, imageResponse] =
+          await Promise.all([
+            axios.get<Accident>(`${baseUrl}/api/v1/accidents/${accidentId}`),
+            axios.get<Aircraft>(`${baseUrl}/api/v1/aircrafts/${accidentId}`),
+            axios.get<{ images: { s3_url: string }[] }>(
+              `${baseUrl}/api/v1/aircrafts/${accidentId}/images`
+            ),
+          ]);
 
-        // Fetch aircraft details using aircraft ID
-        const aircraftApiUrl = `${baseUrl}/api/v1/aircrafts/${accidentData.aircraft_id}`;
-        const aircraftResponse = await axios.get<Aircraft>(aircraftApiUrl);
+        const accidentData = accidentResponse.data;
         const aircraftData = aircraftResponse.data;
+        const imageData = imageResponse.data;
 
         // Fetching the stored S3 URL for the aircraft image
-        const imageUrl = `${baseUrl}/api/v1/aircrafts/${accidentData.aircraft_id}/images`;
-        const imageResponse = await axios.get<{ images: { s3_url: string }[] }>(
-          imageUrl,
-        );
-        const images = imageResponse.data.images;
-        const aircraftImageUrl = images.length > 0 ? images[0].s3_url : '';
+        const aircraftImageUrl =
+          imageData.images.length > 0 ? imageData.images[0].s3_url : '';
 
         // Combine accident, aircraft details, and image URL
         const combinedData = {

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Header } from '@/components/header';
+import Header from '@/components/Header';
 import { buttonVariants } from '@/components/ui/button';
 import { useFetchAccidentDetails } from '@/hooks/useAccidentData';
 import MapComponent from '@/components/MapComponent';
