@@ -179,8 +179,7 @@ func (s *Store) GetAccidentById(id int) (*models.Aircraft, error) {
 
 // GetAllImagesForAircraft fetches all images associated with an aircraft by its ID.
 func (s *Store) GetAllImagesForAircraft(aircraftID int) ([]*models.AircraftImage, error) {
-	query := `SELECT id, aircraft_id, image_url, s3_url FROM AircraftImages WHERE aircraft_id = ?`
-
+	query := `SELECT id, aircraft_id, image_url, COALESCE(s3_url, '') AS s3_url FROM AircraftImages WHERE aircraft_id = ?`
 	rows, err := s.db.Query(query, aircraftID)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching aircraft images: %w", err)

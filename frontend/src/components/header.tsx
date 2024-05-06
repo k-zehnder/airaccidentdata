@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React from "react";
-import { ThemeToggle } from "./theme-toggle";
-import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlane } from "@fortawesome/free-solid-svg-icons"; 
+import React from 'react';
+import { ThemeToggle } from './theme-toggle';
+import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlane } from '@fortawesome/free-solid-svg-icons';
 
 export const Header = () => {
   return (
@@ -15,7 +15,9 @@ export const Header = () => {
           <Link legacyBehavior href="/">
             <a className="flex items-center space-x-2">
               <FontAwesomeIcon icon={faPlane} />
-              <span className="inline-block font-bold">airaccidentdata.com</span>
+              <span className="inline-block font-bold">
+                airaccidentdata.com
+              </span>
             </a>
           </Link>
         </div>
@@ -23,12 +25,21 @@ export const Header = () => {
         {/* Right Section */}
         <div className="flex items-center space-x-4">
           {/* API Link */}
-          <Link legacyBehavior href="https://airaccidentdata.com/swagger/index.html">
-            <a target="_blank" rel="noopener noreferrer" className="flex items-center">
-              <span className="text-sm font-medium text-muted-foreground">API</span>
+          <Link
+            legacyBehavior
+            href="https://airaccidentdata.com/swagger/index.html"
+          >
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center"
+            >
+              <span className="text-sm font-medium text-muted-foreground">
+                API
+              </span>
             </a>
           </Link>
-          
+
           {/* Theme Toggle */}
           <ThemeToggle />
         </div>

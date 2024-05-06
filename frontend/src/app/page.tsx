@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import Pagination from '@/components/pagination';
-import { Badge } from '@/components/ui/badge';
+import InjuryBadges from '@/components/InjuryBadges';
 import { useAccidentData } from '../hooks/useAccidentData';
 import Loader from '@/components/Loader';
 import { formatDate } from '../lib/utils';
@@ -61,6 +61,7 @@ const Home = () => {
             safer flying future.
           </p>
         </div>
+        {/* Accidents list */}
         <div className="max-w-4xl mx-auto">
           {accidents.map((accident) => (
             <Link
@@ -70,40 +71,22 @@ const Home = () => {
             >
               <a className="block border-b-2 py-4 flex items-center  hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">
                 <div className="flex-1">
+                  {/* Date */}
                   <span className="text-gray-500 text-sm block lg:text-base mb-1">
                     {formatDate(accident.entry_date)}
                   </span>
+                  {/* Aircraft details */}
                   <h3 className="text-xl font-semibold mb-1">
                     {accident.aircraftDetails?.registration_number}:{' '}
                     {accident.aircraftDetails?.aircraft_make_name}{' '}
                     {accident.aircraftDetails?.aircraft_model_name}
                   </h3>
-                  {accident.fatal_flag === 'Yes' && (
-                    <Badge className="bg-red-500 mb-1">Fatalities</Badge>
-                  )}
-                  {(accident.flight_crew_injury_serious !== 0 ||
-                    accident.cabin_crew_injury_serious !== 0 ||
-                    accident.passenger_injury_serious !== 0 ||
-                    accident.ground_injury_serious !== 0) && (
-                    <Badge className="bg-yellow-500 mb-1">
-                      Serious Injuries
-                    </Badge>
-                  )}
-                  {(accident.flight_crew_injury_minor !== 0 ||
-                    accident.cabin_crew_injury_minor !== 0 ||
-                    accident.passenger_injury_minor !== 0 ||
-                    accident.ground_injury_minor !== 0) && (
-                    <Badge className="bg-green-500 mb-1">Minor Injuries</Badge>
-                  )}
-                  {accident.remark_text.toLowerCase().includes('bird') && (
-                    <Badge className="bg-blue-500 mb-1">Birds Present</Badge>
-                  )}
-                  {(accident.remark_text.toLowerCase().includes('stall') ||
-                    accident.remark_text.toLowerCase().includes('stalled')) && (
-                    <Badge className="bg-orange-500 mb-1">Stall</Badge>
-                  )}
+                  {/* Badges for injuries */}
+                  <InjuryBadges accident={accident} />
+                  {/* Additional remarks */}
                   <p className="text-gray-500">{accident.remark_text}</p>
                 </div>
+                {/* Thumbnail */}
                 <div className="w-1/4 flex justify-end">
                   <img
                     src={
@@ -118,6 +101,7 @@ const Home = () => {
             </Link>
           ))}
         </div>
+        {/* Pagination */}
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

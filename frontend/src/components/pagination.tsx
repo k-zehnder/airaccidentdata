@@ -40,13 +40,17 @@ const Pagination: React.FC<PaginationProps> = ({
         <>
           <button
             onClick={() => onPageChange(1)}
-            className={`px-3 py-2 ${darkMode ? 'bg-gray-800 text-white' : 'bg-foreground text-white'} rounded hover:bg-foreground focus:outline-none focus:ring-2 focus:ring-opacity-50`}
+            className={`px-3 py-2 ${
+              darkMode ? 'bg-gray-800 text-white' : 'bg-foreground text-white'
+            } rounded hover:bg-foreground focus:outline-none focus:ring-2 focus:ring-opacity-50`}
           >
             First
           </button>
           <button
             onClick={() => onPageChange(currentPage - 1)}
-            className={`px-3 py-2 ${darkMode ? 'bg-gray-800 text-white' : 'bg-foreground text-white'} rounded hover:bg-foreground focus:outline-none focus:ring-2 focus:ring-opacity-50`}
+            className={`px-3 py-2 ${
+              darkMode ? 'bg-gray-800 text-white' : 'bg-foreground text-white'
+            } rounded hover:bg-foreground focus:outline-none focus:ring-2 focus:ring-opacity-50`}
           >
             Previous
           </button>
@@ -58,7 +62,13 @@ const Pagination: React.FC<PaginationProps> = ({
         <button
           key={page}
           onClick={() => onPageChange(page)}
-          className={`px-3 py-2 text-sm ${currentPage === page ? (darkMode ? 'bg-gray-800 text-white' : 'bg-foreground text-white') : 'bg-white text-gray-700'} rounded hover:bg-foreground hover:text-white focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-opacity-50`}
+          className={`px-3 py-2 text-sm ${
+            currentPage === page
+              ? darkMode
+                ? 'bg-gray-800 text-white'
+                : 'bg-foreground text-white'
+              : 'bg-white text-gray-700'
+          } rounded hover:bg-foreground hover:text-white focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-opacity-50`}
         >
           {page}
         </button>
@@ -69,13 +79,17 @@ const Pagination: React.FC<PaginationProps> = ({
         <>
           <button
             onClick={() => onPageChange(currentPage + 1)}
-            className={`px-3 py-2 ${darkMode ? 'bg-gray-800 text-white' : 'bg-foreground text-white'} rounded hover:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50`}
+            className={`px-3 py-2 ${
+              darkMode ? 'bg-gray-800 text-white' : 'bg-foreground text-white'
+            } rounded hover:bg-foreground focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50`}
           >
             Next
           </button>
           <button
             onClick={() => onPageChange(totalPages)}
-            className={`px-3 py-2 ${darkMode ? 'bg-gray-800 text-white' : 'bg-foreground text-white'} rounded hover:bg-foreground focus:outline-none focus:ring-2 focus:ring-opacity-50`}
+            className={`px-3 py-2 ${
+              darkMode ? 'bg-gray-800 text-white' : 'bg-foreground text-white'
+            } rounded hover:bg-foreground focus:outline-none focus:ring-2 focus:ring-opacity-50`}
           >
             Last
           </button>
