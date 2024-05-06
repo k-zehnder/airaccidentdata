@@ -405,9 +405,6 @@ const docTemplate = `{
                 "aircraft_id": {
                     "type": "integer"
                 },
-                "description": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "integer"
                 },

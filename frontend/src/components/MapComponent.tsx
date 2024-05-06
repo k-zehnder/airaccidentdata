@@ -53,7 +53,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ latitude, longitude }) => {
         // Extract the state features from the topojson
         const states = feature(
           us,
-          us.objects.states as GeometryCollection,
+          us.objects.states as GeometryCollection
         ).features;
 
         // If latitude and longitude are provided, update the map's center and zoom
