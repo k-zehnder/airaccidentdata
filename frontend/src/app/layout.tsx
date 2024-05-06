@@ -1,5 +1,5 @@
 import './globals.css';
-import { ThemeProvider } from '@/components/Theme-Provider';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import { cn } from '../lib/utils';
 import { GoogleAnalytics } from '@next/third-parties/google';
 
