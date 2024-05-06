@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Header from '@/components/Header';
-import Pagination from '@/components/Pagination';
-import InjuryBadges from '@/components/InjuryBadges';
+import Header from '@/components/header';
+import Pagination from '@/components/pagination';
+import InjuryBadges from '@/components/injuryBadges';
 import { useAccidentData } from '../hooks/useAccidentData';
-import Loader from '@/components/Loader';
+import Loader from '@/components/loader';
 import { formatDate } from '../lib/utils';
 
 const Home = () => {

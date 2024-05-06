@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ThemeToggle } from './ThemeToggle';
+import { ThemeToggle } from './theme-toggle';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlane } from '@fortawesome/free-solid-svg-icons';
