@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import Pagination from '@/components/pagination';
-import InjuryBadges from '@/components/InjuryBadges';
+import AccidentBadges from '@/components/AccidentBadges';
 import { useAccidentData } from '../hooks/useAccidentData';
 import Loader from '@/components/Loader';
 import { formatDate } from '../lib/utils';
@@ -81,8 +81,8 @@ const Home = () => {
                     {accident.aircraftDetails?.aircraft_make_name}{' '}
                     {accident.aircraftDetails?.aircraft_model_name}
                   </h3>
-                  {/* Badges for injuries */}
-                  <InjuryBadges accident={accident} />
+                  {/* Render contextual badges for accident specifics */}
+                  <AccidentBadges accident={accident} />
                   {/* Additional remarks */}
                   <p className="text-gray-500">{accident.remark_text}</p>
                 </div>
