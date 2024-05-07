@@ -103,7 +103,7 @@ const AccidentBadges: React.FC<AccidentBadgeProps> = ({ accident }) => {
       {/* Additional badges based on specific conditions found in remark text */}
       {(remark_text.toLowerCase().includes('bird') ||
         remark_text.toLowerCase().includes('birds')) && (
-        <Badge className="bg-blue-500 mb-1">Birds</Badge>
+        <Badge className="bg-blue-500 mb-1">Birdstrike</Badge>
       )}
       {(remark_text.toLowerCase().includes('stall') ||
         remark_text.toLowerCase().includes('stalled')) && (
