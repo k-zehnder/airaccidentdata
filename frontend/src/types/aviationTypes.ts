@@ -14,8 +14,7 @@ export interface Accident {
   location_city_name: string;
   location_state_name: string;
   location_country_name: string;
-  latitude?: number;
-  longitude?: number;
+  location?: Location;
   remark_text: string;
   event_type_description: string;
   fatal_flag: string;
