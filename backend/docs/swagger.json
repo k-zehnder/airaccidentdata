@@ -100,6 +100,103 @@
                 }
             }
         },
+        "/accidents/{id}/injuries": {
+            "get": {
+                "description": "Retrieve injury details for an accident based on the provided ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accidents"
+                ],
+                "summary": "Get injuries for an accident",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Accident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of injuries associated with the accident",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Injury"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid accident ID provided",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "No injuries found for the specified accident ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/accidents/{id}/location": {
+            "get": {
+                "description": "Retrieve location details of an accident by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accidents"
+                ],
+                "summary": "Get location by accident ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Accident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detailed location data",
+                        "schema": {
+                            "$ref": "#/definitions/models.Location"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid accident ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Location not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/aircrafts": {
             "get": {
                 "description": "Retrieve a list of all aircrafts with pagination.",
@@ -230,56 +327,6 @@
                     },
                     "404": {
                         "description": "Aircraft not found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/injuries/{id}": {
-            "get": {
-                "description": "Retrieve injury details for an accident based on the provided ID.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Injuries"
-                ],
-                "summary": "Get injuries for an accident",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Accident ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of injuries associated with the accident",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Injury"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid accident ID provided",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "No injuries found for the specified accident ID",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -452,6 +499,29 @@
                     "type": "string"
                 },
                 "person_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Location": {
+            "type": "object",
+            "properties": {
+                "city_name": {
+                    "type": "string"
+                },
+                "country_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "state_name": {
                     "type": "string"
                 }
             }

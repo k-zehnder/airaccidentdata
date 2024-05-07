@@ -36,7 +36,7 @@ export const createScraper = (db: Database): Scraper => {
   // Load the aircraft type mapping data from a specified JSON file.
   // This map will be used to find URLs for aircraft images based on their type.
   const aircraftTypeMap = loadAircraftTypeMap(
-    'src/parser/aircraftMapping.json'
+    'src/htmlParser/aircraftMapping.json'
   );
 
   // Function to fetch the original high-resolution image URL from a Wikipedia file page URL

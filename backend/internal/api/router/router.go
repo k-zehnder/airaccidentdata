@@ -39,11 +39,8 @@ func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 		{
 			accidents.GET("", controllers.GetAccidentsHandler(store, log))
 			accidents.GET("/:id", controllers.GetAccidentByIdHandler(store, log))
-		}
-
-		injuries := v1.Group("/injuries")
-		{
-			injuries.GET("/:id", controllers.GetInjuriesByAccidentIdHandler(store, log))
+			accidents.GET("/:id/location", controllers.GetLocationByAccidentIdHandler(store, log))
+			accidents.GET("/:id/injuries", controllers.GetInjuriesByAccidentIdHandler(store, log))
 		}
 	}
 
