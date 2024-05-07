@@ -1,13 +1,13 @@
 import { Badge } from '@/components/ui/badge';
 import { Accident } from '../types/aviationTypes';
 
-interface InjuryProps {
+interface AccidentBadgeProps {
   accident: Accident;
 }
 
-// Component to render badges for injuries
-const InjuryBadges: React.FC<InjuryProps> = ({ accident }) => {
-  const { injuries } = accident;
+// Component to render badges based on injury data and specific remark text conditions
+const AccidentBadges: React.FC<AccidentBadgeProps> = ({ accident }) => {
+  const { injuries, remark_text } = accident;
 
   // Initialize injury counts for each severity and person type
   const injuryCounts: { [key: string]: number } = {
@@ -39,9 +39,9 @@ const InjuryBadges: React.FC<InjuryProps> = ({ accident }) => {
   const getLabel = (count: number, singular: string, plural: string) =>
     count === 1 ? singular : plural;
 
-  // Render badges for each injury severity type present in the accident
   return (
     <>
+      {/* Render badges for injuries */}
       {injuryCounts.ground_fatal +
         injuryCounts.flight_crew_fatal +
         injuryCounts.cabin_crew_fatal +
@@ -99,8 +99,21 @@ const InjuryBadges: React.FC<InjuryProps> = ({ accident }) => {
           'Minor Injuries'
         )}`}</Badge>
       )}
+
+      {/* Additional badges based on specific conditions found in remark text */}
+      {(remark_text.toLowerCase().includes('bird') ||
+        remark_text.toLowerCase().includes('birds')) && (
+        <Badge className="bg-blue-500 mb-1">Birds</Badge>
+      )}
+      {(remark_text.toLowerCase().includes('stall') ||
+        remark_text.toLowerCase().includes('stalled')) && (
+        <Badge className="bg-purple-500 mb-1">Stall</Badge>
+      )}
+      {remark_text.toLowerCase().includes('fire') && (
+        <Badge className="bg-orange-500 mb-1">Fire</Badge>
+      )}
     </>
   );
 };
 
-export default InjuryBadges;
+export default AccidentBadges;
