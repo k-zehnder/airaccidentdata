@@ -154,27 +154,58 @@ func (s *Store) GetAccidents(page, limit int) ([]*models.Accident, int, error) {
 }
 
 // GetAccidentById fetches an accident by its ID from the database.
-func (s *Store) GetAccidentById(id int) (*models.Aircraft, error) {
-	query := `SELECT id, registration_number, aircraft_make_name, aircraft_model_name, aircraft_operator FROM Aircrafts WHERE id = ?`
+func (s *Store) GetAccidentById(id int) (*models.Accident, error) {
+	query := `
+		SELECT 
+			id, updated, entry_date, event_local_date, event_local_time, remark_text, event_type_description, fsdo_description,
+			flight_number, aircraft_missing_flag, aircraft_damage_description,
+			flight_activity, flight_phase, far_part, fatal_flag, aircraft_id
+		FROM Accidents
+		WHERE id = ?;
+	`
 
 	row := s.db.QueryRow(query, id)
 
-	var aircraft models.Aircraft
+	var accident models.Accident
 	err := row.Scan(
-		&aircraft.ID,
-		&aircraft.RegistrationNumber,
-		&aircraft.AircraftMakeName,
-		&aircraft.AircraftModelName,
-		&aircraft.AircraftOperator,
+		&accident.ID, &accident.Updated, &accident.EntryDate, &accident.EventLocalDate,
+		&accident.EventLocalTime, &accident.RemarkText, &accident.EventTypeDescription,
+		&accident.FSDODescription, &accident.FlightNumber, &accident.AircraftMissingFlag,
+		&accident.AircraftDamageDescription, &accident.FlightActivity, &accident.FlightPhase,
+		&accident.FARPart, &accident.FatalFlag, &accident.AircraftID,
 	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// Return nil for the accident if not found.
+			return nil, nil
+		}
+		// Return the error if any other error occurred.
+		return nil, fmt.Errorf("error scanning accident row: %w", err)
+	}
+
+	// Return the scanned accident.
+	return &accident, nil
+}
+
+// GetLocationByAccidentId retrieves location details based on an accident's location ID.
+func (s *Store) GetLocationByAccidentId(accidentId int) (*models.Location, error) {
+	query := `
+    SELECT Locations.id, Locations.city_name, Locations.state_name, Locations.country_name, Locations.latitude, Locations.longitude
+    FROM Locations
+    JOIN Accidents ON Locations.id = Accidents.location_id
+    WHERE Accidents.id = ?;
+    `
+	row := s.db.QueryRow(query, accidentId)
+
+	var location models.Location
+	err := row.Scan(&location.ID, &location.CityName, &location.StateName, &location.CountryName, &location.Latitude, &location.Longitude)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("error scanning aircraft row: %w", err)
+		return nil, fmt.Errorf("error fetching location: %w", err)
 	}
-
-	return &aircraft, nil
+	return &location, nil
 }
 
 // GetAllImagesForAircraft fetches all images associated with an aircraft by its ID.

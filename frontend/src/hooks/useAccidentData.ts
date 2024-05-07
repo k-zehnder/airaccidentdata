@@ -51,7 +51,7 @@ export const useAccidentData = (currentPage: number) => {
                 process.env.NEXT_PUBLIC_ENV === 'development'
                   ? 'http://localhost:8080'
                   : 'https://airaccidentdata.com'
-              }/api/v1/injuries/${accident.id}`;
+              }/api/v1/accidents/${accident.id}/injuries`;
               const injuriesResponse = await axios.get<{ injuries: Injury[] }>(
                 injuriesUrl
               );
@@ -99,43 +99,51 @@ export const useFetchAccidentDetails = (accidentId: string) => {
   useEffect(() => {
     const fetchAccidentDetails = async () => {
       setLoading(true);
-      try {
-        // Determine the base URL based on environment
-        const baseUrl =
-          process.env.NEXT_PUBLIC_ENV === 'development'
-            ? 'http://localhost:8080'
-            : 'https://airaccidentdata.com';
+      const baseUrl =
+        process.env.NEXT_PUBLIC_ENV === 'development'
+          ? 'http://localhost:8080'
+          : 'https://airaccidentdata.com';
 
-        const [accidentResponse, aircraftResponse, imageResponse] =
+      try {
+        // Fetch accident details
+        const accidentResponse = await axios.get<Accident>(
+          `${baseUrl}/api/v1/accidents/${accidentId}`
+        );
+        const aircraftId = accidentResponse.data.aircraft_id;
+
+        // Fetch additional data in parallel: aircraft details, images, and location
+        const [aircraftResponse, imageResponse, locationResponse] =
           await Promise.all([
-            axios.get<Accident>(`${baseUrl}/api/v1/accidents/${accidentId}`),
-            axios.get<Aircraft>(`${baseUrl}/api/v1/aircrafts/${accidentId}`),
+            axios.get<Aircraft>(`${baseUrl}/api/v1/aircrafts/${aircraftId}`),
             axios.get<{ images: { s3_url: string }[] }>(
-              `${baseUrl}/api/v1/aircrafts/${accidentId}/images`
+              `${baseUrl}/api/v1/aircrafts/${aircraftId}/images`
+            ),
+            axios.get<Location>(
+              `${baseUrl}/api/v1/accidents/${accidentId}/location`
             ),
           ]);
 
-        const accidentData = accidentResponse.data;
-        const aircraftData = aircraftResponse.data;
-        const imageData = imageResponse.data;
+        // Extract image URL if images are available
+        const imageUrl =
+          imageResponse.data.images.length > 0
+            ? imageResponse.data.images[0].s3_url
+            : '';
 
-        // Fetching the stored S3 URL for the aircraft image
-        const aircraftImageUrl =
-          imageData.images.length > 0 ? imageData.images[0].s3_url : '';
-
-        // Combine accident, aircraft details, and image URL
+        // Combine all fetched data into a single object
         const combinedData = {
-          ...accidentData,
-          aircraftDetails: aircraftData,
-          imageUrl: aircraftImageUrl,
+          ...accidentResponse.data,
+          aircraftDetails: aircraftResponse.data,
+          imageUrl: imageUrl,
+          location: locationResponse.data,
         };
 
         setAccidentDetails(combinedData);
       } catch (error) {
         console.error('Error fetching accident details:', error);
         setAccidentDetails(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchAccidentDetails();

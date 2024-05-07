@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/computers33333/airaccidentdata/internal/models"
 	"github.com/computers33333/airaccidentdata/internal/store"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -120,7 +121,47 @@ func GetAccidentByIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerF
 			return
 		}
 
+		if accident == nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Accident not found"})
+			return
+		}
+
 		c.JSON(http.StatusOK, accident)
+	}
+}
+
+// GetLocationByAccidentIdHandler returns a handler for fetching location details by accident ID.
+// @Summary Get location by accident ID
+// @Description Retrieve location details of an accident by its ID
+// @Tags Accidents
+// @Produce json
+// @Param id path int true "Accident ID"
+// @Success 200 {object} models.Location "Detailed location data"
+// @Failure 400 {object} models.ErrorResponse "Invalid accident ID"
+// @Failure 404 {object} models.ErrorResponse "Location not found"
+// @Failure 500 {object} models.ErrorResponse "Internal Server Error"
+// @Router /accidents/{id}/location [get]
+func GetLocationByAccidentIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		accidentId, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse{Message: "Invalid accident ID"})
+			return
+		}
+
+		location, err := store.GetLocationByAccidentId(accidentId)
+		if err != nil {
+			log.WithError(err).Error("Failed to fetch location")
+			c.JSON(http.StatusInternalServerError, models.ErrorResponse{Message: "Failed to fetch location"})
+			return
+		}
+
+		if location == nil {
+			c.JSON(http.StatusNotFound, models.ErrorResponse{Message: "Location not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, location)
 	}
 }
 
@@ -189,14 +230,14 @@ func GetAllImagesForAircraftHandler(store *store.Store, log *logrus.Logger) gin.
 // GetInjuriesByAccidentIdHandler returns a handler for fetching injury details associated with a specific accident.
 // @Summary Get injuries for an accident
 // @Description Retrieve injury details for an accident based on the provided ID.
-// @Tags Injuries
+// @Tags Accidents
 // @Produce json
 // @Param id path int true "Accident ID"
 // @Success 200 {array} models.Injury "List of injuries associated with the accident"
 // @Failure 400 {object} models.ErrorResponse "Invalid accident ID provided"
 // @Failure 404 {object} models.ErrorResponse "No injuries found for the specified accident ID"
 // @Failure 500 {object} models.ErrorResponse "Internal Server Error"
-// @Router /injuries/{id} [get]
+// @Router /accidents/{id}/injuries [get]
 func GetInjuriesByAccidentIdHandler(store *store.Store, log *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))

@@ -52,3 +52,12 @@ export interface Injury {
   count: number;
   accident_id: number;
 }
+
+export interface Location {
+  id: number;
+  city_name: string;
+  state_name: string;
+  country_name: string;
+  latitude: number;
+  longitude: number;
+}
