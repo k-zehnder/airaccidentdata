@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Accident } from '../types/accident';
+import { Accident } from '../types/aviationTypes';
 
 interface InjuryProps {
   accident: Accident;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Aircraft, Accident, Injury } from '@/types/accident';
+import { Aircraft, Accident, Injury, Location } from '@/types/aviationTypes';
 
 export const useAccidentData = (currentPage: number) => {
   const [accidents, setAccidents] = useState<Accident[]>([]);
@@ -125,7 +125,7 @@ export const useFetchAccidentDetails = (accidentId: string) => {
 
         // Extract image URL if images are available
         const imageUrl =
-          imageResponse.data.images.length > 0
+          imageResponse.data.images && imageResponse.data.images.length > 0
             ? imageResponse.data.images[0].s3_url
             : '';
 

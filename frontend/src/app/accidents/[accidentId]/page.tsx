@@ -18,12 +18,6 @@ const AccidentDetail: React.FC<AccidentDetailProps> = ({ params }) => {
   const { accidentId } = params;
   const { accidentDetails, isLoading } = useFetchAccidentDetails(accidentId);
 
-  useEffect(() => {
-    if (accidentDetails) {
-      console.log('Accident details:', accidentDetails);
-    }
-  }, [accidentDetails]);
-
   if (isLoading) {
     return (
       <>
@@ -82,13 +76,13 @@ const AccidentDetail: React.FC<AccidentDetailProps> = ({ params }) => {
         <section className="bg-white dark:bg-background/50 shadow-md rounded border p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-4">Location Information</h2>
           <p>
-            {accidentDetails?.location_city_name},{' '}
-            {accidentDetails?.location_state_name},{' '}
-            {accidentDetails?.location_country_name}
+            {accidentDetails?.location?.city_name},{' '}
+            {accidentDetails?.location?.state_name},{' '}
+            {accidentDetails?.location?.country_name}
           </p>
           <MapComponent
-            latitude={accidentDetails?.latitude}
-            longitude={accidentDetails?.longitude}
+            latitude={accidentDetails?.location?.latitude}
+            longitude={accidentDetails?.location?.longitude}
           />
         </section>
 
