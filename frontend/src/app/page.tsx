@@ -89,10 +89,7 @@ const Home = () => {
                 {/* Thumbnail */}
                 <div className="w-1/4 flex justify-end">
                   <img
-                    src={
-                      accident.imageUrl ||
-                      'https://upload.wikimedia.org/wikipedia/commons/e/e2/BK-117_Polizei-NRW_D-HNWL.jpg'
-                    }
+                    src={accident.imageUrl}
                     alt={`Thumbnail for ${accident.aircraft_id}`}
                     className="w-16 h-16 object-cover mb-2"
                   />
