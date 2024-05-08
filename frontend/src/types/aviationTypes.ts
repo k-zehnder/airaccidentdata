@@ -19,6 +19,7 @@ export interface Accident {
   location?: Location;
   location_id?: number;
   remark_text: string;
+  injuries?: Injury[];
 }
 
 export interface Aircraft {
