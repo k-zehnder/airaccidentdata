@@ -159,7 +159,7 @@ func (s *Store) GetAccidentById(id int) (*models.Accident, error) {
 		SELECT 
 			id, updated, entry_date, event_local_date, event_local_time, remark_text, event_type_description, fsdo_description,
 			flight_number, aircraft_missing_flag, aircraft_damage_description,
-			flight_activity, flight_phase, far_part, fatal_flag, aircraft_id
+			flight_activity, flight_phase, far_part, fatal_flag, location_id, aircraft_id
 		FROM Accidents
 		WHERE id = ?;
 	`
@@ -172,7 +172,7 @@ func (s *Store) GetAccidentById(id int) (*models.Accident, error) {
 		&accident.EventLocalTime, &accident.RemarkText, &accident.EventTypeDescription,
 		&accident.FSDODescription, &accident.FlightNumber, &accident.AircraftMissingFlag,
 		&accident.AircraftDamageDescription, &accident.FlightActivity, &accident.FlightPhase,
-		&accident.FARPart, &accident.FatalFlag, &accident.AircraftID,
+		&accident.FARPart, &accident.FatalFlag, &accident.LocationID, &accident.AircraftID,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
