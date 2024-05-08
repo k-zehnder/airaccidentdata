@@ -10,6 +10,8 @@ services:
       - 3000:3000
     env_file:
       - ./frontend/.env
+    environment:
+      - NEXT_PUBLIC_ENV=development
     depends_on:
       - backend
 
@@ -47,7 +49,7 @@ services:
       - MYSQL_DATABASE
       - MYSQL_USER
       - MYSQL_PASSWORD
-      - MYSQL_HOST
+      - MYSQL_HOST=mysql
       - MYSQL_PORT
 
   aircraft_scraper:
@@ -62,7 +64,7 @@ services:
     env_file:
       - ./aircraft_scraper/.env
     environment:
-      - MYSQL_HOST
+      - MYSQL_HOST=mysql
       - MYSQL_PORT
       - MYSQL_USER
       - MYSQL_PASSWORD
@@ -71,6 +73,16 @@ services:
       - AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY
       - AWS_S3_BUCKET
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/dev.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    depends_on:
+      - frontend
+      - backend
 
 volumes:
   mysql_airaccidentdata_dev:

@@ -1,6 +1,14 @@
 # Use the official Go image as the base image
 FROM golang:latest
 
+# Install necessary packages
+RUN apt-get update && apt-get install -y \
+    mysql-client \
+    wget \
+    && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && apt install -y ./google-chrome-stable_current_amd64.deb \
+    && rm -f google-chrome-stable_current_amd64.deb
+
 # Set the working directory for your application
 WORKDIR /app
 
@@ -16,6 +24,5 @@ COPY . .
 # Expose port 8080
 EXPOSE 8080
 
-# Command to build and run the Go application directly.
-# 'go run main.go' compiles and runs the application on the fly, which is ideal for development.
+# Command to run the application
 CMD ["go", "run", "main.go"]
