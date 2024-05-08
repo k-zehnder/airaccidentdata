@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import { buttonVariants } from '@/components/ui/button';
@@ -16,7 +16,9 @@ interface AccidentDetailProps {
 
 const AccidentDetail: React.FC<AccidentDetailProps> = ({ params }) => {
   const { accidentId } = params;
-  const { accidentDetails, isLoading } = useFetchAccidentDetails(accidentId);
+  const accidentIdNumber = parseInt(accidentId, 10);
+  const { accidentDetails, isLoading } =
+    useFetchAccidentDetails(accidentIdNumber);
 
   if (isLoading) {
     return (

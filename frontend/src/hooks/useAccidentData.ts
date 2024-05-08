@@ -1,6 +1,5 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Accident, Aircraft, Injury, Location } from '@/types/aviationTypes';
+import { Accident } from '@/types/aviationTypes';
 import {
   fetchAccidents,
   fetchAccidentDetails,
