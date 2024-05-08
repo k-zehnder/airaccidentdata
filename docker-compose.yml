@@ -1,66 +1,70 @@
-version: '3.8'
-
 services:
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: computers33333/airaccidentdata-frontend
     ports:
       - 3000:3000
-    networks:
-      - app-network
     env_file:
-      - .env
+      - ./frontend/.env
     environment:
-      - NEXT_PUBLIC_ENV
+      - NEXT_PUBLIC_ENV=production
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: computers33333/airaccidentdata-backend
     ports:
       - 8080:8080
-    networks:
-      - app-network
     env_file:
-      - .env
+      - ./backend/.env
     environment:
+      - GO_ENV=production
       - MYSQL_DSN
       - SERVER_ADDRESS
+      - GOOGLE_MAPS_API_KEY
 
   mysql:
     image: mysql:latest
     ports:
       - 3306:3306
     volumes:
-      - accident_data:/var/lib/mysql
-    networks:
-      - app-network
+      - mysql_airaccidentdata_prod:/var/lib/mysql
     env_file:
-      - .env
+      - ./backend/.env # MySQL uses the same .env file as backend
     environment:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - MYSQL_USER
       - MYSQL_PASSWORD
-      - MYSQL_HOST
+      - MYSQL_HOST=mysql
       - MYSQL_PORT
+
+  aircraft_scraper:
+    image: computers33333/airaccidentdata-aircraft_scraper
+    volumes:
+      - ./aircraft_scraper:/app 
+      - /app/node_modules 
+    depends_on:
+      - mysql
+    env_file:
+      - ./aircraft_scraper/.env
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_DATABASE
+      - AWS_REGION
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_S3_BUCKET
 
   nginx:
     image: nginx:latest
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
-      - ./frontend/nginx.conf:/etc/nginx/nginx.conf
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
+      - ./nginx/prod.conf:/etc/nginx/nginx.conf
 
 volumes:
-  accident_data:
+  mysql_airaccidentdata_prod:
     driver: local
