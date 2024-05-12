@@ -17,7 +17,7 @@ func NewConfig() *AppConfig {
 		DataSourceName: GetEnv("MYSQL_DSN", "default_dsn"),
 		Environment:    GetEnv("GO_ENV", "dev"),
 		ServerAddress:  GetEnv("SERVER_ADDRESS", "0.0.0.0:8080"),
-		SwaggerHost:    GetDefaultSwaggerHost(GetEnv("GO_ENV", "dev")),
+		SwaggerHost:    GetDefaultSwaggerHost(GetEnv("GO_ENV", "development")),
 	}
 }
 
@@ -32,9 +32,9 @@ func GetEnv(key, fallback string) string {
 // GetDefaultSwaggerHost returns the default Swagger host based on the environment.
 func GetDefaultSwaggerHost(env string) string {
 	switch env {
-	case "dev":
+	case "development":
 		return "localhost:8080"
 	default:
-		return ""
+		return "airaccidentdata.com"
 	}
 }

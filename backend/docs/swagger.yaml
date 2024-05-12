@@ -122,8 +122,9 @@ definitions:
     type: object
 info:
   contact: {}
-  description: This is the server for managing air accident data.
-  title: Air Accident Data API
+  description: API server for managing air accident data.
+  title: AirAccidentData.com API
+  version: "1"
 paths:
   /accidents:
     get:
