@@ -8,9 +8,9 @@ package main
 import (
 	"log"
 
-	_ "github.com/computers33333/airaccidentdata/docs" // Import for Swagger documentation generation
 	"github.com/joho/godotenv"
 
+	"github.com/computers33333/airaccidentdata/docs"
 	"github.com/computers33333/airaccidentdata/internal/api/server"
 	"github.com/computers33333/airaccidentdata/internal/config"
 	"github.com/computers33333/airaccidentdata/internal/store"
@@ -26,7 +26,8 @@ func main() {
 	// Load configuration settings
 	cfg := config.NewConfig()
 
-	// Initialize the data store
+	// Configure Swagger and initialize the database
+	docs.SwaggerInfo.Host = cfg.SwaggerHost
 	store, err := store.NewStore(cfg.DataSourceName)
 	if err != nil {
 		log.Fatalf("Failed to create store: %v", err)
