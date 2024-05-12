@@ -1,9 +1,10 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is the server for managing air accident data.",
-        "title": "Air Accident Data API",
-        "contact": {}
+        "description": "API server for managing air accident data.",
+        "title": "AirAccidentData.com API",
+        "contact": {},
+        "version": "1"
     },
     "basePath": "/api/v1",
     "paths": {
