@@ -16,6 +16,7 @@ const config = {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
     s3Bucket: process.env.AWS_S3_BUCKET!,
   },
+  typeMapPath: 'src/database/aircraftMapping.json',
 };
 
 export default config;
