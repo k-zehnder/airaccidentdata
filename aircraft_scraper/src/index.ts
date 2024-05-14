@@ -2,34 +2,38 @@
  * Orchestrates the image scraping and uploading pipeline for aircraft data.
  */
 import config from './config/config';
-import { createAxiosFetcher } from './imageFetcher/wikiImageFetcher';
-import { createCheerioParser } from './htmlParser/aircraftDataParser';
-import { createScraper } from './wikiScraper/aircraftImageScraper';
-import { createS3BucketUploader } from './awsIntegration/awsClient';
 import { createDatabaseConnection } from './database/dbConnector';
-import { processImages } from './imageProcessor/imageProcessor';
-import { uploadImagesAndUpdateDb } from './imageProcessor/imageUploader';
+import { createAxiosFetcher } from './helpers/wikiImageFetcher';
+import { createCheerioParser } from './helpers/aircraftHtmlParser';
+import { createAircraftImageScraper } from './services/scraper/aircraftImageScraper';
+import { createAWSClient } from './services/aws/awsClient';
 
-const main = async (): Promise<void> => {
+// Main function to coordinate scraping and uploading images.
+const main = async () => {
+  // Initialize database connection
+  const db = await createDatabaseConnection(config);
+
+  // Initialize the necessary helpers and clients
+  const parser = createCheerioParser();
+  const fetcher = createAxiosFetcher(parser);
+  const awsClient = createAWSClient(config, db);
+  const aircraftScraper = createAircraftImageScraper(db, fetcher);
+
   try {
-    // Initialize database and functional component instances
-    const db = await createDatabaseConnection(config);
-    const imageFetcher = createAxiosFetcher();
-    const htmlParser = createCheerioParser();
-    const aviationScraper = createScraper(db);
-    const awsClient = createS3BucketUploader(config);
+    // Scrape images using the aircraft scraper
+    const aircraftImages = await aircraftScraper.scrapeImages();
 
-    // Retrieve images from Wikipedia and store them in the database
-    await processImages(db, imageFetcher, htmlParser, aviationScraper, config);
+    // Upload images and handle database updates
+    await awsClient.uploadImagesAndHandleDb(aircraftImages);
 
-    // Upload images to S3 and update the database
-    await uploadImagesAndUpdateDb(db, awsClient, imageFetcher);
-
-    // Close database to free resources
-    await db.close();
+    console.log('All images processed and uploaded.');
   } catch (error) {
     console.error('Error in main process:', error);
+  } finally {
+    // Ensure the database connection is closed
+    await db.close();
   }
 };
 
+// Execute the main function
 main();

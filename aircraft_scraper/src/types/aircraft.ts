@@ -1,6 +1,5 @@
 export interface AircraftMapping {
   url: string;
-  type: 'exact' | 'direct' | 'indirect';
 }
 
 export interface AircraftType {

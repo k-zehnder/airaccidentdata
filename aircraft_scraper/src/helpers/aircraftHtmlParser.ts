@@ -1,3 +1,4 @@
+// Provides a parser using Cheerio to extract and modify image URLs from HTML and parse aircraft types.
 import cheerio from 'cheerio';
 
 export interface Parser {
@@ -6,7 +7,9 @@ export interface Parser {
   parseAircraftType(type: string): any;
 }
 
+// Creates a Cheerio parser
 const createCheerioParser = (): Parser => {
+  // Modifies the image URL to remove resolution and format it correctly
   const modifyImageUrl = (url: string): string => {
     if (!url.startsWith('//')) {
       return url;
@@ -21,6 +24,7 @@ const createCheerioParser = (): Parser => {
     return `https://en.wikipedia.org/wiki/File:${filename}`;
   };
 
+  // Extracts image URLs from the provided HTML
   const extractImageUrls = async (html: string): Promise<string[]> => {
     const $ = cheerio.load(html);
     const imageUrls: string[] = [];
@@ -37,14 +41,10 @@ const createCheerioParser = (): Parser => {
     return imageUrls;
   };
 
+  // Parses the aircraft type string into make, model, and registration number
   const parseAircraftType = (type: string) => {
-    // Extract registration number (last element)
     const registrationNumber = type.substring(type.lastIndexOf(' ') + 1);
-
-    // Extract make and model from the remaining string
     const makeAndModel = type.substring(0, type.lastIndexOf(' ')).trim();
-
-    // Split make and model by the last occurrence of a space
     const lastSpaceIndex = makeAndModel.lastIndexOf(' ');
     const make = makeAndModel.substring(0, lastSpaceIndex);
     const model = makeAndModel.substring(lastSpaceIndex + 1);

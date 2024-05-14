@@ -1,3 +1,4 @@
+// Provides a factory function to create a MySQL database connection and various database operations.
 import mysql, { RowDataPacket } from 'mysql2/promise';
 import { AircraftType } from '../types/aircraft';
 
@@ -43,6 +44,7 @@ export const createDatabaseConnection = async (
     }));
   };
 
+  // Function to update the aircraft image with S3 URL
   const updateAircraftImageWithS3Url = async (
     aircraftId: number,
     imageUrl: string,
@@ -85,6 +87,7 @@ export const createDatabaseConnection = async (
     }
   };
 
+  // Function to get all aircraft images
   const getAllAircraftImages = async (): Promise<
     { aircraftId: number; imageUrl: string }[]
   > => {
