@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const config = {
-  nodeEnv: process.env.NODE_ENV || 'development',
+  nodeEnv: process.env.NEXT_PUBLIC_ENV || 'development',
 };
 
 export default config;
