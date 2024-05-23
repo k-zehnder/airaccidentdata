@@ -1,27 +1,46 @@
-// Package config handles configuration management.
 package config
 
-import "os"
+import (
+	"fmt"
+	"log"
+	"os"
 
-// AppConfig represents the application's configuraton.
+	"github.com/computers33333/airaccidentdata/docs"
+	"github.com/joho/godotenv"
+)
+
+// AppConfig represents the application's configuration.
 type AppConfig struct {
-	DataSourceName string
-	Environment    string
-	ServerAddress  string
-	SwaggerHost    string
+	DataSourceName string // Database connection string
+	Environment    string // Application environment (e.g., "development", "production")
+	ServerAddress  string // Address on which the server should listen
+	SwaggerHost    string // Host for Swagger documentation
+	CSVFilePath    string // Path to the FAA data CSV file
 }
 
 // NewConfig initializes and returns a new AppConfig with default values obtained from environment variables.
 func NewConfig() *AppConfig {
-	return &AppConfig{
-		DataSourceName: GetEnv("MYSQL_DSN", "default_dsn"),
-		Environment:    GetEnv("GO_ENV", "dev"),
+	// Load environment variables
+	err := godotenv.Load()
+	if err != nil && !os.IsNotExist(err) {
+		log.Printf("Warning: Failed to load environment variables: %v", err)
+	}
+
+	config := &AppConfig{
+		DataSourceName: GetDataSourceName(),
+		Environment:    GetEnv("GO_ENV", "development"),
 		ServerAddress:  GetEnv("SERVER_ADDRESS", "0.0.0.0:8080"),
 		SwaggerHost:    GetDefaultSwaggerHost(GetEnv("GO_ENV", "development")),
+		CSVFilePath:    GetEnv("CSV_FILE_PATH", "downloaded_file.csv"),
 	}
+
+	// Configure Swagger host
+	docs.SwaggerInfo.Host = config.SwaggerHost
+
+	return config
 }
 
-// GetEnv retrieves the value of an environment variable or returns a fallback if it doesn't exist.
+// GetEnv retrieves the value of an environment variable or returns a fallback value if the variable is not set.
 func GetEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
@@ -37,4 +56,14 @@ func GetDefaultSwaggerHost(env string) string {
 	default:
 		return "airaccidentdata.com"
 	}
+}
+
+// GetDataSourceName constructs the MYSQL_DSN from individual environment variables.
+func GetDataSourceName() string {
+	user := GetEnv("MYSQL_USER", "user")
+	password := GetEnv("MYSQL_PASSWORD", "password")
+	host := GetEnv("MYSQL_HOST", "mysql")
+	port := GetEnv("MYSQL_PORT", "3306")
+	database := GetEnv("MYSQL_DATABASE", "airaccidentdata")
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", user, password, host, port, database)
 }

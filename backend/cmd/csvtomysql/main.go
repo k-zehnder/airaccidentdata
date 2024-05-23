@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"time"
@@ -20,27 +19,28 @@ import (
 	"github.com/computers33333/airaccidentdata/internal/config"
 	"github.com/computers33333/airaccidentdata/internal/models"
 	_ "github.com/go-sql-driver/mysql" // Blank identifier imports MySQL driver to initialize and register it.
-	"github.com/joho/godotenv"
 )
 
 // main is the entry point of the application, responsible for processing CSV data and inserting it into a MySQL database.
 func main() {
-	if err := loadEnv(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
+	// Load configuration
+	cfg := config.NewConfig()
 
-	db, err := setupDatabase()
+	// Initialize the database
+	db, err := setupDatabase(cfg.DataSourceName)
 	if err != nil {
 		log.Fatalf("Database setup failed: %v", err)
 	}
 	defer db.Close()
 
-	file, err := os.Open("downloaded_file.csv")
+	// Open the CSV file
+	file, err := os.Open(cfg.CSVFilePath)
 	if err != nil {
 		log.Fatalf("Failed to open file: %v", err)
 	}
 	defer file.Close()
 
+	// Process the CSV file
 	if err := processCSV(file, db); err != nil {
 		log.Fatalf("Failed to process CSV: %v", err)
 	}
@@ -68,8 +68,8 @@ func processCSV(file *os.File, db *sql.DB) error {
 
 	// Sort records by ENTRY_DATE in descending order
 	sort.Slice(records, func(i, j int) bool {
-		entryDate1, err1 := ParseDate(records[i][1])
-		entryDate2, err2 := ParseDate(records[j][1])
+		entryDate1, err1 := parseDate(records[i][1])
+		entryDate2, err2 := parseDate(records[j][1])
 		if err1 != nil || err2 != nil {
 			return false
 		}
@@ -135,15 +135,15 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident,
 		AircraftOperator:   record[12],
 	}
 
-	entryDate, err := ParseDate(record[1])
+	entryDate, err := parseDate(record[1])
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("error parsing entry date: %v", err)
 	}
-	eventLocalDate, err := ParseDate(record[2])
+	eventLocalDate, err := parseDate(record[2])
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("error parsing event local date: %v", err)
 	}
-	eventLocalTime, err := ParseTime(record[3])
+	eventLocalTime, err := parseTime(record[3])
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("error parsing event local time: %v", err)
 	}
@@ -320,11 +320,8 @@ func getCoordinates(place string) (float64, float64, error) {
 }
 
 // setupDatabase establishes a connection to the MySQL database.
-func setupDatabase() (*sql.DB, error) {
-	cfg := config.NewConfig()
-	dsn := cfg.DataSourceName
-
-	db, err := sql.Open("mysql", dsn)
+func setupDatabase(dataSourceName string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dataSourceName)
 	if err != nil {
 		return nil, fmt.Errorf("could not open database: %w", err)
 	}
@@ -334,26 +331,6 @@ func setupDatabase() (*sql.DB, error) {
 	}
 
 	return db, nil
-}
-
-// loadEnv searches for the .env file starting in the current directory and moving up.
-func loadEnv() error {
-	dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	for {
-		if _, err := os.Stat(filepath.Join(dir, ".env")); err == nil {
-			return godotenv.Load(filepath.Join(dir, ".env"))
-		}
-
-		parentDir := filepath.Dir(dir)
-		if parentDir == dir {
-			return fmt.Errorf("root directory reached, .env file not found")
-		}
-		dir = parentDir
-	}
 }
 
 // atoiSafe converts string to int, returns 0 if conversion fails or the string is empty.
@@ -370,7 +347,7 @@ func AtoiSafe(s string) int {
 }
 
 // Helper function to parse a date string into time.Time, returns time.Time and error.
-func ParseDate(dateStr string) (time.Time, error) {
+func parseDate(dateStr string) (time.Time, error) {
 	layout := "02-Jan-06"
 	t, err := time.Parse(layout, dateStr)
 	if err != nil {
@@ -380,7 +357,7 @@ func ParseDate(dateStr string) (time.Time, error) {
 }
 
 // Helper function to format a time string into time.Time, returns time.Time and error.
-func ParseTime(timeStr string) (string, error) {
+func parseTime(timeStr string) (string, error) {
 	layout := "15:04:05Z"
 	t, err := time.Parse(layout, timeStr)
 	if err != nil {

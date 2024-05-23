@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { Header } from '@/components/header';
 import Pagination from '@/components/pagination';
 import AccidentBadges from '@/components/AccidentBadges';
-import { useAccidentData } from '../hooks/useAccidentData';
+import { useFetchAccidentData } from '../hooks/useFetchAccidentData';
 import Loader from '@/components/Loader';
 import { formatDate } from '../lib/utils';
 
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const { accidents, totalPages, isFetching } = useAccidentData(currentPage);
+  const { accidents, totalPages, isFetching } =
+    useFetchAccidentData(currentPage);
 
   if (isFetching) {
     return (
