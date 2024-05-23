@@ -9,9 +9,7 @@ services:
     ports:
       - 3000:3000
     env_file:
-      - ./frontend/.env
-    environment:
-      - NEXT_PUBLIC_ENV=development
+      - .env
     depends_on:
       - backend
 
@@ -21,15 +19,26 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./backend:/app # Mounts the host backend directory to /app in the container
+      - ./backend/bin/init-db.sh:/app/init-db.sh # Mounts the host file to the container
+      - ./backend/internal/store/schema.sql:/app/schema.sql # Mounts the host file to the container
     ports:
       - 8080:8080
     env_file:
-      - ./backend/.env
-    environment:
-      - MYSQL_DSN
-      - SERVER_ADDRESS
+      - .env
     depends_on:
       - mysql
+
+  aircraft_scraper:
+    build:
+      context: ./aircraft_scraper
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./aircraft_scraper:/app # Mounts the host scraper directory to /app in the container
+      - /app/node_modules # An anonymous volume to prevent overwriting node_modules from the container
+    depends_on:
+      - mysql
+    env_file:
+      - .env
 
   mysql:
     image: mysql:latest
@@ -43,41 +52,12 @@ services:
     volumes:
       - mysql_airaccidentdata_dev:/var/lib/mysql # Persistent volume for MySQL data
     env_file:
-      - ./backend/.env # MySQL uses the same .env file as backend
-    environment:
-      - MYSQL_ROOT_PASSWORD
-      - MYSQL_DATABASE
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT
-
-  aircraft_scraper:
-    build:
-      context: ./aircraft_scraper
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./aircraft_scraper:/app # Mounts the host scraper directory to /app in the container
-      - /app/node_modules # An anonymous volume to prevent overwriting node_modules from the container
-    depends_on:
-      - mysql
-    env_file:
-      - ./aircraft_scraper/.env
-    environment:
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-      - MYSQL_DATABASE
-      - AWS_REGION
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
-      - AWS_S3_BUCKET
+      - .env
 
   nginx:
     image: nginx:latest
     volumes:
-      - ./nginx/dev.conf:/etc/nginx/nginx.conf
+      - ./nginx/development.conf:/etc/nginx/nginx.conf # Mounts the host file to the container
     ports:
       - 80:80
     depends_on:
