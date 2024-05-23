@@ -1,25 +1,34 @@
-# Stage 1: Build the Go application
-FROM golang:latest AS build
+# Use the official Golang image as the base image
+FROM golang:1.20
+
+# Set the Current Working Directory inside the container
 WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . ./
-RUN CGO_ENABLED=0 go build -o main .
 
-# Stage 2: Setup a smaller base image using Debian
-FROM debian:stable-slim  
-WORKDIR /root/
-
-# Install bash, mysql-client, wget, and Google Chrome
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     bash \
     default-mysql-client \
     wget \
     && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
-    && apt install -y ./google-chrome-stable_current_amd64.deb \
+    && apt-get install -y ./google-chrome-stable_current_amd64.deb \
     && rm -f google-chrome-stable_current_amd64.deb
 
-# Copy built binary from the build stage
-COPY --from=build /app/main .
+# Copy go mod and sum files
+COPY go.mod go.sum ./
+
+# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
+RUN go mod download
+
+# Copy the source from the current directory to the Working Directory inside the container
+COPY . .
+
+# Build the Go apps
+RUN go build -o /app/csvdownloader ./cmd/csvdownloader/main.go
+RUN go build -o /app/csvtomysql ./cmd/csvtomysql/main.go
+RUN go build -o /app/main ./main.go
+
+# This container exposes port 8080 to the outside world
 EXPOSE 8080
+
+# Run the init-db.sh script before starting the main executable
 CMD ["./main"]

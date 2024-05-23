@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import { buttonVariants } from '@/components/ui/button';
-import { useFetchAccidentDetails } from '@/hooks/useAccidentData';
+import { useFetchAccidentDetails } from '@/hooks/useFetchAccidentDetails';
 import MapComponent from '@/components/MapComponent';
 import Loader from '@/components/Loader';
 
