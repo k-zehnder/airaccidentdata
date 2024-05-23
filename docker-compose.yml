@@ -4,37 +4,14 @@ services:
     ports:
       - 3000:3000
     env_file:
-      - ./frontend/.env
-    environment:
-      - NEXT_PUBLIC_ENV=production
+      - .env
 
   backend:
     image: computers33333/airaccidentdata-backend
     ports:
       - 8080:8080
     env_file:
-      - ./backend/.env
-    environment:
-      - GO_ENV=production
-      - MYSQL_DSN
-      - SERVER_ADDRESS
-      - GOOGLE_MAPS_API_KEY
-
-  mysql:
-    image: mysql:latest
-    ports:
-      - 3306:3306
-    volumes:
-      - mysql_airaccidentdata_prod:/var/lib/mysql
-    env_file:
-      - ./backend/.env # MySQL uses the same .env file as backend
-    environment:
-      - MYSQL_ROOT_PASSWORD
-      - MYSQL_DATABASE
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT
+      - .env
 
   aircraft_scraper:
     image: computers33333/airaccidentdata-aircraft_scraper
@@ -44,26 +21,25 @@ services:
     depends_on:
       - mysql
     env_file:
-      - ./aircraft_scraper/.env
-    environment:
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-      - MYSQL_DATABASE
-      - AWS_REGION
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
-      - AWS_S3_BUCKET
+      - .env
+
+  mysql:
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_airaccidentdata_prod:/var/lib/mysql
+    env_file:
+      - .env
 
   nginx:
     image: nginx:latest
     ports:
-      - '80:80'
-      - '443:443'
+      - 80:80
+      - 443:443
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
-      - ./nginx/prod.conf:/etc/nginx/nginx.conf
+      - ./nginx/production.conf:/etc/nginx/nginx.conf
 
 volumes:
   mysql_airaccidentdata_prod:

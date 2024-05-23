@@ -106,7 +106,9 @@ export const createAxiosFetcher = (parser: Parser): Fetcher => {
   // and falls back to fetching from Wikipedia if no mapping is found.
   const fetchImages = async (aircraft: AircraftType): Promise<string[]> => {
     // Load the JSON data which maps aircraft types to Wikipedia URLs
-    const aircraftTypeMap = loadAircraftTypeMap(config.typeMapPath);
+    const aircraftTypeMap = loadAircraftTypeMap(
+      config.aircraftTypeToImageMapPath
+    );
 
     const searchTermsForMap = `${aircraft.make} ${aircraft.model}`;
     console.log(`Attempting to fetch images for ${searchTermsForMap}`);

@@ -11,7 +11,7 @@ push:
 .PHONY: run
 run:
 	@echo "Starting backend service..."
-	docker-compose up -d backend
+	docker compose up -d backend
 
 .PHONY: test
 test:
@@ -19,3 +19,8 @@ test:
 	go test -v -coverprofile=coverage.out ./...
 	@echo "Generating coverage report..."
 	go tool cover -html=coverage.out -o coverage.html
+
+.PHONY: fetch-data 
+fetch-data:
+	@echo "Running CSV downloader and CSV-to-MySQL processor..."
+	docker exec -it $(shell docker ps -qf "name=backend") sh -c "/app/csvdownloader && /app/csvtomysql"
