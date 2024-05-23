@@ -66,7 +66,7 @@
 
    ```bash
    cd backend
-   make data
+   make fetch-data
    cd ..
    ```
 
@@ -74,7 +74,7 @@
 
    ```bash
    cd aircraft_scraper
-   make images
+   make fetch-images
    cd ..
    ```
 
