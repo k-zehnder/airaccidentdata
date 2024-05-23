@@ -8,9 +8,6 @@ package main
 import (
 	"log"
 
-	"github.com/joho/godotenv"
-
-	"github.com/computers33333/airaccidentdata/docs"
 	"github.com/computers33333/airaccidentdata/internal/api/server"
 	"github.com/computers33333/airaccidentdata/internal/config"
 	"github.com/computers33333/airaccidentdata/internal/store"
@@ -18,23 +15,19 @@ import (
 
 // main sets up and starts the API server.
 func main() {
-	// Load environment variables from .env file
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Failed to load .env file: %v", err)
-	}
-
 	// Load configuration settings
 	cfg := config.NewConfig()
 
-	// Configure Swagger and initialize the database
-	docs.SwaggerInfo.Host = cfg.SwaggerHost
+	// Initialize the database store
 	store, err := store.NewStore(cfg.DataSourceName)
 	if err != nil {
 		log.Fatalf("Failed to create store: %v", err)
 	}
 
-	// Initialize and start the HTTP server
+	// Create the router
 	router := server.NewServer(store)
-	srv := server.StartServer(":8080", router)
+
+	// Start the HTTP server
+	srv := server.StartServer(cfg.ServerAddress, router)
 	defer server.GracefulShutdown(srv)
 }

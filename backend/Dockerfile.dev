@@ -1,9 +1,9 @@
-# Use the official Go image as the base image
-FROM golang:latest
+# Use the official Debian-based Go image
+FROM golang:1.20
 
 # Install necessary packages
 RUN apt-get update && apt-get install -y \
-    mysql-client \
+    default-mysql-client \
     wget \
     && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && apt install -y ./google-chrome-stable_current_amd64.deb \
@@ -24,5 +24,5 @@ COPY . .
 # Expose port 8080
 EXPOSE 8080
 
-# Command to run the application
-CMD ["go", "run", "main.go"]
+# Run the initialization script and start the Go application
+CMD ["sh", "-c", "/app/init-db.sh"]

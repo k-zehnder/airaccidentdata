@@ -16,17 +16,21 @@ const main = async () => {
   // Initialize the necessary helpers and clients
   const parser = createCheerioParser();
   const fetcher = createAxiosFetcher(parser);
-  const awsClient = createAWSClient(config, db);
   const aircraftScraper = createAircraftImageScraper(db, fetcher);
 
   try {
     // Scrape images using the aircraft scraper
     const aircraftImages = await aircraftScraper.scrapeImages();
 
-    // Upload images and handle database updates
-    await awsClient.uploadImagesAndHandleDb(aircraftImages);
+    if (config.nodeEnv !== 'development') {
+      // Upload images and handle database updates in non-development environments
+      const awsClient = createAWSClient(config, db);
+      await awsClient.uploadImagesAndHandleDb(aircraftImages);
+    } else {
+      console.log('Development mode: Skipping S3 upload.');
+    }
 
-    console.log('All images processed and uploaded.');
+    console.log('All images processed.');
   } catch (error) {
     console.error('Error in main process:', error);
   } finally {
