@@ -17,8 +17,8 @@ import (
 	"github.com/computers33333/airaccidentdata/internal/store"
 )
 
-// NewServer initializes a new Gin web server with custom logging and routing configured.
-func NewServer(store *store.Store) *gin.Engine {
+// NewRouter initializes a new Gin router with custom logging and routing configured.
+func NewRouter(store *store.Store) *gin.Engine {
 	log := logrus.New()
 	log.SetFormatter(&logrus.JSONFormatter{})
 	router := router.SetupRouter(store, log)
