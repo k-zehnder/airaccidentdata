@@ -8,6 +8,7 @@ package main
 import (
 	"log"
 
+	"github.com/computers33333/airaccidentdata/internal/api/router"
 	"github.com/computers33333/airaccidentdata/internal/api/server"
 	"github.com/computers33333/airaccidentdata/internal/config"
 	"github.com/computers33333/airaccidentdata/internal/store"
@@ -25,7 +26,7 @@ func main() {
 	}
 
 	// Create the router
-	router := server.NewServer(store)
+	router := router.NewRouter(store)
 
 	// Start the HTTP server
 	srv := server.StartServer(cfg.ServerAddress, router)

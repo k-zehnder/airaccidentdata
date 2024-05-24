@@ -12,6 +12,15 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// NewRouter initializes a new Gin web server with custom logging and routing configured.
+func NewRouter(store *store.Store) *gin.Engine {
+	log := logrus.New()
+	log.SetFormatter(&logrus.JSONFormatter{})
+	router := SetupRouter(store, log)
+
+	return router
+}
+
 // SetupRouter configures a Gin router with necessary routes, middleware, and CORS policies.
 func SetupRouter(store *store.Store, log *logrus.Logger) *gin.Engine {
 	router := gin.Default()
