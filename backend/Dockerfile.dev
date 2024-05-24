@@ -21,6 +21,11 @@ RUN go mod download
 # Copy the source from the current directory to the Working Directory inside the container
 COPY . .
 
+# Build the Go apps
+RUN go build -o /app/csvdownloader ./cmd/csvdownloader/main.go
+RUN go build -o /app/csvtomysql ./cmd/csvtomysql/main.go
+RUN go build -o /app/main ./main.go
+
 # Expose port 8080
 EXPOSE 8080
 
