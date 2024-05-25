@@ -70,7 +70,7 @@ const Home = () => {
               legacyBehavior
               href={`/accidents/${accident.id}`}
             >
-              <a className="block border-b-2 py-4 flex items-center  hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">
+              <a className="block border-b-2 py-4 flex items-center hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">
                 <div className="flex-1">
                   {/* Date */}
                   <span className="text-gray-500 text-sm block lg:text-base mb-1">
@@ -92,7 +92,7 @@ const Home = () => {
                   <img
                     src={accident.imageUrl}
                     alt={`Thumbnail for ${accident.aircraft_id}`}
-                    className="w-16 h-16 object-cover mb-2"
+                    className="w-16 h-16 object-contain mb-2"
                   />
                 </div>
               </a>
