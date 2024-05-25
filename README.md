@@ -23,6 +23,7 @@
 
    ```dotenv
    # MySQL Configuration
+   MYSQL_ROOT_USER=root
    MYSQL_ROOT_PASSWORD=password
    MYSQL_DATABASE=airaccidentdata
    MYSQL_USER=user
