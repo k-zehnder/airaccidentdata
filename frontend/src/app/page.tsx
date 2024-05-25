@@ -92,7 +92,7 @@ const Home = () => {
                   <img
                     src={accident.imageUrl}
                     alt={`Thumbnail for ${accident.aircraft_id}`}
-                    className="w-16 h-16 object-cover mb-2"
+                    className="w-16 h-16 object-contain mb-2"
                   />
                 </div>
               </a>
