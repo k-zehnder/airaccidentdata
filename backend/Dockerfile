@@ -26,7 +26,7 @@ RUN go mod download
 # Copy the source from the current directory to the Working Directory inside the container
 COPY . .
 
-# Ensure init-db.sh is executable
+# Ensure init-db.sh and run-csv-processors.sh are executable
 RUN chmod +x /app/bin/init-db.sh /app/bin/run-csv-processors.sh
 
 # Expose port 8080
