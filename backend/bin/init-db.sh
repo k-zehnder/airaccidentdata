@@ -16,7 +16,7 @@ mysql -h $MYSQL_HOST -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT
 
 # Apply the schema.sql (idempotent operation)
 echo "Applying schema..."
-mysql -h $MYSQL_HOST -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_DATABASE < /app/schema.sql
+mysql -h $MYSQL_HOST -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_DATABASE < /app/internal/store/schema.sql
 
 echo "Database initialization completed."
 

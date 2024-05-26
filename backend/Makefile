@@ -22,7 +22,5 @@ test:
 
 .PHONY: data
 data:
-	@echo "Building CSV downloader and CSV-to-MySQL processor in the container..."
-	docker exec -it $(shell docker ps -qf "name=backend") sh -c "go build -o /app/csvdownloader ./cmd/csvdownloader/main.go && go build -o /app/csvtomysql ./cmd/csvtomysql/main.go"
 	@echo "Running CSV downloader and CSV-to-MySQL processor in the container..."
-	docker exec -it $(shell docker ps -qf "name=backend") sh -c "/app/csvdownloader && /app/csvtomysql"
+	docker exec -it $(shell docker ps -qf "name=backend") sh -c "/app/bin/run-csv-processors.sh"
