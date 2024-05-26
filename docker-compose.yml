@@ -8,9 +8,6 @@ services:
 
   backend:
     image: computers33333/airaccidentdata-backend:latest
-    volumes:
-      - ./backend/bin/init-db.sh:/app/init-db.sh # Mounts the host file to the container
-      - ./backend/internal/store/schema.sql:/app/schema.sql # Mounts the host file to the container
     ports:
       - 8080:8080
     env_file:
