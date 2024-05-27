@@ -77,8 +77,8 @@
    For **Mac**:
 
    ```bash
-   brew install --cask docker
-   open /Applications/Docker.app
+   brew install docker
+   brew install docker-compose
    ```
 
    For **Windows**:
