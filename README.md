@@ -35,7 +35,7 @@
    GO_ENV=development
    SERVER_ADDRESS=0.0.0.0:8080
 
-   # AWS Configuration (for aircraft_scraper service, needed for production environment only)
+   # AWS Configuration (production only, for Cloudflare caching with S3 bucket)
    AWS_REGION=your-region
    AWS_ACCESS_KEY_ID=your-access-key-id
    AWS_SECRET_ACCESS_KEY=your-secret-access-key
@@ -46,16 +46,49 @@
 
    # Google Maps API Configuration
    GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-
-   # FAA Accident Data Configuration
-   CSV_FILE_PATH=downloaded_file.csv
    ```
 
-3. **Ensure Docker is Installed and Running:**
+3. **Obtain Google Maps Geocoding API Key:**
 
-   Make sure Docker is installed and running on your host machine. You can download Docker from [here](https://www.docker.com/products/docker-desktop).
+   To get the coordinates for accidents, you need a Google Maps Geocoding API key. Follow the instructions [here](https://developers.google.com/maps/documentation/geocoding/get-api-key) to obtain and configure your API key. Then, add it to your `.env` file:
 
-4. **Launch Development Environment with Docker:**
+   ```dotenv
+   GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+   ```
+
+4. **Ensure Docker is Installed and Running:**
+
+   Make sure Docker is installed and running on your host machine. You can download Docker Desktop from [here](https://www.docker.com/products/docker-desktop).
+
+   Alternatively, you can install Docker via the command line:
+
+   For **Ubuntu**:
+
+   ```bash
+   sudo apt-get update
+   sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+   sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+   sudo apt-get update
+   sudo apt-get install -y docker-ce
+   sudo systemctl status docker
+   ```
+
+   For **Mac**:
+
+   ```bash
+   brew install --cask docker
+   open /Applications/Docker.app
+   ```
+
+   For **Windows**:
+
+   ```powershell
+   Install-Package -Name docker -ProviderName DockerMsftProvider
+   Restart-Computer -Force
+   ```
+
+5. **Launch Development Environment with Docker:**
 
    This will build and start all necessary services:
 
@@ -63,7 +96,7 @@
    make dev
    ```
 
-5. **Populate the Database with Accident Data:**
+6. **Populate the Database with Accident Data:**
 
    ```bash
    cd backend
@@ -71,7 +104,7 @@
    cd ..
    ```
 
-6. **Populate the Database with Aircraft Images:**
+7. **Populate the Database with Aircraft Images:**
 
    ```bash
    cd aircraft_scraper
