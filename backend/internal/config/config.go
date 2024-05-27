@@ -62,7 +62,7 @@ func GetDefaultSwaggerHost(env string) string {
 	}
 }
 
-// GetDataSourceName constructs the MySQL DSN from individual environment variables.
+// GetDataSourceName constructs the MySQL Data Source Name (DSN) from individual environment variables.
 func GetDataSourceName() string {
 	user := GetEnv("MYSQL_USER", "user")
 	password := GetEnv("MYSQL_PASSWORD", "password")
