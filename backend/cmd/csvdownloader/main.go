@@ -8,20 +8,20 @@ import (
 	"os/exec"
 
 	"github.com/chromedp/chromedp"
+	"github.com/computers33333/airaccidentdata/internal/config"
 )
 
 // main is the entry point of the application. It loads environment variables from a .env file,
-// sets up a connection to the MySQL database, and processes a CSV file to insert data into the database.
+// fetches the Federal Aviation Administration accident data CSV file, and processes it to insert data into the MySQL database.
 func main() {
-	pageURL := "https://www.asias.faa.gov/apex/f?p=100:93:::NO:::"
-	outputPath := "downloaded_file.csv"
+	cfg := config.NewConfig()
 
-	downloadLink, err := fetchCsvDownloadLink(pageURL)
+	downloadLink, err := fetchCsvDownloadLink(cfg.PageURL)
 	if err != nil {
 		log.Fatalf("Error fetching CSV download link: %v", err)
 	}
 
-	if err := downloadCsvFile(downloadLink, outputPath); err != nil {
+	if err := downloadCsvFile(downloadLink, cfg.CSVFilePath); err != nil {
 		log.Fatalf("Error downloading CSV file: %v", err)
 	}
 

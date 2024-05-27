@@ -11,11 +11,13 @@ import (
 
 // AppConfig represents the application's configuration.
 type AppConfig struct {
-	DataSourceName string // Database connection string
-	Environment    string // Application environment (e.g., "development", "production")
-	ServerAddress  string // Address on which the server should listen
-	SwaggerHost    string // Host for Swagger documentation
-	CSVFilePath    string // Path to the FAA data CSV file
+	DataSourceName   string // Database connection string
+	Environment      string // Application environment (e.g., "development", "production")
+	ServerAddress    string // Address on which the server should listen
+	SwaggerHost      string // Host for Swagger documentation
+	PageURL          string // URL to fetch the FAA accident data CSV file
+	CSVFilePath      string // Path to save the downloaded FAA accident data CSV file
+	GoogleMapsAPIKey string // API Key for Google Maps
 }
 
 // NewConfig initializes and returns a new AppConfig with default values obtained from environment variables.
@@ -27,11 +29,13 @@ func NewConfig() *AppConfig {
 	}
 
 	config := &AppConfig{
-		DataSourceName: GetDataSourceName(),
-		Environment:    GetEnv("GO_ENV", "development"),
-		ServerAddress:  GetEnv("SERVER_ADDRESS", "0.0.0.0:8080"),
-		SwaggerHost:    GetDefaultSwaggerHost(GetEnv("GO_ENV", "development")),
-		CSVFilePath:    GetEnv("CSV_FILE_PATH", "downloaded_file.csv"),
+		DataSourceName:   GetDataSourceName(),
+		Environment:      GetEnv("GO_ENV", "development"),
+		ServerAddress:    GetEnv("SERVER_ADDRESS", "0.0.0.0:8080"),
+		SwaggerHost:      GetDefaultSwaggerHost(GetEnv("GO_ENV", "development")),
+		PageURL:          "https://www.asias.faa.gov/apex/f?p=100:93:::NO:::",
+		CSVFilePath:      "downloaded_file.csv",
+		GoogleMapsAPIKey: GetEnv("GOOGLE_MAPS_API_KEY", ""),
 	}
 
 	// Configure Swagger host
@@ -58,7 +62,7 @@ func GetDefaultSwaggerHost(env string) string {
 	}
 }
 
-// GetDataSourceName constructs the MYSQL_DSN from individual environment variables.
+// GetDataSourceName constructs the MySQL Data Source Name (DSN) from individual environment variables.
 func GetDataSourceName() string {
 	user := GetEnv("MYSQL_USER", "user")
 	password := GetEnv("MYSQL_PASSWORD", "password")
