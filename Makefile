@@ -34,6 +34,7 @@ deploy:
 	docker compose down
 	docker pull $(FRONTEND_IMAGE_TAG)
 	docker pull $(BACKEND_IMAGE_TAG)
+	docker pull $(AIRCRAFT_SCRAPER_IMAGE_TAG)
 	docker compose up -d
 	@echo "Application deployed successfully."
 
