@@ -13,6 +13,10 @@ run:
 	@echo "Starting aircraft_scraper service..."
 	docker compose up -d aircraft_scraper
 
+.PHONY: pull
+pull:
+	docker pull $(AIRCRAFT_SCRAPER_IMAGE_TAG)
+
 .PHONY: images 
 images:
 	@echo "Collecting aircraft images from Wikipedia..."
