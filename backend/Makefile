@@ -20,6 +20,11 @@ test:
 	@echo "Generating coverage report..."
 	go tool cover -html=coverage.out -o coverage.html
 
+.PHONY: pull
+pull:
+	@echo "Pulling backend Docker image..."
+	docker pull $(BACKEND_IMAGE_TAG)
+
 .PHONY: data
 data:
 	@echo "Running CSV downloader and CSV-to-MySQL processor in the container..."

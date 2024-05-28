@@ -13,6 +13,11 @@ run:
 	@echo "Starting frontend service..."
 	docker compose up -d frontend
 
+.PHONY: pull
+pull:
+	@echo "Pulling frontend Docker image..."
+	docker pull $(FRONTEND_IMAGE_TAG)
+
 .PHONY: dev
 dev:
 	@echo "Setting up development environment for frontend..."
