@@ -23,12 +23,12 @@
 
    ```dotenv
    # MySQL Configuration
-   MYSQL_ROOT_PASSWORD=password
+   MYSQL_HOST=mysql
+   MYSQL_PORT=3306
    MYSQL_DATABASE=airaccidentdata
    MYSQL_USER=user
    MYSQL_PASSWORD=password
-   MYSQL_HOST=mysql
-   MYSQL_PORT=3306
+   MYSQL_ROOT_PASSWORD=password
 
    # Backend Configuration
    GO_ENV=development
