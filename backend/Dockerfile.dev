@@ -35,11 +35,11 @@ RUN swag init
 # Verify Swagger docs generation
 RUN test -f docs/swagger.json && test -f docs/swagger.yaml
 
-# Ensure init-db.sh and run-csv-processors.sh are executable
-RUN chmod +x /app/bin/init-db.sh /app/bin/run-csv-processors.sh
+# Ensure entrypoint.sh and run-csv-processors.sh are executable
+RUN chmod +x /app/bin/entrypoint.sh /app/bin/run-csv-processors.sh
 
 # Expose port 8080
 EXPOSE 8080
 
 # Run the initialization script and start the Go application
-CMD ["/app/bin/init-db.sh"]
+ENTRYPOINT ["/app/bin/entrypoint.sh"]
