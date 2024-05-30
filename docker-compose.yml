@@ -12,30 +12,11 @@ services:
       - 8080:8080
     env_file:
       - .env
-    depends_on:
-      - mysql
 
   aircraft_scraper:
     image: computers33333/airaccidentdata-aircraft_scraper:latest
     env_file:
       - .env
-    depends_on:
-      - mysql
-
-  mysql:
-    image: mysql:latest
-    healthcheck:
-      test: ['CMD-SHELL', 'mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    ports:
-      - 3306:3306
-    volumes:
-      - mysql_airaccidentdata_prod:/var/lib/mysql
-    env_file:
-      - .env
-    restart: always
 
   nginx:
     image: nginx:latest
@@ -48,7 +29,3 @@ services:
     depends_on:
       - frontend
       - backend
-
-volumes:
-  mysql_airaccidentdata_prod:
-    driver: local
