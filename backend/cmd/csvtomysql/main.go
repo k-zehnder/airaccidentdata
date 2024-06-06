@@ -12,8 +12,10 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/computers33333/airaccidentdata/internal/config"
@@ -148,12 +150,22 @@ func parseRecordToIncident(record []string) (*models.Aircraft, *models.Accident,
 		return nil, nil, nil, fmt.Errorf("error parsing event local time: %v", err)
 	}
 
+	// Process the remark text
+	remarkText, city, state := ExtractCityState(record[7])
+	if city == "" {
+		city = record[4]
+	}
+	if state == "" {
+		state = record[5]
+	}
+	remarkText = ProcessRemark(remarkText, city, state)
+
 	incident := &models.Accident{
 		Updated:                   record[0],
 		EntryDate:                 entryDate,
 		EventLocalDate:            eventLocalDate,
 		EventLocalTime:            eventLocalTime,
-		RemarkText:                record[7],
+		RemarkText:                remarkText,
 		EventTypeDescription:      record[8],
 		FSDODescription:           record[9],
 		FlightNumber:              record[11],
@@ -317,6 +329,37 @@ func getCoordinates(place string) (float64, float64, error) {
 	lng := geoResp.Results[0].Geometry.Location.Lng
 
 	return lat, lng, nil
+}
+
+// ExtractCityState extracts the city and state from the remark text.
+func ExtractCityState(remarkText string) (string, string, string) {
+	// Define a regex pattern to capture city and state
+	pattern := `, ([A-Za-z\s]+), ([A-Z]{2})\.`
+	re := regexp.MustCompile(pattern)
+
+	// Find and extract city and state
+	match := re.FindStringSubmatch(remarkText)
+	if len(match) == 3 {
+		city := match[1]
+		state := match[2]
+		remarkText = strings.TrimSuffix(remarkText, match[0])
+		return remarkText, city, state
+	}
+
+	return remarkText, "", ""
+}
+
+// ProcessRemark processes the remark text by ensuring it ends with the provided city and state.
+func ProcessRemark(remarkText, city, state string) string {
+	// Extract any existing city and state
+	remarkText, _, _ = ExtractCityState(remarkText)
+
+	// Ensure the remarkText ends with a period
+	if !strings.HasSuffix(remarkText, ".") {
+		remarkText = strings.TrimSpace(remarkText) + "."
+	}
+
+	return fmt.Sprintf("%s %s, %s.", remarkText, strings.ToUpper(city), strings.ToUpper(state))
 }
 
 // setupDatabase establishes a connection to the MySQL database.
