@@ -1,5 +1,7 @@
 # airaccidentdata
 
+[![CI/CD Pipeline](https://github.com/k-zehnder/airaccidentdata/actions/workflows/workflow.yml/badge.svg)](https://github.com/k-zehnder/airaccidentdata/actions/workflows/workflow.yml)
+
 ## Quickstart
 
 1. **Clone the Repository:**
