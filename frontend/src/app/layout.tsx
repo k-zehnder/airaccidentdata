@@ -7,36 +7,31 @@ const fontStyling = {
   fontFamily: '"Inter", sans-serif',
 };
 
-interface Metadata {
-  title: string;
-  description: string;
-  faviconUrl: string;
-  ogImageUrl: string;
-}
-
-export const metadata: Metadata = {
-  title: 'airaccidentdata.com',
-  description: 'Latest plane crash accidents and incident news!',
-  faviconUrl: 'https://s.airaccidentdata.com/favicon.ico',
-  ogImageUrl: 'https://s.airaccidentdata.com/og-image.png',
-};
-
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   return (
     <html lang="en">
       <head>
-        <title>{metadata.title}</title>
-        <meta name="description" content={metadata.description} />
-        <meta property="og:title" content={metadata.title} />
-        <meta property="og:description" content={metadata.description} />
-        <meta property="og:image" content={metadata.ogImageUrl} />
+        <title>airaccidentdata.com</title>
+        <meta
+          name="description"
+          content="Latest plane crash accidents and incident news!"
+        />
+        <meta property="og:title" content="airaccidentdata.com" />
+        <meta
+          property="og:description"
+          content="Latest plane crash accidents and incident news!"
+        />
+        <meta
+          property="og:image"
+          content="https://s.airaccidentdata.com/og-image.png"
+        />
         <link
           rel="icon"
-          href={metadata.faviconUrl}
+          href="https://s.airaccidentdata.com/favicon.ico"
           type="image/x-icon"
           sizes="16x16"
         />
@@ -56,4 +51,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;
