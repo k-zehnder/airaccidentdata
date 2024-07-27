@@ -70,12 +70,12 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
     container_name: elasticsearch
     environment:
-      - discovery.type=single-node
-      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      - discovery.type=single-node # Elasticsearch single node discovery
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m' # Java options for Elasticsearch
     ports:
       - 9200:9200
     volumes:
-      - esdata:/usr/share/elasticsearch/data
+      - esdata:/usr/share/elasticsearch/data # Persistent volume for Elasticsearch data
 
 volumes:
   mysql_airaccidentdata_dev:
