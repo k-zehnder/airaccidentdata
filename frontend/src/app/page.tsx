@@ -1,31 +1,60 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Header } from '@/components/header';
 import Pagination from '@/components/pagination';
 import AccidentBadges from '@/components/AccidentBadges';
-import { useFetchAccidentData } from '../hooks/useFetchAccidentData';
+import SearchBar from '@/components/SearchBar';
 import Loader from '@/components/Loader';
-import { formatDate } from '../lib/utils';
+import { formatDate } from '@/lib/utils';
+import { Header } from '@/components/header';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAccidentData } from '@/hooks/useAccidentData';
+import SuspenseWrapper from '@/components/SuspenseWrapper';
 
-const Home = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const { accidents, totalPages, isFetching } =
-    useFetchAccidentData(currentPage);
+const Home: React.FC = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams() as URLSearchParams;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
-  if (isFetching) {
-    return (
-      <>
-        <Header />
-        <Loader />
-      </>
-    );
+  useEffect(() => {
+    const page = searchParams.get('page');
+    const query = searchParams.get('query');
+    if (page) setCurrentPage(Number(page));
+    if (query) setSearchQuery(query);
+  }, [searchParams]);
+
+  const { accidents, totalPages, isLoading } = useAccidentData(
+    currentPage,
+    searchQuery
+  );
+
+  const handleLogoClick = () => {
+    setSearchQuery('');
+    setCurrentPage(1);
+    router.push('/');
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+    router.push(`/?page=1&query=${query}`);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    router.push(`/?page=${page}&query=${searchQuery}`);
+  };
+
+  if (isLoading) {
+    return <Loader />;
   }
 
   return (
     <>
-      <Header />
+      <Header onLogoClick={handleLogoClick} />
+
       <main className="container mx-auto px-4 py-6">
         <div className="max-w-4xl mx-auto mb-6 text-center">
           <a
@@ -53,6 +82,7 @@ const Home = () => {
             </svg>
           </a>
         </div>
+
         <div className="max-w-4xl mx-auto mb-8">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-center">
             Explore Aviation Accidents and Insights
@@ -62,48 +92,46 @@ const Home = () => {
             safer flying future.
           </p>
         </div>
-        {/* Accidents list */}
+
+        <SearchBar onSearch={handleSearch} searchQuery={searchQuery} />
+
         <div className="max-w-4xl mx-auto">
           {accidents.map((accident) => (
             <Link
               key={accident.id}
-              legacyBehavior
-              href={`/accidents/${accident.id}`}
+              href={`/accidents/${accident.id}?page=${currentPage}`}
+              className="block border-b-2 py-4 flex items-center hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
             >
-              <a className="block border-b-2 py-4 flex items-center  hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">
-                <div className="flex-1">
-                  {/* Date */}
-                  <span className="text-gray-500 text-sm block lg:text-base mb-1">
-                    {formatDate(accident.entry_date)}
-                  </span>
-                  {/* Aircraft details */}
-                  <h3 className="text-xl font-semibold mb-1">
-                    {accident.aircraftDetails?.registration_number}:{' '}
-                    {accident.aircraftDetails?.aircraft_make_name}{' '}
-                    {accident.aircraftDetails?.aircraft_model_name}
-                  </h3>
-                  {/* Render contextual badges for accident specifics */}
-                  <AccidentBadges accident={accident} />
-                  {/* Additional remarks */}
-                  <p className="text-gray-500">{accident.remark_text}</p>
-                </div>
-                {/* Thumbnail */}
-                <div className="w-1/4 flex justify-end">
-                  <img
-                    src={accident.imageUrl}
-                    alt={`Thumbnail for ${accident.aircraft_id}`}
-                    className="w-16 h-16 object-contain mb-2"
-                  />
-                </div>
-              </a>
+              <div className="flex-1">
+                <span className="text-gray-500 text-sm block lg:text-base mb-1">
+                  {formatDate(accident.entry_date)}
+                </span>
+                <h3 className="text-xl font-semibold mb-1">
+                  {accident.aircraftDetails?.registration_number}:{' '}
+                  {accident.aircraftDetails?.aircraft_make_name}{' '}
+                  {accident.aircraftDetails?.aircraft_model_name}
+                </h3>
+                <AccidentBadges accident={accident} />
+                <p className="text-gray-500">{accident.remark_text}</p>
+              </div>
+              <div className="w-1/4 flex justify-end">
+                <img
+                  src={
+                    accident.imageUrl ||
+                    'https://upload.wikimedia.org/wikipedia/commons/e/e2/BK-117_Polizei-NRW_D-HNWL.jpg'
+                  }
+                  alt={`Thumbnail for ${accident.aircraft_id}`}
+                  className="w-16 h-16 object-contain mb-2"
+                />
+              </div>
             </Link>
           ))}
         </div>
-        {/* Pagination */}
+
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={handlePageChange}
           darkMode={true}
         />
       </main>
@@ -111,4 +139,12 @@ const Home = () => {
   );
 };
 
-export default Home;
+const Page: React.FC = () => {
+  return (
+    <SuspenseWrapper>
+      <Home />
+    </SuspenseWrapper>
+  );
+};
+
+export default Page;

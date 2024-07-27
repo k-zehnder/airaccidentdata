@@ -1,15 +1,18 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Accident } from '@/types/aviationTypes';
-import { createAccidentService } from '../services/accidentService';
-import config from '../config/config';
 
-// Default instance of the accident service
-const defaultAccidentService = createAccidentService(axios, config.nodeEnv);
+interface AccidentService {
+  fetchAccidents: (
+    page: number
+  ) => Promise<{ accidents: Accident[]; total: number }>;
+  fetchAircraftDetails: (aircraftId: number) => Promise<any>;
+  fetchAircraftImages: (aircraftId: number) => Promise<any>;
+  fetchAccidentInjuries: (accidentId: number) => Promise<any>;
+}
 
 export const useFetchAccidentData = (
   currentPage: number,
-  accidentService = defaultAccidentService
+  accidentService: AccidentService
 ) => {
   const [accidents, setAccidents] = useState<Accident[]>([]);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -23,39 +26,8 @@ export const useFetchAccidentData = (
         const { accidents, total } = await accidentService.fetchAccidents(
           currentPage
         );
-        const accidentsWithDetails = await Promise.all(
-          accidents.map(async (accident) => {
-            try {
-              const aircraftDetails =
-                await accidentService.fetchAircraftDetails(
-                  accident.aircraft_id
-                );
-              const images = await accidentService.fetchAircraftImages(
-                accident.aircraft_id
-              );
-              const injuries = await accidentService.fetchAccidentInjuries(
-                accident.id
-              );
-              return {
-                ...accident,
-                aircraftDetails,
-                imageUrl: images[0] || '',
-                injuries,
-              };
-            } catch (error) {
-              console.error(
-                `Error fetching details for accident ID ${accident.id}:`,
-                error
-              );
-              return null; // Important to return null in case of error
-            }
-          })
-        );
-
-        // Clean up the array by removing any null or falsy values
-        const filteredAccidents = accidentsWithDetails.filter(
-          (accident) => accident !== null && accident.aircraftDetails !== null
-        ) as Accident[];
+        const detailedAccidents = await getDetailedAccidents(accidents);
+        const filteredAccidents = filterValidAccidents(detailedAccidents);
         setAccidents(filteredAccidents);
         setTotalPages(Math.ceil(total / accidentsPerPage));
       } catch (error) {
@@ -66,6 +38,41 @@ export const useFetchAccidentData = (
 
     fetchAccidentsData();
   }, [currentPage, accidentService]);
+
+  const getDetailedAccidents = async (accidents: Accident[]) => {
+    return await Promise.all(
+      accidents.map(async (accident) => {
+        try {
+          const [aircraftDetails, images, injuries] = await Promise.all([
+            accidentService.fetchAircraftDetails(accident.aircraft_id),
+            accidentService.fetchAircraftImages(accident.aircraft_id),
+            accidentService.fetchAccidentInjuries(accident.id),
+          ]);
+          return {
+            ...accident,
+            aircraftDetails,
+            imageUrl:
+              images[0] ||
+              'https://upload.wikimedia.org/wikipedia/commons/e/e2/BK-117_Polizei-NRW_D-HNWL.jpg',
+            injuries,
+          };
+        } catch (error) {
+          console.error(
+            `Error fetching details for accident ID ${accident.id}:`,
+            error
+          );
+          return null;
+        }
+      })
+    );
+  };
+
+  const filterValidAccidents = (accidents: (Accident | null)[]): Accident[] => {
+    return accidents.filter(
+      (accident): accident is Accident =>
+        accident !== null && accident.aircraftDetails !== null
+    );
+  };
 
   return { accidents, totalPages, isFetching };
 };

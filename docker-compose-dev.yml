@@ -41,7 +41,11 @@ services:
   mysql:
     image: mysql:latest
     healthcheck:
-      test: ['CMD-SHELL', 'mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}']
+      test:
+        [
+          'CMD-SHELL',
+          'mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -62,6 +66,19 @@ services:
       - frontend
       - backend
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+    ports:
+      - 9200:9200
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
 volumes:
   mysql_airaccidentdata_dev:
+    driver: local
+  esdata:
     driver: local
