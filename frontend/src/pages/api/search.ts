@@ -65,6 +65,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       (hit: ElasticSearchHit<Accident>) => hit._source
     );
     const total = response.hits.total.value;
+
+    // Set Cache-Control headers
+    res.setHeader('Cache-Control', 'public, max-age=7200, s-maxage=7200');
     res.status(200).json({ results, total });
   } catch (error) {
     console.error('Search service error:', error);
