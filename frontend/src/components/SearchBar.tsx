@@ -22,7 +22,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchQuery }) => {
           setQuery(e.target.value)
         }
         placeholder="Search accidents..."
-        className="w-3/4 p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-blue-500"
+        className="w-full max-w-lg p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-blue-500"
       />
       <button
         type="submit"
