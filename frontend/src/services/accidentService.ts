@@ -45,7 +45,7 @@ export const createAccidentService = (
       images: { s3_url?: string; image_url?: string }[] | null;
     }>(apiUrl);
 
-    // Check for s3_url or use image_url as a fallback
+    // Attempt to retrieve the s3_url for each image; fallback to image_url or a default placeholder if unavailable
     return (
       response.data.images?.map(
         (img) =>
