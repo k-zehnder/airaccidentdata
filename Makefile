@@ -16,6 +16,7 @@ build:
 	$(MAKE) -C frontend build
 	$(MAKE) -C backend build
 	$(MAKE) -C aircraft_scraper build
+	$(MAKE) -C elastic build
 
 .PHONY: test
 test:

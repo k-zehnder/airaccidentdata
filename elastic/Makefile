@@ -1,7 +1,7 @@
 .PHONY: index
 index:
 	@echo "Indexing data into Elasticsearch..."
-	@echo "Use `make index ARGS=--clear` to clear index"
+	@echo "Use 'make index ARGS=--clear' to clear index"
 	docker exec -it $(shell docker ps -qf "name=elastic_indexer") sh -c "ts-node src/index.ts $(ARGS)"
 
 .PHONY: build
