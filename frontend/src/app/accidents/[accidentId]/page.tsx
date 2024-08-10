@@ -1,13 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
-import { useFetchAccidentDetails } from '@/hooks/useFetchAccidentDetails';
 import MapComponent from '@/components/MapComponent';
 import Loader from '@/components/Loader';
 import { Header } from '@/components/header';
 import { useRouter } from 'next/navigation';
+import { useAccidentContext } from '@/contexts/AccidentContext';
+import { Accident } from '@/types/aviationTypes';
 
 interface AccidentDetailProps {
   params: {
@@ -19,8 +20,17 @@ const AccidentDetail: React.FC<AccidentDetailProps> = ({ params }) => {
   const router = useRouter();
   const { accidentId } = params;
   const accidentIdNumber = parseInt(accidentId, 10);
-  const { accidentDetails, isLoading } =
-    useFetchAccidentDetails(accidentIdNumber);
+
+  const { fetchAccidentDetails, isLoading } = useAccidentContext();
+  const [accidentDetails, setAccidentDetails] = useState<Accident | null>(null);
+
+  useEffect(() => {
+    const loadAccidentDetails = async () => {
+      const details = await fetchAccidentDetails(accidentIdNumber);
+      setAccidentDetails(details);
+    };
+    loadAccidentDetails();
+  }, [accidentIdNumber]);
 
   const handleLogoClick = () => {
     router.push('/');

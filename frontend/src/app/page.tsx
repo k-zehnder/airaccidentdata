@@ -9,7 +9,7 @@ import Loader from '@/components/Loader';
 import { formatDate } from '@/lib/utils';
 import { Header } from '@/components/header';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAccidentData } from '@/hooks/useAccidentData';
+import { useAccidentContext } from '@/contexts/AccidentContext';
 import SuspenseWrapper from '@/components/SuspenseWrapper';
 
 const Home: React.FC = () => {
@@ -25,10 +25,12 @@ const Home: React.FC = () => {
     if (query) setSearchQuery(query);
   }, [searchParams]);
 
-  const { accidents, totalPages, isLoading } = useAccidentData(
-    currentPage,
-    searchQuery
-  );
+  const { accidents, totalPages, isLoading, fetchAccidents } =
+    useAccidentContext();
+
+  useEffect(() => {
+    fetchAccidents(currentPage, searchQuery);
+  }, [currentPage, searchQuery]);
 
   const handleLogoClick = () => {
     setSearchQuery('');
