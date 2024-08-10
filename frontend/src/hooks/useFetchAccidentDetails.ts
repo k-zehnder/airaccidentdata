@@ -31,15 +31,11 @@ export const useFetchAccidentDetails = (
           accidentService.fetchLocation(accidentId),
         ]);
 
-        const imageUrl =
-          images[0] ||
-          'https://upload.wikimedia.org/wikipedia/commons/e/e2/BK-117_Polizei-NRW_D-HNWL.jpg';
-
         // Update state with all fetched details
         setAccidentDetails({
           ...accident,
           aircraftDetails,
-          imageUrl,
+          imageUrl: images[0],
           location,
         });
       } catch (error) {

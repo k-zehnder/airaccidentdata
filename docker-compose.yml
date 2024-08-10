@@ -43,6 +43,14 @@ services:
     env_file:
       - .env
 
+  elastic_indexer:
+    image: computers33333/airaccidentdata-elastic_indexer:latest
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - elasticsearch
+
 volumes:
   esdata:
     driver: local

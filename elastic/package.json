@@ -11,7 +11,10 @@
   "description": "",
   "dependencies": {
     "@elastic/elasticsearch": "^8.14.0",
+    "@types/mysql": "^2.15.26",
     "dotenv": "^16.4.5",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.11.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
     "yargs": "^17.7.2"

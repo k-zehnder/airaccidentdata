@@ -5,7 +5,7 @@ dotenv.config();
 
 const config = {
   mysql: {
-    host: process.env.MYSQL_HOST || 'localhost',
+    host: process.env.MYSQL_HOST || 'mysql',
     user: process.env.MYSQL_USER || 'root',
     password: process.env.MYSQL_PASSWORD || 'password',
     database: process.env.MYSQL_DATABASE || 'airaccidentdata',
@@ -14,7 +14,7 @@ const config = {
     queueLimit: 0,
   },
   elasticsearch: {
-    host: process.env.ELASTICSEARCH_HOST || 'http://localhost:9200',
+    host: process.env.ELASTICSEARCH_HOST || 'http://elasticsearch:9200',
     apiKey: process.env.ELASTICSEARCH_API_KEY || '',
   },
 };

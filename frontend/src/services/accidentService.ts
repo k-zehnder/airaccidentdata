@@ -42,9 +42,18 @@ export const createAccidentService = (
   const fetchAircraftImages = async (aircraftId: number): Promise<string[]> => {
     const apiUrl = `${baseUrl}/api/v1/aircrafts/${aircraftId}/images`;
     const response = await httpClient.get<{
-      images: { s3_url: string }[] | null;
+      images: { s3_url?: string; image_url?: string }[] | null;
     }>(apiUrl);
-    return response.data.images?.map((img) => img.s3_url) || [];
+
+    // Attempt to retrieve the s3_url for each image; fallback to image_url or a default placeholder if unavailable
+    return (
+      response.data.images?.map(
+        (img) =>
+          img.s3_url ||
+          img.image_url ||
+          'https://upload.wikimedia.org/wikipedia/commons/e/e2/BK-117_Polizei-NRW_D-HNWL.jpg'
+      ) || []
+    );
   };
 
   // Fetch injury data for a specific accident
