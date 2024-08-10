@@ -110,6 +110,14 @@
    cd ..
    ```
 
+8. **Index Data into Elasticsearch:**
+
+   ```bash
+   cd elastic
+   make index
+   cd ..
+   ```
+
    Your development environment should now be running.
 
 ## Accessing the Application

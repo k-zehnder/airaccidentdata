@@ -50,7 +50,7 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - 3306:3306
+      - 3307:3306
     volumes:
       - mysql_airaccidentdata_dev:/var/lib/mysql # Persistent volume for MySQL data
     env_file:
@@ -76,6 +76,18 @@ services:
       - 9200:9200
     volumes:
       - esdata:/usr/share/elasticsearch/data # Persistent volume for Elasticsearch data
+
+  elastic_indexer:
+    build:
+      context: ./elastic
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./elastic:/app # Mount the elastic directory to /app in the container
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - elasticsearch
 
 volumes:
   mysql_airaccidentdata_dev:

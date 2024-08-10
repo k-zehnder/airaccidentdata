@@ -104,10 +104,6 @@ const createElasticOperations = (
   },
 });
 
-// Parse command line arguments using built-in process.argv
-const args = process.argv.slice(2);
-const clearFlag = args.includes('--clear');
-
 // Execute indexing, searching, and fetching recent accidents with optional clearing
 const run = async (clear: boolean = false): Promise<void> => {
   // Initialize MySQL connection pool
@@ -140,5 +136,9 @@ const run = async (clear: boolean = false): Promise<void> => {
   await elasticOps.fetchRecentAccidentsFromElastic(5);
 };
 
-// Run the script with the clear flag
+// Parse command line arguments using built-in process.argv
+const args = process.argv.slice(2);
+const clearFlag = args.includes('--clear');
+
+// Run the script
 run(clearFlag);
