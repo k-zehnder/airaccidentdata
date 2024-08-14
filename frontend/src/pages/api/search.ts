@@ -18,6 +18,7 @@ export interface ElasticSearchResponse<T> {
   };
 }
 
+// Initialize Elasticsearch client
 const client = new Client({
   node: 'http://elasticsearch:9200',
   auth: {
@@ -32,14 +33,27 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let response: ElasticSearchResponse<Accident>;
 
     if (query) {
-      // Search by query with pagination
+      // Search by query with pagination, including registration number
       response = (await client.search<ElasticSearchResponse<Accident>>({
         index: 'accidents',
         body: {
           query: {
-            multi_match: {
-              query,
-              fields: ['remark_text', 'aircraftDetails.aircraft_make_name'],
+            bool: {
+              should: [
+                {
+                  // Exact match for the registration number
+                  term: {
+                    'aircraftDetails.registration_number.keyword': query,
+                  },
+                },
+                {
+                  // Fallback to multi-match search across other fields
+                  multi_match: {
+                    query,
+                    fields: ['*'],
+                  },
+                },
+              ],
             },
           },
           from: (page - 1) * size,
@@ -47,7 +61,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         },
       })) as unknown as ElasticSearchResponse<Accident>;
     } else {
-      // Fetch most recent accidents with pagination
+      // Fetch the most recent accidents with pagination if no query is provided
       response = (await client.search<ElasticSearchResponse<Accident>>({
         index: 'accidents',
         body: {
@@ -61,6 +75,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       })) as unknown as ElasticSearchResponse<Accident>;
     }
 
+    // Map the Elasticsearch hits to the response format
     const results = response.hits.hits.map(
       (hit: ElasticSearchHit<Accident>) => hit._source
     );
