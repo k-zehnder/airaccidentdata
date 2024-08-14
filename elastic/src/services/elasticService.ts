@@ -38,11 +38,13 @@ export const createElasticService = (client: Client): ElasticService => {
           bool: {
             should: [
               {
+                // Exact match for the registration number
                 term: {
-                  'aircraftDetails.registration_number.keyword': query, // Exact match for registration number
+                  'aircraftDetails.registration_number.keyword': query,
                 },
               },
               {
+                // Fallback to multi-match search across other fields
                 multi_match: {
                   query,
                   fields: ['*'],
