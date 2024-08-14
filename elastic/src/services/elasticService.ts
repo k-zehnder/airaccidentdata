@@ -35,9 +35,24 @@ export const createElasticService = (client: Client): ElasticService => {
       index: 'accidents',
       body: {
         query: {
-          multi_match: {
-            query,
-            fields: ['remark_text', 'event_type_description', 'fatal_flag'],
+          bool: {
+            should: [
+              {
+                term: {
+                  'aircraftDetails.registration_number.keyword': query, // Exact match for registration number
+                },
+              },
+              {
+                multi_match: {
+                  query,
+                  fields: [
+                    'remark_text',
+                    'event_type_description',
+                    'fatal_flag',
+                  ],
+                },
+              },
+            ],
           },
         },
       },
