@@ -50,10 +50,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                   // Fallback to multi-match search across other fields
                   multi_match: {
                     query,
-                    fields: [
-                      'remark_text',
-                      'aircraftDetails.aircraft_make_name',
-                    ],
+                    fields: ['*'],
                   },
                 },
               ],
