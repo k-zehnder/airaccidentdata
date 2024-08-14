@@ -45,11 +45,7 @@ export const createElasticService = (client: Client): ElasticService => {
               {
                 multi_match: {
                   query,
-                  fields: [
-                    'remark_text',
-                    'event_type_description',
-                    'fatal_flag',
-                  ],
+                  fields: ['*'],
                 },
               },
             ],
