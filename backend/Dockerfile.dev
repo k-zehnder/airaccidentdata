@@ -1,5 +1,5 @@
 # Use the official Debian-based Go image
-FROM golang:1.20
+FROM golang:1.23
 
 # Install necessary packages
 # - default-mysql-client: Required for MySQL database interactions
